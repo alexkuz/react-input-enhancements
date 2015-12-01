@@ -1,16 +1,20 @@
 {
   "stage": 0,
   "optional": "runtime",
-  "plugins": [
-    "react-transform"
-  ],
-  "extra": {
-    "react-transform": {
-      "transforms": [{
-        "transform": "react-transform-hmr",
-        "imports": ["react"],
-        "locals": ["module"]
-      }]
+  "env": {
+    "development": {
+      "plugins": [
+        "react-transform"
+      ],
+      "extra": {
+        "react-transform": {
+          "transforms": [{
+            "transform": "react-transform-hmr",
+            "imports": ["react"],
+            "locals": ["module"]
+          }]
+        }
+      }
     }
   }
 }
