@@ -4,7 +4,7 @@
   "description": "React component boilerplate",
   "scripts": {
     "build:lib": "babel src --out-dir lib",
-    "build:demo": "NODE_ENV=production webpack -p",
+    "build:demo": "NODE_ENV=production webpack -p --optimize-dedupe",
     "stats": "webpack --profile --json > stats.json",
     "start": "webpack-dev-server",
     "lint": "eslint src",

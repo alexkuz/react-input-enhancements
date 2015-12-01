@@ -48,12 +48,7 @@ module.exports = {
     }),
     new webpack.NoErrorsPlugin(),
     new NyanProgressWebpackPlugin()
-  ].concat(isProduction ? [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: { warnings: false },
-      output: { comments: false }
-    })
-  ] : [
+  ].concat(isProduction ? [] : [
     new ExportFilesWebpackPlugin('index.html'),
     new webpack.HotModuleReplacementPlugin()
   ]),
