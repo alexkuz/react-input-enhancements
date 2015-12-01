@@ -1,0 +1,15 @@
+.inline-input {
+  display: inline;
+}
+
+.inline-input .input-group,
+.inline-input .input-group-addon {
+  display: inline;
+}
+
+.inline-input .form-control,
+.inline-input .input-group .form-control {
+  width: auto;
+  display: inline;
+  float: none;
+}
