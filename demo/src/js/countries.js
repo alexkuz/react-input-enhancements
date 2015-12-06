@@ -1,4 +1,6 @@
 export default [
+  { text: 'No Country', value: null },
+  null,
   'Afghanistan',
   'Albania',
   'Algeria',

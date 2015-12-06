@@ -60,6 +60,7 @@ export default class Autosize extends Component {
       for(const [key, val] of Object.entries(sizerContainerStyle)) {
         sizersListEl.style[key] = val;
       }
+      sizersListEl.style.whiteSpace = 'pre';
       this.props.getSizerContainer().appendChild(sizersListEl);
     }
 
@@ -82,10 +83,9 @@ export default class Autosize extends Component {
     this.updateWidth(this.props.text, this.props.minWidth);
   }
 
-  componentWillUpdate(nextProps, nextState) {
-    if (nextProps.text !== this.props.text ||
-        nextState.minWidth !== this.state.minWidth) {
-      this.updateWidth(nextProps.text, nextState.minWidth);
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.text !== this.props.text) {
+      this.updateWidth(nextProps.text, this.state.minWidth);
     }
   }
 
@@ -129,7 +129,7 @@ export default class Autosize extends Component {
 
     this.setState({
       width: Math.max(
-        this.sizerEl.offsetWidth,
+        this.sizerEl.offsetWidth + 1,
         minWidth
       )
     });
@@ -144,7 +144,10 @@ export default class Autosize extends Component {
     } else {
       const input = Children.only(children);
 
-      return React.cloneElement(input, { ...props, style: { width: width + 'px' } });
+      return React.cloneElement(input, {
+        ...props,
+        style: { ...(props.style || {}), width: width ? width + 'px' : 'auto' }
+      });
     }
   }
 }

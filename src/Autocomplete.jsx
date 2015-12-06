@@ -2,23 +2,7 @@ import { Component, PropTypes, Children } from 'react';
 import ReactDOM from 'react-dom';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import * as shapes from './shapes';
-
-function findMatchingText(text, options) {
-  if (!text) {
-    return null;
-  }
-
-  const lowerText = text.toLowerCase();
-
-  for(const opt of options) {
-    const optText = (opt && opt.text ? opt.text : opt);
-    if (optText && optText.toLowerCase().indexOf(lowerText) === 0) {
-      return optText;
-    }
-  }
-
-  return null;
-}
+import findMatchingText from './findMatchingText';
 
 function setSelection(input, text, matchingText) {
   input.value = matchingText;
@@ -61,7 +45,8 @@ export default class Autocomplete extends Component {
     if (e.keyCode === 8) {
       const input = this.getInput();
       if (input.selectionStart !== input.selectionEnd &&
-          input.selectionEnd === input.value.length) {
+          input.selectionEnd === input.value.length &&
+          input.selectionStart !== 0) {
         input.value = input.value.substr(0, input.selectionStart);
       }
     }

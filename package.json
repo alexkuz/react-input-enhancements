@@ -32,12 +32,14 @@
     "eslint-plugin-babel": "^2.1.1",
     "eslint-plugin-react": "^3.2.3",
     "export-files-webpack-plugin": "0.0.1",
+    "expose-loader": "^0.7.1",
     "html-webpack-plugin": "^1.6.1",
     "imports-loader": "^0.6.4",
     "json-loader": "^0.5.2",
     "nyan-progress-webpack-plugin": "^1.1.4",
     "postcss-loader": "^0.8.0",
     "raw-loader": "^0.5.1",
+    "react-addons-perf": "^0.14.3",
     "react-bootstrap": "^0.28.1",
     "react-pure-render": "^1.0.2",
     "react-transform-hmr": "^1.0.1",
@@ -52,7 +54,8 @@
   "dependencies": {
     "classnames": "^2.2.1",
     "jss": "^3.2.0",
-    "jss-nested": "^1.0.1"
+    "jss-nested": "^1.0.1",
+    "jss-vendor-prefixer": "^1.0.1"
   },
   "author": "Alexander <alexkuz@gmail.com> (http://kuzya.org/)",
   "license": "MIT"
