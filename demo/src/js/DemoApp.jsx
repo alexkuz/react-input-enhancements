@@ -33,18 +33,20 @@ const ValueInput2 = pure(({ value, onChange }) =>
 
 const code1and2 = `
   This text has no default width:{' '}
-  <Autosize value={value}>
+  <Autosize defaultValue={value}
+            onChange={e => onChange(e.target.value)}>
     <Input type='text'
            standalone
-           onChange={e => onChange(e.target.value)}
            groupClassName='inline-input'
            addonAfter={<Glyphicon glyph='star' />} />
   </Autosize>
   and this has 100px default width:{' '}
-  <Autosize value={value} defaultWidth={100}>
+  <Autosize defaultValue={value}
+            defaultWidth={100}
+            onChange={e => onChange(e.target.value)}
+            >
     <Input type='text'
            standalone
-           onChange={e => onChange(e.target.value)}
            groupClassName='inline-input'
            addonBefore={<Glyphicon glyph='asterisk' />} />
   </Autosize>
@@ -61,13 +63,13 @@ const ValueInput3 = pure(({ value, onChange }) =>
   </Autocomplete>);
 
 const code3 = `
-  <Autocomplete value={value}
-                options={countries}>
+  <Autocomplete defaultValue={value}
+                options={countries}
+                onChange={e => onChange(e.target.value)}>
     <Input type='text'
            label='Autocomplete:'
            labelClassName='col-xs-3'
-           wrapperClassName='col-xs-9'
-           onChange={e => onChange(e.target.value)} />
+           wrapperClassName='col-xs-9' />
   </Autocomplete>
 `;
 
@@ -93,14 +95,14 @@ const code4 = `
   <Input label='Combobox (Dropdown + Autocomplete):'
          labelClassName='col-xs-3'
          wrapperClassName='col-xs-9'>
-    <Combobox value={value}
+    <Combobox defaultValue={value}
               options={countries}
               dropdownProps={{ style: { width: '100%' } }}
               onValueChange={onChange}
+              onChange={e => onChange(e.target.value)}
               autocomplete>
       {inputProps =>
         <input {...inputProps}
-               onChange={e => onChange(e.target.value)}
                type='text'
                className={\`\$\{inputProps.className\} form-control\`\} />
       }
@@ -130,14 +132,14 @@ const code5 = `
   <Input label='Combobox (Dropdown + Autosize):'
          labelClassName='col-xs-3'
          wrapperClassName='col-xs-9'>
-    <Combobox value={value}
+    <Combobox defaultValue={value}
               options={countries}
               dropdownProps={{ style: { width: '100%' } }}
               onValueChange={onChange}
+              onChange={e => onChange(e.target.value)}
               autosize>
       {inputProps =>
         <input {...inputProps}
-               onChange={e => onChange(e.target.value)}
                type='text'
                className={\`\$\{inputProps.className\} form-control\`\} />
       }
@@ -167,7 +169,7 @@ const code6 = `
   <Input label='Combobox (Dropdown + Autosize + Autocomplete, defaultWidth=100):'
          labelClassName='col-xs-3'
          wrapperClassName='col-xs-9'>
-    <Combobox value={value}
+    <Combobox defaultValue={value}
               options={countries}
               defaultWidth={100}
               onValueChange={onChange}
@@ -175,7 +177,6 @@ const code6 = `
               autocomplete>
       {inputProps =>
         <input {...inputProps}
-               onChange={e => onChange(e.target.value)}
                type='text'
                className={\`\$\{inputProps.className\} form-control\`\} />
       }
