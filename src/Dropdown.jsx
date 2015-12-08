@@ -162,7 +162,7 @@ export default class Dropdown extends Component {
         <path d='M0 0 H10 L5 5 z'/>
       </svg>
     );
-    const caretClassName = classNames(classes.caret, this.state.isActive && classes.caretActive);
+    const caretClassName = classNames(classes.caret, this.state.hover && classes.caretActive);
     const listClassName = classNames(classes.list, this.state.isActive && classes.listActive);
 
     return (
@@ -170,6 +170,8 @@ export default class Dropdown extends Component {
            style={dropdownStyle}
            onFocus={this.handleFocus}
            onBlur={this.handleBlur}
+           onMouseEnter={() => this.setState({ hover: true })}
+           onMouseLeave={() => this.setState({ hover: false })}
            ref='dropdown'
            {...dropdownProps}>
         {this.renderInput()}
@@ -199,7 +201,10 @@ export default class Dropdown extends Component {
       defaultValue: null,
       className: classNames(classes.input, className),
       onKeyDown: this.handleKeyDown,
-      onChange: this.handleChange
+      onChange: this.handleChange,
+      style: {
+        paddingRight: '15px'
+      }
     };
 
     if (typeof children === 'function') {
@@ -346,20 +351,29 @@ export default class Dropdown extends Component {
 
 const sheet = jss.createStyleSheet({
   dropdown: {
-    display: 'table',
-    position: 'relative'
-  },
-  input: {
-    display: 'table-cell'
+    position: 'relative',
+    display: 'inline-block'
   },
   caret: {
-    display: 'table-cell',
-    width: '10px',
+    position: 'absolute',
+    right: '5px',
+    top: 0,
     'padding-top': '5px',
     'vertical-align': 'middle',
-    'padding-left': '3px'
+    'padding-left': '3px',
+    width: '10px',
+    '& svg': {
+      display: 'inline-block',
+      opacity: 0,
+      transition: 'opacity 0.15s linear, transform 0.15s linear',
+      transform: 'translateY(5px)'
+    }
   },
   caretActive: {
+    '& svg': {
+      opacity: 1,
+      transform: 'translateY(0)'
+    }
   },
   list: {
     position: 'absolute',
