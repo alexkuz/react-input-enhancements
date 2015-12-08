@@ -34,7 +34,6 @@ module.exports = {
     hash: true
   },
   plugins: [
-    new CleanWebpackPlugin(['index.html', 'demo/dist', 'lib']),
     new HtmlWebpackPlugin({
       inject: true,
       template: 'demo/src/index.html',
@@ -48,7 +47,9 @@ module.exports = {
     }),
     new webpack.NoErrorsPlugin(),
     new NyanProgressWebpackPlugin()
-  ].concat(isProduction ? [] : [
+  ].concat(isProduction ? [
+    new CleanWebpackPlugin(['index.html', 'demo/dist', 'lib'])
+  ] : [
     new ExportFilesWebpackPlugin('index.html'),
     new webpack.HotModuleReplacementPlugin()
   ]),
