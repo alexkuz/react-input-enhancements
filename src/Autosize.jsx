@@ -37,14 +37,15 @@ export default class Autosize extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      width: props.minWidth,
-      minWidth: props.minWidth
+      width: props.defaultWidth,
+      defaultWidth: props.defaultWidth,
+      value: props.value || props.defaultValue
     };
   }
 
   static propTypes = {
-    text: PropTypes.string,
-    minWidth: PropTypes.number,
+    value: PropTypes.string,
+    defaultWidth: PropTypes.number,
     getInputElement: PropTypes.func
   }
 
@@ -78,14 +79,30 @@ export default class Autosize extends Component {
   }
 
   componentDidMount() {
-    if (this.props.minWidth === undefined)
-      this.initMinWidth();
-    this.updateWidth(this.props.text, this.props.minWidth);
+    let defaultWidth = this.props.defaultWidth;
+
+    if (defaultWidth === undefined) {
+      const input = this.getInput();
+      defaultWidth = input.offsetWidth;
+      this.setDefaultWidth(defaultWidth);
+    }
+
+    this.updateWidth(this.props.value, defaultWidth);
+  }
+
+  setDefaultWidth(defaultWidth) {
+    this.setState({ defaultWidth });
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.text !== this.props.text) {
-      this.updateWidth(nextProps.text, this.state.minWidth);
+    if (nextProps.value !== this.props.value) {
+      this.setState({ value: nextProps.value });
+    }
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (nextState.value !== this.state.value) {
+      this.updateWidth(nextState.value, nextState.defaultWidth);
     }
   }
 
@@ -100,21 +117,13 @@ export default class Autosize extends Component {
       el.getElementsByTagName('INPUT')[0];
   }
 
-  initMinWidth() {
-    const input = this.getInput();
-
-    this.setState({
-      minWidth: input.offsetWidth
-    });
-  }
-
-  updateWidth(text, minWidth) {
+  updateWidth(value, defaultWidth) {
     const input = this.getInput();
     const inputStyle = window.getComputedStyle(input, null);
 
-    if (!text) {
+    if (!value) {
       this.setState({
-        width: minWidth
+        width: defaultWidth
       });
       return;
     }
@@ -125,29 +134,46 @@ export default class Autosize extends Component {
       }
     }
 
-    this.sizerEl.innerText = text;
+    this.sizerEl.innerText = value;
 
     this.setState({
       width: Math.max(
         this.sizerEl.offsetWidth + 1,
-        minWidth
+        defaultWidth
       )
     });
   }
 
   render() {
-    const { minWidth, children, text, ...props } = this.props;
+    const { defaultWidth, children, ...props } = this.props;
     const { width } = this.state;
+    const inputProps = {
+      ...props,
+      style: {
+        ...(props.style || {}),
+        ...(width ? { width: width + 'px' } : {})
+      },
+      onChange: this.handleChange
+    }
 
     if (typeof children === 'function') {
-      return children(width, props);
+      return children(inputProps, { width });
     } else {
       const input = Children.only(children);
 
-      return React.cloneElement(input, {
-        ...props,
-        style: { ...(props.style || {}), width: width ? width + 'px' : 'auto' }
-      });
+      return React.cloneElement(input, { ...inputProps, ...input.props });
+    }
+  }
+
+  handleChange = e => {
+    const value = e.target.value;
+
+    if (this.props.value === undefined) {
+      this.setState({ value });
+    }
+
+    if (this.props.onChange) {
+      this.props.onChange(e);
     }
   }
 }

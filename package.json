@@ -1,7 +1,7 @@
 {
   "name": "react-input-enhancements",
   "version": "0.1.0",
-  "description": "React component boilerplate",
+  "description": "Set of enhancements for input control (bootstrap-ready)",
   "scripts": {
     "build:lib": "babel src --out-dir lib",
     "build:demo": "NODE_ENV=production webpack -p --optimize-dedupe",
@@ -13,7 +13,9 @@
     "prepublish": "npm run build:lib"
   },
   "main": "lib/index.js",
-  "repository": {},
+  "repository": {
+    "url": "https://github.com/alexkuz/react-input-enhancements"
+  },
   "keywords": [
     "react",
     "reactjs"
@@ -55,7 +57,8 @@
     "classnames": "^2.2.1",
     "jss": "^3.2.0",
     "jss-nested": "^1.0.1",
-    "jss-vendor-prefixer": "^1.0.1"
+    "jss-vendor-prefixer": "^1.0.1",
+    "lodash.sortby": "^3.1.5"
   },
   "author": "Alexander <alexkuz@gmail.com> (http://kuzya.org/)",
   "license": "MIT"

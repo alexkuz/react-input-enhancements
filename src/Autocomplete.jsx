@@ -1,25 +1,30 @@
-import { Component, PropTypes, Children } from 'react';
+import React, { Component, PropTypes, Children } from 'react';
 import ReactDOM from 'react-dom';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import * as shapes from './shapes';
-import findMatchingText from './findMatchingText';
+import findMatchingTextIndex from './findMatchingTextIndex';
 
 function setSelection(input, text, matchingText) {
-  input.value = matchingText;
-  input.setSelectionRange(text.length, matchingText.length);
+  if (text === null) {
+    input.value = null;
+  } else {
+    input.value = matchingText;
+    input.setSelectionRange(text.length, matchingText.length);
+  }
 }
 
 export default class Autocomplete extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      matchingText: null
+      matchingText: null,
+      value: props.value || props.defaultValue
     };
   }
 
   static propTypes = {
     getInputElement: PropTypes.func,
-    text: PropTypes.string,
+    value: PropTypes.string,
     options: PropTypes.arrayOf(shapes.ITEM_OR_STRING)
   }
 
@@ -31,38 +36,27 @@ export default class Autocomplete extends Component {
   componentWillMount() {
   }
 
-  componentWillUnmount() {
-    const input = this.getInput();
-    input.removeEventListener('keydown', this.handleKeyDown);
-  }
-
-  componentDidMount() {
-    const input = this.getInput();
-    input.addEventListener('keydown', this.handleKeyDown);
-  }
-
-  handleKeyDown = e => {
-    if (e.keyCode === 8) {
-      const input = this.getInput();
-      if (input.selectionStart !== input.selectionEnd &&
-          input.selectionEnd === input.value.length &&
-          input.selectionStart !== 0) {
-        input.value = input.value.substr(0, input.selectionStart);
-      }
+  componentWillReceiveProps(nextProps) {
+    if (this.props.value !== nextProps.value) {
+      this.setState({ value: nextProps.value });
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.text !== nextProps.text) {
-      const matchingText = findMatchingText(nextProps.text, this.props.options);
+  componentWillUpdate(nextProps, nextState) {
+    if (this.state.value !== nextState.value) {
+      const match = findMatchingTextIndex(nextState.value, nextProps.options, true);
+      const [, matchingText] = match;
       this.setState({ matchingText });
     }
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.text !== prevProps.text && this.state.matchingText) {
-      const input = this.getInput();
-      setSelection(input, this.props.text, this.state.matchingText);
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.value !== prevState.value ||
+      this.state.matchingText !== prevState.matchingText) {
+      if (this.state.matchingText) {
+        const input = this.getInput();
+        setSelection(input, this.state.value, this.state.matchingText);
+      }
     }
   }
 
@@ -78,13 +72,63 @@ export default class Autocomplete extends Component {
   }
 
   render() {
-    const { minWidth, children, ...props } = this.props;
+    const { children, value, ...props } = this.props;
     const { matchingText } = this.state;
+    const inputProps = {
+      ...props,
+      value: matchingText || value,
+      onKeyDown: this.handleKeyDown,
+      onChange: this.handleChange
+    };
 
     if (typeof children === 'function') {
-      return children(matchingText, props);
+      return children(inputProps, { matchingText, value });
     } else {
-      return Children.only(children);
+      const input = Children.only(children);
+      return React.cloneElement(input, { ...inputProps, ...input.props });
     }
+  }
+
+  handleChange = e => {
+    const value = e.target.value;
+
+    if (this.props.value === undefined) {
+      this.setState({ value });
+    }
+
+    if (this.props.onChange) {
+      this.props.onChange(e);
+    }
+  }
+
+  handleKeyDown = e => {
+    const keyMap = {
+      Backspace: this.handleBackspaceKeyDown,
+      Enter: this.handleEnterKeyDown
+    }
+
+    if (keyMap[e.key]) {
+      keyMap[e.key](e);
+    }
+
+    if (this.props.onKeyDown) {
+      this.props.onKeyDown(e);
+    }
+  }
+
+  handleBackspaceKeyDown = () => {
+    const input = this.getInput();
+    if (input.selectionStart !== input.selectionEnd &&
+        input.selectionEnd === input.value.length &&
+        input.selectionStart !== 0) {
+      input.value = input.value.substr(0, input.selectionStart);
+    }
+  }
+
+  handleEnterKeyDown = () => {
+    const input = this.getInput();
+
+    setSelection(input, this.state.matchingText, this.state.matchingText);
+    input.blur();
   }
 }
