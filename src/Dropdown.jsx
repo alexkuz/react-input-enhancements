@@ -46,9 +46,11 @@ function getOptionClassName(opt, isHighlighted) {
 }
 
 function getOptionKey(opt, idx) {
+  const value = getOptionValue(opt);
+
   return opt === null ?
     `option-separator-${idx}` :
-    `option-${getOptionValue(opt) || ('null-' + idx)}`;
+    `option-${typeof value === 'string' ? value : (getOptionText(opt) + idx)}`;
 }
 
 function getSiblingIndex(idx, options, next) {
