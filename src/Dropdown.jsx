@@ -369,6 +369,7 @@ export default class Dropdown extends Component {
   }
 
   handleBlur = () => {
+    return;
     this.selectOption(this.state.selectedIndex);
     this.setState({
       isActive: false,
@@ -417,9 +418,10 @@ const sheet = jss.createStyleSheet({
   },
   listHeader: {
     'flex-shrink': 0,
-    height: '20px',
-    'font-size': '1em',
+    height: '3rem',
+    'font-size': '0.8em',
     color: '#999999',
+    'background-color': '#FAFAFA',
     padding: '0.5rem 1rem',
     'border-bottom': '1px solid #DDDDDD'
   },
