@@ -369,7 +369,6 @@ export default class Dropdown extends Component {
   }
 
   handleBlur = () => {
-    return;
     this.selectOption(this.state.selectedIndex);
     this.setState({
       isActive: false,
