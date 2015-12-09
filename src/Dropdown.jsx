@@ -6,13 +6,17 @@ import { create } from 'jss';
 import jssNested from 'jss-nested';
 import jssVendorPrefixer from 'jss-vendor-prefixer';
 import findMatchingTextIndex from './findMatchingTextIndex';
-import filterByMatchingText from './filterByMatchingText';
+import filterByMatchingTextWithThreshold from './filterByMatchingTextWithThreshold';
 import sortByMatchingText from './sortByMatchingText';
 import limitBy from './limitBy';
 
 const jss = create();
 jss.use(jssNested());
 jss.use(jssVendorPrefixer());
+
+function isStatic(opt) {
+  return opt === null || opt.static === true;
+}
 
 function getOptionText(opt) {
   return typeof opt === 'string' || !opt ?
@@ -44,7 +48,7 @@ function getOptionClassName(opt, isHighlighted) {
 function getOptionKey(opt, idx) {
   return opt === null ?
     `option-separator-${idx}` :
-    `option-${getOptionText(opt)}`;
+    `option-${getOptionValue(opt) || ('null-' + idx)}`;
 }
 
 function getSiblingIndex(idx, options, next) {
@@ -85,7 +89,7 @@ export default class Dropdown extends Component {
     const [selectedIndex] = match;
 
     this.state = {
-      value: null,
+      value: props.value || props.defaultValue,
       isActive: false,
       listShown: false,
       selectedIndex,
@@ -113,12 +117,27 @@ export default class Dropdown extends Component {
     onRenderCaret: (className, style, isActive, children) =>
       <div {...{ className, style }}>{children}</div>,
 
-    onRenderList: (className, style, isActive, listShown, children) =>
-      listShown && <div {...{ className, style }}>{children}</div>,
+    onRenderList: (className, style, isActive, listShown, children, header) =>
+      listShown && (
+        <div {...{ className, style }}>
+          {header && <div className={sheet.classes.listHeader}>{header}</div>}
+          <div className={sheet.classes.listOptions}>{children}</div>
+        </div>
+      ),
+
+    onRenderListHeader: (allCount, shownCount, staticCount) => {
+      if (allCount - staticCount < 20) return null;
+      const allItems = `${allCount - staticCount} ${
+        (allCount - staticCount) === 1 ? 'item' : 'items'
+      }`;
+      return allCount === shownCount ?
+        `${allItems} found` :
+        `${shownCount - staticCount} of ${allItems} shown`;
+    },
 
     dropdownProps: {},
 
-    optionFilters: [filterByMatchingText, sortByMatchingText, limitBy(100)]
+    optionFilters: [filterByMatchingTextWithThreshold(20), sortByMatchingText, limitBy(100)]
   }
 
   shouldComponentUpdate = shouldPureComponentUpdate
@@ -127,7 +146,7 @@ export default class Dropdown extends Component {
     const { options, optionFilters } = nextProps;
 
     if (this.props.options !== options || this.props.optionFilters !== optionFilters) {
-      this.updateSelectedIndex(this.state.value, options, optionFilters)
+      this.updateSelectedIndex(this.state.value, options, optionFilters);
     }
   }
 
@@ -153,8 +172,8 @@ export default class Dropdown extends Component {
   }
 
   render() {
-    const { dropdownClassName, onRenderCaret, onRenderList,
-            dropdownStyle, dropdownProps } = this.props;
+    const { dropdownClassName, onRenderCaret, onRenderList, onRenderListHeader,
+            dropdownStyle, dropdownProps, options } = this.props;
     const { classes } = sheet;
 
     const caret = (
@@ -181,7 +200,12 @@ export default class Dropdown extends Component {
           null,
           this.state.isActive,
           this.state.listShown,
-          this.state.shownOptions.map(this.renderOption)
+          this.state.shownOptions.map(this.renderOption),
+          onRenderListHeader(
+            options.length,
+            this.state.shownOptions.length,
+            options.filter(isStatic).length
+          )
         )}
       </div>
     );
@@ -240,10 +264,12 @@ export default class Dropdown extends Component {
   }
 
   handleOptionClick(idx) {
-    this.selectOption(idx);
     this.setState({
+      value: getOptionText(this.state.shownOptions[idx]),
       selectedIndex: idx,
       listShown: false
+    }, () => {
+      this.selectOption(idx);
     });
   }
 
@@ -312,10 +338,11 @@ export default class Dropdown extends Component {
   }
 
   handleEnterKeyDown = () => {
-    this.selectOption(this.state.selectedIndex);
     this.setState({
-      isActive: false,
+      value: getOptionText(this.state.shownOptions[this.state.selectedIndex]),
       listShown: false
+    }, () => {
+      this.selectOption(this.state.selectedIndex);
     });
   }
 
@@ -343,8 +370,7 @@ export default class Dropdown extends Component {
     this.selectOption(this.state.selectedIndex);
     this.setState({
       isActive: false,
-      listShown: false,
-      value: getOptionValue(this.state.shownOptions[this.state.selectedIndex])
+      listShown: false
     });
   }
 }
@@ -382,9 +408,22 @@ const sheet = jss.createStyleSheet({
     'z-index': 10000,
     'max-height': '30rem',
     'min-width': '22rem',
-    'overflow-y': 'auto',
     'background-color': '#FFFFFF',
-    'box-shadow': '1px 1px 4px rgba(100, 100, 100, 0.3)'
+    'box-shadow': '1px 1px 4px rgba(100, 100, 100, 0.3)',
+    display: 'flex',
+    'flex-direction': 'column'
+  },
+  listHeader: {
+    'flex-shrink': 0,
+    height: '20px',
+    'font-size': '1em',
+    color: '#999999',
+    padding: '0.5rem 1rem',
+    'border-bottom': '1px solid #DDDDDD'
+  },
+  listOptions: {
+    'flex-grow': 1,
+    'overflow-y': 'auto'
   },
   option: {
     padding: '1rem 1.5rem',
