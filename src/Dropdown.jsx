@@ -284,7 +284,7 @@ export default class Dropdown extends Component {
     this.setState({
       listShown: false
     }, () => {
-      this.selectOption(findOptionIndex(this.props.options, option));
+      this.selectOption(findOptionIndex(this.props.options, option), true);
     });
   }
 
@@ -359,7 +359,7 @@ export default class Dropdown extends Component {
     this.setState({
       listShown: false
     }, () => {
-      this.selectOption(findOptionIndex(this.props.options, option));
+      this.selectOption(findOptionIndex(this.props.options, option), true);
     });
   }
 
