@@ -162,7 +162,7 @@ const ValueInput6 = pure(({ value, onChange }) =>
          labelClassName='col-xs-3'
          wrapperClassName='col-xs-6'>
     <Combobox defaultValue={value}
-              options={countries}
+              options={[...countries]}
               defaultWidth={100}
               onValueChange={onChange}
               autosize
@@ -277,7 +277,7 @@ export default class DemoApp extends React.Component {
       value1: null,
       value2: null,
       value3: null,
-      value4: 'value--Albania',
+      value4: null,
       value5: null,
       value6: 'value--Fiji',
       value7: null,
@@ -292,6 +292,14 @@ export default class DemoApp extends React.Component {
       code7open: false,
       code8open: false
     };
+  }
+
+  componentDidMount() {
+    window.setTimeout(this.setDelayedState, 200);
+  }
+
+  setDelayedState = () => {
+    this.setState({ value4: 'value--Albania' });
   }
 
   render() {

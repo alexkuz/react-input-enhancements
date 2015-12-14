@@ -75,14 +75,14 @@ function findOptionIndex(options, option) {
   return options.findIndex(opt => opt === option);
 }
 
-function getInitialState(props) {
+function getStateFromProps(props) {
   const shownOptions = getShownOptions(null, props.options, props.optionFilters);
   const match = findMatchingTextIndex(props.value || props.defaultValue, props.options);
-  const [selectedIndex] = match;
+  const [selectedIndex, matchingText] = match;
   const highlightedIndex = findOptionIndex(shownOptions, props.options[selectedIndex]);
 
   return {
-    value: props.value || props.defaultValue,
+    value: matchingText || null,
     isActive: false,
     listShown: false,
     selectedIndex,
@@ -96,7 +96,7 @@ export default class Dropdown extends Component {
     super(props);
     this.optionRefs = {};
 
-    this.state = getInitialState(props);
+    this.state = getStateFromProps(props);
   }
 
   static propTypes = {
@@ -150,15 +150,20 @@ export default class Dropdown extends Component {
 
   shouldComponentUpdate = shouldPureComponentUpdate
 
-  componentWillReceiveProps(nextProps) {
-    const { options, optionFilters } = nextProps;
+  componentWillUpdate(nextProps, nextState) {
+    const { options, optionFilters, defaultValue, value } = nextProps;
 
-    if (this.props.options !== options || this.props.optionFilters !== optionFilters) {
+    if ((this.props.defaultValue !== defaultValue ||
+    this.props.value !== value) && nextState.value === null) {
+      this.setState(getStateFromProps(nextProps));
+    } else if (this.props.options !== options ||
+      this.props.optionFilters !== optionFilters) {
       const [highlightedIndex, shownOptions] = this.updateHighlightedIndex(
-        this.state.value, options, optionFilters
+        nextState.value, options, optionFilters
       );
       const selectedIndex = findOptionIndex(options, shownOptions[highlightedIndex]);
-      this.setState({ selectedIndex });
+
+      this.setState({ selectedIndex, value });
     }
   }
 
