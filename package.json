@@ -1,6 +1,6 @@
 {
   "name": "react-input-enhancements",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Set of enhancements for input control (bootstrap-ready)",
   "scripts": {
     "build:lib": "babel src --out-dir lib",
