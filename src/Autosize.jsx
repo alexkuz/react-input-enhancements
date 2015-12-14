@@ -1,7 +1,7 @@
 import React, { Component, PropTypes, Children } from 'react';
 import ReactDOM from 'react-dom';
 import shouldPureComponentUpdate from 'react-pure-render/function';
-import './getComputedStyle';
+import './utils/getComputedStyle';
 
 const ALLOWED_CSS_PROPS = [
   'direction',

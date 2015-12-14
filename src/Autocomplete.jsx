@@ -2,7 +2,7 @@ import React, { Component, PropTypes, Children } from 'react';
 import ReactDOM from 'react-dom';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import * as shapes from './shapes';
-import findMatchingTextIndex from './findMatchingTextIndex';
+import findMatchingTextIndex from './utils/findMatchingTextIndex';
 
 function setSelection(input, text, matchingText) {
   if (text === null) {

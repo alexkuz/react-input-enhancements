@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import { create } from 'jss';
 import jssNested from 'jss-nested';
 import jssVendorPrefixer from 'jss-vendor-prefixer';
-import findMatchingTextIndex from './findMatchingTextIndex';
+import findMatchingTextIndex from './utils/findMatchingTextIndex';
 import * as filters from './filters';
 
 const jss = create();
