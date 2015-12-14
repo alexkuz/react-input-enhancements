@@ -1,5 +1,5 @@
 export default [
-  { text: 'No Country', value: null, static: true },
+  { label: 'No Country', text: '', value: null, static: true },
   null,
   { text: 'Afghanistan', value: 'value--Afghanistan' },
   { text: 'Albania', value: 'value--Albania' },

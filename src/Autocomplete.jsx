@@ -9,7 +9,9 @@ function setSelection(input, text, matchingText) {
     input.value = null;
   } else {
     input.value = matchingText;
-    input.setSelectionRange(text.length, matchingText.length);
+    if (text.length !== matchingText.length) {
+      input.setSelectionRange(text.length, matchingText.length);
+    }
   }
 }
 
@@ -38,21 +40,18 @@ export default class Autocomplete extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.value !== nextProps.value) {
-      this.setState({ value: nextProps.value });
+      this.setValue(nextProps.value);
     }
   }
 
-  componentWillUpdate(nextProps, nextState) {
-    if (this.state.value !== nextState.value) {
-      const match = findMatchingTextIndex(nextState.value, nextProps.options, true);
-      const [, matchingText] = match;
-      this.setState({ matchingText });
-    }
+  setValue(value) {
+    const match = findMatchingTextIndex(value, this.props.options);
+    const [, matchingText] = match;
+    this.setState({ value, matchingText });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.value !== prevState.value ||
-      this.state.matchingText !== prevState.matchingText) {
+    if (this.state.value !== prevState.value) {
       if (this.state.matchingText) {
         const input = this.getInput();
         setSelection(input, this.state.value, this.state.matchingText);
@@ -72,8 +71,8 @@ export default class Autocomplete extends Component {
   }
 
   render() {
-    const { children, value, ...props } = this.props;
-    const { matchingText } = this.state;
+    const { children, ...props } = this.props;
+    const { matchingText, value } = this.state;
     const inputProps = {
       ...props,
       value: matchingText || value,
@@ -93,7 +92,7 @@ export default class Autocomplete extends Component {
     const value = e.target.value;
 
     if (this.props.value === undefined) {
-      this.setState({ value });
+      this.setValue(value);
     }
 
     if (this.props.onChange) {

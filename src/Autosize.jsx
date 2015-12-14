@@ -67,6 +67,8 @@ export default class Autosize extends Component {
 
     this.sizerEl = document.createElement('span');
     sizersListEl.appendChild(this.sizerEl);
+
+    window.addEventListener('resize', this.handleWindownResize);
   }
 
   componentWillUnmount() {
@@ -76,6 +78,8 @@ export default class Autosize extends Component {
       sizersListEl = null;
     }
     this.sizerEl = null;
+
+    window.removeEventListener('resize', this.handleWindownResize);
   }
 
   componentDidMount() {
@@ -163,6 +167,10 @@ export default class Autosize extends Component {
 
       return React.cloneElement(input, { ...inputProps, ...input.props });
     }
+  }
+
+  handleWindownResize = () => {
+    this.updateWidth(this.state.value, this.state.defaultWidth);
   }
 
   handleChange = e => {

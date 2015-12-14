@@ -1,13 +1,17 @@
 import React from 'react';
-import Autosize from 'Autosize';
-import Autocomplete from 'Autocomplete';
-import Combobox from 'Combobox';
 import PageHeader from 'react-bootstrap/lib/PageHeader';
 import Input from 'react-bootstrap/lib/Input';
 import Glyphicon from 'react-bootstrap/lib/Glyphicon';
+import Collapse from 'react-bootstrap/lib/Collapse';
+import Static from 'react-bootstrap/lib/FormControls/Static';
+
 import countries from './countries';
 import pure from './pure';
-import Collapse from 'react-bootstrap/lib/Collapse';
+
+import Autosize from 'Autosize';
+import Autocomplete from 'Autocomplete';
+import Combobox from 'Combobox';
+import Mask from 'Mask';
 
 import pkg from '../../../package.json';
 import './bootstrap-input-inline.css';
@@ -59,7 +63,8 @@ const ValueInput3 = pure(({ value, onChange }) =>
     <Input type='text'
            label='Autocomplete:'
            labelClassName='col-xs-3'
-           wrapperClassName='col-xs-9' />
+           wrapperClassName='col-xs-6'
+           placeholder='No Country' />
   </Autocomplete>);
 
 const code3 = `
@@ -69,14 +74,15 @@ const code3 = `
     <Input type='text'
            label='Autocomplete:'
            labelClassName='col-xs-3'
-           wrapperClassName='col-xs-9' />
+           wrapperClassName='col-xs-6'
+           placeholder='No Country' />
   </Autocomplete>
 `;
 
 const ValueInput4 = pure(({ value, onChange }) =>
   <Input label='Combobox (Dropdown + Autocomplete):'
          labelClassName='col-xs-3'
-         wrapperClassName='col-xs-9'>
+         wrapperClassName='col-xs-6'>
     <Combobox defaultValue={value}
               options={countries}
               dropdownProps={{ style: { width: '100%' } }}
@@ -86,7 +92,8 @@ const ValueInput4 = pure(({ value, onChange }) =>
       {inputProps =>
         <input {...inputProps}
                type='text'
-               className={`${inputProps.className} form-control`} />
+               className={`${inputProps.className} form-control`}
+               placeholder='No Country' />
       }
     </Combobox>
   </Input>);
@@ -94,7 +101,7 @@ const ValueInput4 = pure(({ value, onChange }) =>
 const code4 = `
   <Input label='Combobox (Dropdown + Autocomplete):'
          labelClassName='col-xs-3'
-         wrapperClassName='col-xs-9'>
+         wrapperClassName='col-xs-6'>
     <Combobox defaultValue={value}
               options={countries}
               dropdownProps={{ style: { width: '100%' } }}
@@ -104,7 +111,8 @@ const code4 = `
       {inputProps =>
         <input {...inputProps}
                type='text'
-               className={\`\$\{inputProps.className\} form-control\`\} />
+               className={\`\$\{inputProps.className\} form-control\`\}
+               placeholder='No Country' />
       }
     </Combobox>
   </Input>
@@ -113,17 +121,18 @@ const code4 = `
 const ValueInput5 = pure(({ value, onChange }) =>
   <Input label='Combobox (Dropdown + Autosize):'
          labelClassName='col-xs-3'
-         wrapperClassName='col-xs-9'>
+         wrapperClassName='col-xs-6'>
     <Combobox defaultValue={value}
               options={countries}
-              dropdownProps={{ style: { width: '100%' } }}
+              dropdownProps={{ style: { minWidth: '100%' } }}
               onValueChange={onChange}
               onChange={e => onChange(e.target.value)}
               autosize>
       {inputProps =>
         <input {...inputProps}
                type='text'
-               className={`${inputProps.className} form-control`} />
+               className={`${inputProps.className} form-control`}
+               placeholder='No Country' />
       }
     </Combobox>
   </Input>);
@@ -131,17 +140,18 @@ const ValueInput5 = pure(({ value, onChange }) =>
 const code5 = `
   <Input label='Combobox (Dropdown + Autosize):'
          labelClassName='col-xs-3'
-         wrapperClassName='col-xs-9'>
+         wrapperClassName='col-xs-6'>
     <Combobox defaultValue={value}
               options={countries}
-              dropdownProps={{ style: { width: '100%' } }}
+              dropdownProps={{ style: { minWidth: '100%' } }}
               onValueChange={onChange}
               onChange={e => onChange(e.target.value)}
               autosize>
       {inputProps =>
         <input {...inputProps}
                type='text'
-               className={\`\$\{inputProps.className\} form-control\`\} />
+               className={\`\$\{inputProps.className\} form-control\`\}
+               placeholder='No Country' />
       }
     </Combobox>
   </Input>
@@ -150,7 +160,7 @@ const code5 = `
 const ValueInput6 = pure(({ value, onChange }) =>
   <Input label='Combobox (Dropdown + Autosize + Autocomplete, defaultWidth=100):'
          labelClassName='col-xs-3'
-         wrapperClassName='col-xs-9'>
+         wrapperClassName='col-xs-6'>
     <Combobox defaultValue={value}
               options={countries}
               defaultWidth={100}
@@ -160,7 +170,8 @@ const ValueInput6 = pure(({ value, onChange }) =>
       {inputProps =>
         <input {...inputProps}
                type='text'
-               className={`${inputProps.className} form-control`} />
+               className={`${inputProps.className} form-control`}
+               placeholder='No Country' />
       }
     </Combobox>
   </Input>);
@@ -168,7 +179,7 @@ const ValueInput6 = pure(({ value, onChange }) =>
 const code6 = `
   <Input label='Combobox (Dropdown + Autosize + Autocomplete, defaultWidth=100):'
          labelClassName='col-xs-3'
-         wrapperClassName='col-xs-9'>
+         wrapperClassName='col-xs-6'>
     <Combobox defaultValue={value}
               options={countries}
               defaultWidth={100}
@@ -178,10 +189,85 @@ const code6 = `
       {inputProps =>
         <input {...inputProps}
                type='text'
-               className={\`\$\{inputProps.className\} form-control\`\} />
+               className={\`\$\{inputProps.className\} form-control\`\}
+               placeholder='No Country' />
       }
     </Combobox>
   </Input>
+`;
+
+const ValueInput7 = pure(({ value, onChange, onUnmaskedValueChange }) =>
+  <Mask pattern='0000-0000-0000-0000'
+        defaultValue={value}
+        onChange={e => onChange(e.target.value)}
+        onUnmaskedValueChange={onUnmaskedValueChange}
+        style={{ fontFamily: 'monospace' }}>
+    {inputProps =>
+      <Autosize defaultWidth={100} {...inputProps}>
+        <Input type='text'
+               label='Mask + Autosize (credit card):'
+               labelClassName='col-xs-3'
+               wrapperClassName='col-xs-1'
+               groupClassName='autosize-addon-input'
+               addonAfter={<Glyphicon glyph='credit-card' />} />
+      </Autosize>
+    }
+  </Mask>);
+
+const code7 = `
+  <Mask pattern='0000-0000-0000-0000'
+        defaultValue={value}
+        onChange={e => onChange(e.target.value)}
+        onUnmaskedValueChange={onUnmaskedValueChange}
+        style={{ fontFamily: 'monospace' }}>
+    {inputProps =>
+      <Autosize defaultWidth={100} {...inputProps}>
+        <Input type='text'
+               label='Mask + Autosize (credit card):'
+               labelClassName='col-xs-3'
+               wrapperClassName='col-xs-1'
+               groupClassName='autosize-addon-input'
+               addonAfter={<Glyphicon glyph='credit-card' />} />
+      </Autosize>
+    }
+  </Mask>
+`;
+
+const ValueInput8 = pure(({ value, onChange, onUnmaskedValueChange }) =>
+  <Mask pattern='+\ 7\ (000) 000-00-00'
+        defaultValue={value}
+        onChange={e => onChange(e.target.value)}
+        onUnmaskedValueChange={onUnmaskedValueChange}
+        style={{ fontFamily: 'monospace' }}>
+    {inputProps =>
+      <Autosize defaultWidth={100} {...inputProps}>
+        <Input type='text'
+               label='Mask + Autosize (phone number):'
+               labelClassName='col-xs-3'
+               wrapperClassName='col-xs-1'
+               groupClassName='autosize-addon-input'
+               addonAfter={<Glyphicon glyph='phone' />} />
+      </Autosize>
+    }
+  </Mask>);
+
+const code8 = `
+  <Mask pattern='+\ 7\ (000) 000-00-00'
+        defaultValue={value}
+        onChange={e => onChange(e.target.value)}
+        onUnmaskedValueChange={onUnmaskedValueChange}
+        style={{ fontFamily: 'monospace' }}>
+    {inputProps =>
+      <Autosize defaultWidth={100} {...inputProps}>
+        <Input type='text'
+               label='Mask + Autosize (phone number):'
+               labelClassName='col-xs-3'
+               wrapperClassName='col-xs-1'
+               groupClassName='autosize-addon-input'
+               addonAfter={<Glyphicon glyph='phone' />} />
+      </Autosize>
+    }
+  </Mask>
 `;
 
 export default class DemoApp extends React.Component {
@@ -194,11 +280,17 @@ export default class DemoApp extends React.Component {
       value4: 'value--Albania',
       value5: null,
       value6: 'value--Fiji',
+      value7: null,
+      unmaskedValue7: null,
+      value8: null,
+      unmaskedValue8: null,
       code1and2open: false,
       code3open: false,
       code4open: false,
       code5open: false,
-      code6open: false
+      code6open: false,
+      code7open: false,
+      code8open: false
     };
   }
 
@@ -211,13 +303,13 @@ export default class DemoApp extends React.Component {
           <form className='form-horizontal'>
             <div className='form-group'>
               <div className='control-label col-xs-3'>Autosize (inline):</div>
-              <div className='col-xs-9'>
+              <div className='col-xs-6'>
                 This text has no default width:{' '}
                 <ValueInput1 value={this.state.value1}
                              onChange={this.handleValue1Change} />,
                 and this has 100px default width:{' '}
                 <ValueInput2 value={this.state.value2}
-                             onChange={this.handleValue2Change} />,
+                             onChange={this.handleValue2Change} />
               </div>
             </div>
             {this.renderCode(code1and2, 'code1and2open')}
@@ -233,6 +325,26 @@ export default class DemoApp extends React.Component {
             <ValueInput6 value={this.state.value6}
                          onChange={this.handleValue6Change} />
             {this.renderCode(code6, 'code6open')}
+            <ValueInput7 value={this.state.value7}
+                         onChange={this.handleValue7Change}
+                         onUnmaskedValueChange={
+                          value => this.setState({ unmaskedValue7: value })
+                         } />
+            <Static label='Unmasked value:'
+                     labelClassName='col-xs-3'
+                     wrapperClassName='col-xs-9'
+                     value={this.state.unmaskedValue7} />
+            {this.renderCode(code7, 'code7open')}
+            <ValueInput8 value={this.state.value8}
+                         onChange={this.handleValue8Change}
+                         onUnmaskedValueChange={
+                          value => this.setState({ unmaskedValue8: value })
+                         } />
+            <Static label='Unmasked value:'
+                     labelClassName='col-xs-3'
+                     wrapperClassName='col-xs-9'
+                     value={this.state.unmaskedValue8} />
+            {this.renderCode(code8, 'code8open')}
           </form>
         </div>
       </div>
@@ -242,7 +354,7 @@ export default class DemoApp extends React.Component {
   renderCode(code, key) {
     return (
       <div className='form-group'>
-        <div className='col-xs-9 col-xs-offset-3'>
+        <div className='col-xs-6 col-xs-offset-3'>
           <a role='button'
              onClick={() => this.setState({ [key]: !this.state[key] })}>Show code</a>
           <Collapse in={this.state[key]}>
@@ -264,6 +376,10 @@ export default class DemoApp extends React.Component {
   handleValue5Change = value => this.setState({ value5: value })
 
   handleValue6Change = value => this.setState({ value6: value })
+
+  handleValue7Change = value => this.setState({ value7: value })
+
+  handleValue8Change = value => this.setState({ value8: value })
 }
 
 

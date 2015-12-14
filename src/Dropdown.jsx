@@ -6,9 +6,7 @@ import { create } from 'jss';
 import jssNested from 'jss-nested';
 import jssVendorPrefixer from 'jss-vendor-prefixer';
 import findMatchingTextIndex from './findMatchingTextIndex';
-import filterByMatchingTextWithThreshold from './filterByMatchingTextWithThreshold';
-import sortByMatchingText from './sortByMatchingText';
-import limitBy from './limitBy';
+import * as filters from './filters';
 
 const jss = create();
 jss.use(jssNested());
@@ -19,11 +17,9 @@ function isStatic(opt) {
 }
 
 function getOptionText(opt) {
-  return typeof opt === 'string' || !opt ?
+  return (typeof opt === 'string' || !opt ?
     opt :
-    typeof opt.label === 'string' ?
-      opt.label :
-      opt.text || opt.value;
+    opt.text || opt.value) || '';
 }
 
 function getOptionValue(opt) {
@@ -38,10 +34,11 @@ function getOptionLabel(opt) {
     (opt.label || opt.text || opt.value);
 }
 
-function getOptionClassName(opt, isHighlighted) {
+function getOptionClassName(opt, isHighlighted, isDisabled) {
   return classNames(
     sheet.classes.option,
-    isHighlighted && sheet.classes.optionHighlighted
+    isHighlighted && sheet.classes.optionHighlighted,
+    isDisabled && sheet.classes.optionDisabled
   );
 }
 
@@ -54,31 +51,44 @@ function getOptionKey(opt, idx) {
 }
 
 function getSiblingIndex(idx, options, next) {
-  if (next) {
-    if (idx === null) {
-      return 0;
-    }
-    while(++idx < options.length) {
-      if (options[idx] !== null && !options[idx].disabled) {
-        return idx;
-      }
-    }
-    return 0;
-  } else {
-    if (idx === null) {
-      return options.length - 1;
-    }
-    while(--idx >= 0) {
-      if (options[idx] !== null && !options[idx].disabled) {
-        return idx;
-      }
-    }
-    return options.length - 1;
+  if (idx === null) {
+    idx = next ? -1 : options.length;
   }
+
+  const step = next ? 1 : -1;
+
+  for (let i = 0; i < options.length; i++) {
+    const currentIdx = (idx + (i + 1) * step + options.length) % options.length;
+    if (options[currentIdx] !== null && !options[currentIdx].disabled) {
+      return currentIdx;
+    }
+  }
+
+  return idx;
 }
 
 function getShownOptions(value, options, optionFilters) {
   return optionFilters.reduce((o, filter) => filter(o, value), options);
+}
+
+function findOptionIndex(options, option) {
+  return options.findIndex(opt => opt === option);
+}
+
+function getInitialState(props) {
+  const shownOptions = getShownOptions(null, props.options, props.optionFilters);
+  const match = findMatchingTextIndex(props.value || props.defaultValue, props.options);
+  const [selectedIndex] = match;
+  const highlightedIndex = findOptionIndex(shownOptions, props.options[selectedIndex]);
+
+  return {
+    value: props.value || props.defaultValue,
+    isActive: false,
+    listShown: false,
+    selectedIndex,
+    highlightedIndex,
+    shownOptions
+  };
 }
 
 export default class Dropdown extends Component {
@@ -86,17 +96,7 @@ export default class Dropdown extends Component {
     super(props);
     this.optionRefs = {};
 
-    const shownOptions = getShownOptions(null, props.options, props.optionFilters);
-    const match = findMatchingTextIndex(props.value || props.defaultValue, shownOptions);
-    const [selectedIndex] = match;
-
-    this.state = {
-      value: props.value || props.defaultValue,
-      isActive: false,
-      listShown: false,
-      selectedIndex,
-      shownOptions
-    };
+    this.state = getInitialState(props);
   }
 
   static propTypes = {
@@ -139,7 +139,13 @@ export default class Dropdown extends Component {
 
     dropdownProps: {},
 
-    optionFilters: [filterByMatchingTextWithThreshold(20), sortByMatchingText, limitBy(100)]
+    optionFilters: [
+      filters.filterByMatchingTextWithThreshold(20),
+      filters.sortByMatchingText,
+      filters.limitBy(100),
+      filters.notFoundMessage('No matches found'),
+      filters.filterRedudantSeparators
+    ]
   }
 
   shouldComponentUpdate = shouldPureComponentUpdate
@@ -148,22 +154,28 @@ export default class Dropdown extends Component {
     const { options, optionFilters } = nextProps;
 
     if (this.props.options !== options || this.props.optionFilters !== optionFilters) {
-      this.updateSelectedIndex(this.state.value, options, optionFilters);
+      const [highlightedIndex, shownOptions] = this.updateHighlightedIndex(
+        this.state.value, options, optionFilters
+      );
+      const selectedIndex = findOptionIndex(options, shownOptions[highlightedIndex]);
+      this.setState({ selectedIndex });
     }
   }
 
-  updateSelectedIndex(value, options, optionFilters) {
+  updateHighlightedIndex(value, options, optionFilters) {
     const shownOptions = getShownOptions(value, options, optionFilters);
-    const match = findMatchingTextIndex(value, shownOptions);
-    const [selectedIndex] = match;
+    const match = findMatchingTextIndex(value, shownOptions, true);
+    const [highlightedIndex] = match;
 
-    this.setState({ selectedIndex, shownOptions });
+    this.setState({ highlightedIndex, shownOptions });
+
+    return [highlightedIndex, shownOptions];
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.selectedIndex !== prevState.selectedIndex &&
-      this.state.selectedIndex !== null) {
-      const optionEl = this.optionRefs['option-' + this.state.selectedIndex];
+    if (this.state.highlightedIndex !== prevState.highlightedIndex &&
+      this.state.highlightedIndex !== null) {
+      const optionEl = this.optionRefs['option-' + this.state.highlightedIndex];
       if (optionEl) {
         const optionHeight = optionEl.offsetHeight;
         const listEl = optionEl.parentNode;
@@ -177,14 +189,15 @@ export default class Dropdown extends Component {
     const { dropdownClassName, onRenderCaret, onRenderList, onRenderListHeader,
             dropdownStyle, dropdownProps, options } = this.props;
     const { classes } = sheet;
+    const { shownOptions, isActive, hover, listShown } = this.state;
 
     const caret = (
       <svg width='10' height='5' fill='currentColor'>
         <path d='M0 0 H10 L5 5 z'/>
       </svg>
     );
-    const caretClassName = classNames(classes.caret, this.state.hover && classes.caretActive);
-    const listClassName = classNames(classes.list, this.state.isActive && classes.listActive);
+    const caretClassName = classNames(classes.caret, hover && classes.caretActive);
+    const listClassName = classNames(classes.list, isActive && classes.listActive);
 
     return (
       <div className={classNames(classes.dropdown, dropdownClassName)}
@@ -196,17 +209,17 @@ export default class Dropdown extends Component {
            ref='dropdown'
            {...dropdownProps}>
         {this.renderInput()}
-        {onRenderCaret(caretClassName, null, this.state.isActive, caret)}
+        {onRenderCaret(caretClassName, null, isActive, caret)}
         {onRenderList(
           listClassName,
           null,
-          this.state.isActive,
-          this.state.listShown,
-          this.state.shownOptions.map(this.renderOption),
+          isActive,
+          listShown,
+          shownOptions.map(this.renderOption),
           onRenderListHeader(
             options.length,
-            this.state.shownOptions.length,
-            options.filter(isStatic).length
+            shownOptions.length,
+            shownOptions.filter(isStatic).length
           )
         )}
       </div>
@@ -217,7 +230,7 @@ export default class Dropdown extends Component {
     const { dropdownClassName, onRenderCaret, onRenderList, className,
             style, children, onValueChange, ...props } = this.props;
     const { classes } = sheet;
-    const selectedOption = this.state.shownOptions[this.state.selectedIndex];
+    const selectedOption = this.state.shownOptions[this.state.highlightedIndex];
 
     const inputProps = {
       ...props,
@@ -246,12 +259,13 @@ export default class Dropdown extends Component {
 
   renderOption = (opt, idx) => {
     const { onRenderOption } = this.props;
-    const highlighted = idx === this.state.selectedIndex;
+    const highlighted = idx === this.state.highlightedIndex;
+    const disabled = opt && opt.disabled;
 
     return (
       React.cloneElement(
         onRenderOption(
-          getOptionClassName(opt, highlighted),
+          getOptionClassName(opt, highlighted, disabled),
           null,
           opt,
           highlighted
@@ -266,12 +280,11 @@ export default class Dropdown extends Component {
   }
 
   handleOptionClick(idx) {
+    const option = this.state.shownOptions[idx];
     this.setState({
-      value: getOptionText(this.state.shownOptions[idx]),
-      selectedIndex: idx,
       listShown: false
     }, () => {
-      this.selectOption(idx);
+      this.selectOption(findOptionIndex(this.props.options, option));
     });
   }
 
@@ -281,7 +294,7 @@ export default class Dropdown extends Component {
 
     if (this.props.value === undefined) {
       this.setState({ value });
-      this.updateSelectedIndex(value, options, optionFilters);
+      this.updateHighlightedIndex(value, options, optionFilters);
     }
     this.setState({ textValue: value });
 
@@ -312,23 +325,23 @@ export default class Dropdown extends Component {
   }
 
   handleArrowUpKeyDown = e => {
-    const { selectedIndex, shownOptions } = this.state;
+    const { highlightedIndex, shownOptions } = this.state;
 
     e.preventDefault();
 
     this.setState({
-      selectedIndex: getSiblingIndex(selectedIndex, shownOptions, false),
+      highlightedIndex: getSiblingIndex(highlightedIndex, shownOptions, false),
       listShown: true
     });
   }
 
   handleArrowDownKeyDown = e => {
-    const { selectedIndex, shownOptions } = this.state;
+    const { highlightedIndex, shownOptions } = this.state;
 
     e.preventDefault();
 
     this.setState({
-      selectedIndex: getSiblingIndex(selectedIndex, shownOptions, true),
+      highlightedIndex: getSiblingIndex(highlightedIndex, shownOptions, true),
       listShown: true
     });
   }
@@ -340,23 +353,32 @@ export default class Dropdown extends Component {
   }
 
   handleEnterKeyDown = () => {
+    const { highlightedIndex, shownOptions } = this.state;
+    const option = shownOptions[highlightedIndex];
+
     this.setState({
-      value: getOptionText(this.state.shownOptions[this.state.selectedIndex]),
       listShown: false
     }, () => {
-      this.selectOption(this.state.selectedIndex);
+      this.selectOption(findOptionIndex(this.props.options, option));
     });
   }
 
-  selectOption(selectedIndex) {
-    const { shownOptions } = this.state;
+  selectOption(index, fireOnChange) {
+    const { options, optionFilters } = this.props;
+    const option = options[index];
+    const shownOptions = getShownOptions(getOptionText(option), options, optionFilters);
+
     this.setState({
-      textValue: getOptionText(shownOptions[selectedIndex])
+      value: getOptionText(option),
+      textValue: getOptionText(option),
+      highlightedIndex: findOptionIndex(shownOptions, option),
+      selectedIndex: index,
+      shownOptions
     });
-    if (this.props.onValueChange) {
+    if (fireOnChange && this.props.onValueChange) {
       this.props.onValueChange(
-        getOptionValue(shownOptions[selectedIndex]),
-        getOptionText(shownOptions[selectedIndex])
+        getOptionValue(option),
+        getOptionText(option)
       );
     }
   }
@@ -369,10 +391,13 @@ export default class Dropdown extends Component {
   }
 
   handleBlur = () => {
-    this.selectOption(this.state.selectedIndex);
+    const { selectedIndex } = this.state;
+
     this.setState({
       isActive: false,
       listShown: false
+    }, () => {
+      this.selectOption(selectedIndex, false);
     });
   }
 }
@@ -440,6 +465,12 @@ const sheet = jss.createStyleSheet({
     color: '#FFFFFF',
     '&:hover': {
       'background-color': '#3333FF'
+    }
+  },
+  optionDisabled: {
+    color: '#999999',
+    '&:hover': {
+      'background-color': 'inherit'
     }
   },
   separator: {
