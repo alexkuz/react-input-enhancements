@@ -151,10 +151,9 @@ export default class Dropdown extends Component {
   shouldComponentUpdate = shouldPureComponentUpdate
 
   componentWillUpdate(nextProps, nextState) {
-    const { options, optionFilters, defaultValue, value } = nextProps;
+    const { options, optionFilters } = nextProps;
 
-    if ((this.props.defaultValue !== defaultValue ||
-    this.props.value !== value) && nextState.value === null) {
+    if ((this.props.defaultValue || this.props.value) && nextState.value === null) {
       this.setState(getStateFromProps(nextProps));
     } else if (this.props.options !== options ||
       this.props.optionFilters !== optionFilters) {
