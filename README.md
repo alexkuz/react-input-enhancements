@@ -14,6 +14,10 @@ All components accept `function` as a child, providing props as a first argument
 
 [`<Combobox />`](#combobox) is a combination of `Dropdown`, `Autosize` and/or `Autocomplete` components.
 
+## Demo
+
+http://alexkuz.github.io/react-input-enhancements/
+
 ## Autosize
 
 `Autosize` resizes component to fit it's content.
@@ -121,6 +125,26 @@ All components accept `function` as a child, providing props as a first argument
 * **`pattern`** *string* - Pattern for formating string. Only '0' (digit) or 'a' (letter) pattern chars are currently supported.
 * **`emptyChar`** *string* - Character used as an empty symbol (`' '` by default)
 * **`onUnmaskedValueChange`** *function(text)* - Fires when value is changed, providing unmasked value
+ 
+
+## Combobox
+
+`Combobox` combines `Dropdown`, `Autosize` and/or `Autocomplete` components.
+
+```js
+<Combobox defaultValue={value}
+          options={options}
+          autosize
+          autocomplete>
+  {(inputProps, { matchingText, width }) =>
+    <input type='text' {...inputProps} />
+  }
+</Combobox>
+```
+
+`Autosize` and `Autocomlete` are enabled with corresponding bool props, other properties are proxied to `Dropdown` component.
+
+See [demo](http://alexkuz.github.io/react-input-enhancements/) for code examples.
 
 ## Some other (probably better) implementations
 
