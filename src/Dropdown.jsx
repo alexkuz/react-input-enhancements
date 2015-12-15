@@ -163,7 +163,7 @@ export default class Dropdown extends Component {
       );
       const selectedIndex = findOptionIndex(options, shownOptions[highlightedIndex]);
 
-      this.setState({ selectedIndex, value });
+      this.setState({ selectedIndex });
     }
   }
 
