@@ -5,14 +5,14 @@ The intention of creating this library was to bring `input` component out of the
 
 There are currently four components:
 
-1. [`<Autosize />`](#Autosize)
-2. [`<Autocomplete />`](#)
-3. `<Dropdown />`
-4. `<Mask />`
+1. [`<Autosize />`](#autosize)
+2. [`<Autocomplete />`](#autocomplete)
+3. [`<Dropdown />`](#dropdown)
+4. [`<Mask />`](#mask)
 
 All components accept `function` as a child, providing props as a first argument, which you should pass to your `input` component. If there is nothing else except `input`, it could be passed as a child directly (for simplicity).
 
-[`<Combobox />`](#Combobox) is a combination of `Dropdown`, `Autosize` and/or `Autocomplete` components.
+[`<Combobox />`](#combobox) is a combination of `Dropdown`, `Autosize` and/or `Autocomplete` components.
 
 ## Autosize
 
