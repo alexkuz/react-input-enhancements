@@ -154,7 +154,11 @@ export default class Dropdown extends Component {
     const { options, optionFilters } = nextProps;
 
     if ((this.props.defaultValue || this.props.value) && nextState.value === null) {
-      this.setState(getStateFromProps(nextProps));
+      const state = getStateFromProps(nextProps);
+
+      if (state.value !== null) {
+        this.setState(state);
+      }
     } else if (this.props.options !== options ||
       this.props.optionFilters !== optionFilters) {
       const [highlightedIndex, shownOptions] = this.updateHighlightedIndex(
