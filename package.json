@@ -3,7 +3,7 @@
   "version": "0.3.6",
   "description": "Set of enhancements for input control (bootstrap-ready)",
   "scripts": {
-    "build:lib": "babel src --out-dir lib",
+    "build:lib": "NODE_ENV=production babel src --out-dir lib",
     "build:demo": "NODE_ENV=production webpack -p --optimize-dedupe",
     "stats": "webpack --profile --json > stats.json",
     "start": "webpack-dev-server",
