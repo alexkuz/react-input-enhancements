@@ -85,6 +85,8 @@ export default class Mask extends Component {
         return;
       }
 
+      e.target.value = processedValue.result;
+
       if (this.props.onUnmaskedValueChange) {
         this.props.onUnmaskedValueChange(processedValue.unmaskedValue);
       }
