@@ -7,6 +7,7 @@ import jssNested from 'jss-nested';
 import jssVendorPrefixer from 'jss-vendor-prefixer';
 import findMatchingTextIndex from './utils/findMatchingTextIndex';
 import * as filters from './filters';
+import InputPopup from './InputPopup';
 
 const jss = create();
 jss.use(jssNested());
@@ -116,9 +117,6 @@ export default class Dropdown extends Component {
         </div> :
         <div className={sheet.classes.separator} />,
 
-    onRenderCaret: (className, style, isActive, children) =>
-      <div {...{ className, style }}>{children}</div>,
-
     onRenderList: (className, style, isActive, listShown, children, header) =>
       listShown && (
         <div {...{ className, style }}>
@@ -153,7 +151,7 @@ export default class Dropdown extends Component {
   componentWillUpdate(nextProps, nextState) {
     const { options, optionFilters } = nextProps;
 
-    if ((this.props.defaultValue || this.props.value) && nextState.value === null) {
+    if ((nextProps.defaultValue || nextProps.value) && nextState.value === null) {
       const state = getStateFromProps(nextProps);
 
       if (state.value !== null) {
@@ -194,75 +192,45 @@ export default class Dropdown extends Component {
   }
 
   render() {
-    const { dropdownClassName, onRenderCaret, onRenderList, onRenderListHeader,
-            dropdownStyle, dropdownProps, options } = this.props;
-    const { classes } = sheet;
-    const { shownOptions, isActive, hover, listShown } = this.state;
-
-    const caret = (
-      <svg width='10' height='5' fill='currentColor'>
-        <path d='M0 0 H10 L5 5 z'/>
-      </svg>
-    );
-    const caretClassName = classNames(classes.caret, hover && classes.caretActive);
-    const listClassName = classNames(classes.list, isActive && classes.listActive);
+    const { onRenderCaret, onRenderList, dropdownProps,
+            style, children, onValueChange, ...props } = this.props;
+    const selectedOption = this.state.shownOptions[this.state.highlightedIndex];
 
     return (
-      <div className={classNames(classes.dropdown, dropdownClassName)}
-           style={dropdownStyle}
-           onFocus={this.handleFocus}
-           onBlur={this.handleBlur}
-           onMouseEnter={() => this.setState({ hover: true })}
-           onMouseLeave={() => this.setState({ hover: false })}
-           ref='dropdown'
-           {...dropdownProps}>
-        {this.renderInput()}
-        {onRenderCaret(caretClassName, null, isActive, caret)}
-        {onRenderList(
-          listClassName,
-          null,
-          isActive,
-          listShown,
-          shownOptions.map(this.renderOption),
-          onRenderListHeader(
-            options.length,
-            shownOptions.length,
-            shownOptions.filter(isStatic).length
-          )
-        )}
-      </div>
+      <InputPopup {...props}
+                  value={this.state.isActive ?
+                          this.state.value :
+                          getOptionText(selectedOption)}
+                  proxyProps={{ textValue: this.state.value }}
+                  defaultValue={null}
+                  onChange={this.handleChange}
+                  onBlur={this.handleBlur}
+                  onKeyDown={this.handleKeyDown}
+                  inputPopupProps={dropdownProps}
+                  onRenderPopup={this.renderPopup}
+                  onIsActiveChange={this.handleIsActiveChange}
+                  popupShown={this.state.listShown}>
+        {children}
+      </InputPopup>
     );
   }
 
-  renderInput() {
-    const { dropdownClassName, onRenderCaret, onRenderList, className,
-            style, children, onValueChange, ...props } = this.props;
-    const { classes } = sheet;
-    const selectedOption = this.state.shownOptions[this.state.highlightedIndex];
+  renderPopup = (popupClassName, popupStyle, isActive, popupShown) => {
+    const { onRenderList, onRenderListHeader, options } = this.props;
+    const { shownOptions } = this.state;
 
-    const inputProps = {
-      ...props,
-      value: (this.state.isActive ?
-        this.state.value :
-        getOptionText(selectedOption)),
-      defaultValue: null,
-      className: classNames(classes.input, className),
-      onKeyDown: this.handleKeyDown,
-      onChange: this.handleChange,
-      style: {
-        paddingRight: '15px'
-      }
-    };
-
-    if (typeof children === 'function') {
-      return children(inputProps, {
-        textValue: this.state.textValue
-      });
-    } else {
-      const input = Children.only(children);
-
-      return React.cloneElement(input, { ...inputProps, ...input.props });
-    }
+    return onRenderList(
+      popupClassName,
+      popupStyle,
+      isActive,
+      popupShown,
+      shownOptions.map(this.renderOption),
+      onRenderListHeader(
+        options.length,
+        shownOptions.length,
+        shownOptions.filter(isStatic).length
+      )
+    );
   }
 
   renderOption = (opt, idx) => {
@@ -304,7 +272,6 @@ export default class Dropdown extends Component {
       this.setState({ value });
       this.updateHighlightedIndex(value, options, optionFilters);
     }
-    this.setState({ textValue: value });
 
     if (this.props.onChange) {
       this.props.onChange(e);
@@ -315,16 +282,11 @@ export default class Dropdown extends Component {
     const keyMap = {
       ArrowUp: this.handleArrowUpKeyDown,
       ArrowDown: this.handleArrowDownKeyDown,
-      Escape: this.handleEscapeKeyDown,
       Enter: this.handleEnterKeyDown
     }
 
     if (keyMap[e.key]) {
       keyMap[e.key](e);
-    } else {
-      this.setState({
-        listShown: true
-      });
     }
 
     if (this.props.onKeyDown) {
@@ -338,8 +300,7 @@ export default class Dropdown extends Component {
     e.preventDefault();
 
     this.setState({
-      highlightedIndex: getSiblingIndex(highlightedIndex, shownOptions, false),
-      listShown: true
+      highlightedIndex: getSiblingIndex(highlightedIndex, shownOptions, false)
     });
   }
 
@@ -349,14 +310,7 @@ export default class Dropdown extends Component {
     e.preventDefault();
 
     this.setState({
-      highlightedIndex: getSiblingIndex(highlightedIndex, shownOptions, true),
-      listShown: true
-    });
-  }
-
-  handleEscapeKeyDown = () => {
-    this.setState({
-      listShown: false
+      highlightedIndex: getSiblingIndex(highlightedIndex, shownOptions, true)
     });
   }
 
@@ -364,9 +318,7 @@ export default class Dropdown extends Component {
     const { highlightedIndex, shownOptions } = this.state;
     const option = shownOptions[highlightedIndex];
 
-    this.setState({
-      listShown: false
-    }, () => {
+    setTimeout(() => {
       this.selectOption(findOptionIndex(this.props.options, option), true);
     });
   }
@@ -378,7 +330,6 @@ export default class Dropdown extends Component {
 
     this.setState({
       value: getOptionText(option),
-      textValue: getOptionText(option),
       highlightedIndex: findOptionIndex(shownOptions, option),
       selectedIndex: index,
       shownOptions
@@ -391,63 +342,16 @@ export default class Dropdown extends Component {
     }
   }
 
-  handleFocus = () => {
-    this.setState({
-      isActive: true,
-      listShown: true
-    });
+  handleIsActiveChange = isActive => {
+    this.setState({ isActive });
   }
 
-  handleBlur = () => {
-    const { selectedIndex } = this.state;
-
-    this.setState({
-      isActive: false,
-      listShown: false
-    }, () => {
-      this.selectOption(selectedIndex, false);
-    });
+  handlePopupShownChange = popupShown => {
+    this.setState({ listShown: popupShown });
   }
 }
 
 const sheet = jss.createStyleSheet({
-  dropdown: {
-    position: 'relative',
-    display: 'inline-block'
-  },
-  caret: {
-    position: 'absolute',
-    right: '5px',
-    top: 0,
-    'padding-top': '5px',
-    'vertical-align': 'middle',
-    'padding-left': '3px',
-    width: '10px',
-    '& svg': {
-      display: 'inline-block',
-      opacity: 0,
-      transition: 'opacity 0.15s linear, transform 0.15s linear',
-      transform: 'translateY(5px)'
-    }
-  },
-  caretActive: {
-    '& svg': {
-      opacity: 1,
-      transform: 'translateY(0)'
-    }
-  },
-  list: {
-    position: 'absolute',
-    left: 0,
-    top: '100%',
-    'z-index': 10000,
-    'max-height': '30rem',
-    'min-width': '22rem',
-    'background-color': '#FFFFFF',
-    'box-shadow': '1px 1px 4px rgba(100, 100, 100, 0.3)',
-    display: 'flex',
-    'flex-direction': 'column'
-  },
   listHeader: {
     'flex-shrink': 0,
     height: '3rem',
