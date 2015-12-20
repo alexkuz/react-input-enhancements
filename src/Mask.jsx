@@ -12,18 +12,21 @@ export default class Mask extends Component {
 
     this.state = {
       value: maskedValue.isValid ? maskedValue.result : value,
+      lastIndex: 0
     };
   }
 
   static propTypes = {
     getInputElement: PropTypes.func,
     value: PropTypes.string,
+    defaultValue: PropTypes.string,
     pattern: PropTypes.string.isRequired,
     emptyChar: PropTypes.string
   }
 
   static defaultProps = {
-    emptyChar: ' '
+    emptyChar: ' ',
+    onValidate: () => {}
   }
 
   shouldComponentUpdate = shouldPureComponentUpdate
@@ -31,20 +34,34 @@ export default class Mask extends Component {
   componentWillReceiveProps(nextProps) {
     if (this.props.pattern !== nextProps.pattern ||
       this.props.value !== nextProps.value ||
+      this.props.defaultValue !== nextProps.defaultValue ||
       this.props.emptyChar !== nextProps.emptyChar) {
-      this.setValue(nextProps.value, nextProps);
+      this.setValue(nextProps.value || nextProps.defaultValue, nextProps);
     }
   }
 
   setValue(value, props) {
     const processedValue = applyMaskToString(value, props.pattern, props.emptyChar);
-    if (processedValue.isValid) {
-      this.setState({ value: processedValue.result }, () => {
-        this.getInput().setSelectionRange(processedValue.lastIndex, processedValue.lastIndex);
-      });
-    }
+    const isValid = processedValue.isValid && !this.props.onValidate(value, processedValue.result);
+    const state = isValid ?
+      { value: processedValue.result, lastIndex: processedValue.lastIndex } :
+      {};
+
+    this.setState(
+      state,
+      () => this.setSelectionRange(this.state.lastIndex)
+    );
 
     return processedValue;
+  }
+
+  setSelectionRange(lastIndex) {
+    const input = this.getInput();
+    if (input === document.activeElement) {
+      input.setSelectionRange(lastIndex, lastIndex);
+      // HACK
+      setTimeout(() => input.setSelectionRange(lastIndex, lastIndex));
+    }
   }
 
   getInput() {

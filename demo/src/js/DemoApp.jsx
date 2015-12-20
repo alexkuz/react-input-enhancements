@@ -12,6 +12,7 @@ import Autosize from 'Autosize';
 import Autocomplete from 'Autocomplete';
 import Combobox from 'Combobox';
 import Mask from 'Mask';
+import DatePicker from 'DatePicker';
 
 import pkg from '../../../package.json';
 import './bootstrap-input-inline.css';
@@ -270,6 +271,41 @@ const code8 = `
   </Mask>
 `;
 
+const ValueInput9 = pure(({ value, onChange }) =>
+  <Input label='DatePicker:'
+         labelClassName='col-xs-3'
+         wrapperClassName='col-xs-6'>
+    <DatePicker defaultValue={value}
+                defaultWidth={100}
+                onChange={e => onChange(e.target.value)}
+                inputStyle={{ fontFamily: 'monospace' }}>
+      {inputProps =>
+        <input {...inputProps}
+               type='text'
+               className={`${inputProps.className} form-control`} />
+      }
+    </DatePicker>
+  </Input>);
+
+const code9 = `
+  <Mask pattern='+\ 7\ (000) 000-00-00'
+        defaultValue={value}
+        onChange={e => onChange(e.target.value)}
+        onUnmaskedValueChange={onUnmaskedValueChange}
+        style={{ fontFamily: 'monospace' }}>
+    {inputProps =>
+      <Autosize defaultWidth={100} {...inputProps}>
+        <Input type='text'
+               label='Mask + Autosize (phone number):'
+               labelClassName='col-xs-3'
+               wrapperClassName='col-xs-1'
+               groupClassName='autosize-addon-input'
+               addonAfter={<Glyphicon glyph='phone' />} />
+      </Autosize>
+    }
+  </Mask>
+`;
+
 export default class DemoApp extends React.Component {
   constructor(props) {
     super(props);
@@ -353,6 +389,9 @@ export default class DemoApp extends React.Component {
                      wrapperClassName='col-xs-9'
                      value={this.state.unmaskedValue8} />
             {this.renderCode(code8, 'code8open')}
+            <ValueInput9 value={this.state.value9}
+                         onChange={this.handleValue9Change} />
+            {this.renderCode(code9, 'code8open')}
           </form>
         </div>
       </div>
@@ -388,6 +427,8 @@ export default class DemoApp extends React.Component {
   handleValue7Change = value => this.setState({ value7: value })
 
   handleValue8Change = value => this.setState({ value8: value })
+
+  handleValue9Change = value => this.setState({ value9: value })
 }
 
 

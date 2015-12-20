@@ -204,11 +204,11 @@ export default class Dropdown extends Component {
                   proxyProps={{ textValue: this.state.value }}
                   defaultValue={null}
                   onChange={this.handleChange}
-                  onBlur={this.handleBlur}
                   onKeyDown={this.handleKeyDown}
                   inputPopupProps={dropdownProps}
                   onRenderPopup={this.renderPopup}
                   onIsActiveChange={this.handleIsActiveChange}
+                  onPopupShownChange={this.handlePopupShownChange}
                   popupShown={this.state.listShown}>
         {children}
       </InputPopup>

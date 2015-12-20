@@ -1,4 +1,5 @@
 import React, { Component, PropTypes, Children } from 'react';
+import ReactDOM from 'react-dom';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import classNames from 'classnames';
 import { create } from 'jss';
@@ -31,8 +32,7 @@ export default class InputPopup extends Component {
     onRenderCaret: (className, style, isActive, children) =>
       <div {...{ className, style }}>{children}</div>,
 
-    onRenderPopup: (className, style, isActive, popupShown, children) =>
-      popupShown && <div {...{ className, style }}>{children}</div>,
+    onRenderPopup: () => {},
 
     inputPopupProps: {}
   }
@@ -53,7 +53,7 @@ export default class InputPopup extends Component {
 
   componentWillUpdate(nextProps) {
     if (nextProps.popupShown !== this.props.popupShown) {
-      this.setState({ popupShown: this.props.popupShown })
+      this.setState({ popupShown: nextProps.popupShown })
     }
   }
 
@@ -68,8 +68,7 @@ export default class InputPopup extends Component {
   }
 
   render() {
-    const { className, onRenderCaret, onRenderPopup, inputPopupProps,
-            popup } = this.props;
+    const { className, onRenderCaret, onRenderPopup, inputPopupProps } = this.props;
     const { classes } = sheet;
     const { isActive, hover, popupShown } = this.state;
 
@@ -90,8 +89,7 @@ export default class InputPopup extends Component {
           popupClassName,
           null,
           isActive,
-          popupShown,
-          popup
+          popupShown
         )}
       </div>
     );
@@ -156,6 +154,12 @@ export default class InputPopup extends Component {
   }
 
   handleFocus = e => {
+    if (this.blurTimeout) {
+      clearTimeout(this.blurTimeout);
+      this.blurTimeout = null;
+      return;
+    }
+
     this.setState({
       isActive: true,
       popupShown: true
@@ -167,9 +171,12 @@ export default class InputPopup extends Component {
   }
 
   handleBlur = e => {
-    this.setState({
-      isActive: false,
-      popupShown: false
+    this.blurTimeout = setTimeout(() => {
+      this.setState({
+        isActive: false,
+        popupShown: false
+      });
+      this.blurTimeout = null;
     });
 
     if (this.props.onBlur) {

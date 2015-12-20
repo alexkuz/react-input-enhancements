@@ -57,6 +57,7 @@
     "webpack-dev-server": "^1.10.1"
   },
   "peerDependencies": {
+    "moment": "^2.10.6",
     "react": ">=0.14.0",
     "react-dom": ">=0.14.0"
   },
@@ -65,7 +66,8 @@
     "jss": "^3.2.0",
     "jss-nested": "^1.0.1",
     "jss-vendor-prefixer": "^1.0.1",
-    "lodash.sortby": "^3.1.5"
+    "lodash.sortby": "^3.1.5",
+    "react-date-picker": "^3.1.9"
   },
   "author": "Alexander <alexkuz@gmail.com> (http://kuzya.org/)",
   "license": "MIT"
