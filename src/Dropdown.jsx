@@ -166,6 +166,8 @@ export default class Dropdown extends Component {
       const selectedIndex = findOptionIndex(options, shownOptions[highlightedIndex]);
 
       this.setState({ selectedIndex });
+    } else if (this.state.isActive && !nextState.isActive) {
+      this.setState({ value: getOptionText(nextProps.options[nextState.selectedIndex]) });
     }
   }
 
@@ -201,9 +203,7 @@ export default class Dropdown extends Component {
 
     return (
       <InputPopup {...props}
-                  value={this.state.isActive ?
-                          value :
-                          getOptionText(selectedOption)}
+                  value={value}
                   proxyProps={{ textValue: value }}
                   onChange={this.handleChange}
                   onKeyDown={this.handleKeyDown}
