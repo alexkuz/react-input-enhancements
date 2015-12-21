@@ -4,6 +4,7 @@ import Input from 'react-bootstrap/lib/Input';
 import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import Collapse from 'react-bootstrap/lib/Collapse';
 import Static from 'react-bootstrap/lib/FormControls/Static';
+import Button from 'react-bootstrap/lib/Button';
 
 import countries from './countries';
 import pure from './pure';
@@ -158,11 +159,13 @@ const code5 = `
   </Input>
 `;
 
-const ValueInput6 = pure(({ value, onChange }) =>
+const ValueInput6 = pure(({ value, onChange, addonAfter }) =>
   <Input label='Combobox (Dropdown + Autosize + Autocomplete, defaultWidth=100):'
          labelClassName='col-xs-3'
-         wrapperClassName='col-xs-6'>
+         wrapperClassName='col-xs-6'
+         addonAfter={addonAfter}>
     <Combobox defaultValue={value}
+              value={value}
               options={[...countries]}
               defaultWidth={100}
               onValueChange={onChange}
@@ -367,7 +370,18 @@ export default class DemoApp extends React.Component {
                          onChange={this.handleValue5Change} />
             {this.renderCode(code5, 'code5open')}
             <ValueInput6 value={this.state.value6}
-                         onChange={this.handleValue6Change} />
+                         onChange={this.handleValue6Change}
+                         addonAfter={
+                          <div style={{ display: 'flex' }}>
+                            <Button onClick={() => this.setState({ value6: null })}>
+                              Reset
+                            </Button>
+                            <Button onClick={() => this.setState({ value6: 'value--Andorra' })}
+                                    style={{ marginLeft: '2rem' }}>
+                              Set Andorra
+                            </Button>
+                          </div>
+                         } />
             {this.renderCode(code6, 'code6open')}
             <ValueInput7 value={this.state.value7}
                          onChange={this.handleValue7Change}
@@ -389,9 +403,11 @@ export default class DemoApp extends React.Component {
                      wrapperClassName='col-xs-9'
                      value={this.state.unmaskedValue8} />
             {this.renderCode(code8, 'code8open')}
+            {/*
             <ValueInput9 value={this.state.value9}
                          onChange={this.handleValue9Change} />
             {this.renderCode(code9, 'code8open')}
+            */}
           </form>
         </div>
       </div>

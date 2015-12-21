@@ -77,9 +77,9 @@ function findOptionIndex(options, option) {
 }
 
 function getStateFromProps(props) {
-  const shownOptions = getShownOptions(null, props.options, props.optionFilters);
   const match = findMatchingTextIndex(props.value || props.defaultValue, props.options);
   const [selectedIndex, matchingText] = match;
+  const shownOptions = getShownOptions(matchingText, props.options, props.optionFilters);
   const highlightedIndex = findOptionIndex(shownOptions, props.options[selectedIndex]);
 
   return {
@@ -151,10 +151,11 @@ export default class Dropdown extends Component {
   componentWillUpdate(nextProps, nextState) {
     const { options, optionFilters } = nextProps;
 
-    if ((nextProps.defaultValue || nextProps.value) && nextState.value === null) {
+    if ((nextProps.defaultValue || nextProps.value) && nextState.value === null ||
+        this.props.value !== nextProps.value) {
       const state = getStateFromProps(nextProps);
 
-      if (state.value !== null) {
+      if (state.value !== this.state.value) {
         this.setState(state);
       }
     } else if (this.props.options !== options ||
@@ -194,15 +195,16 @@ export default class Dropdown extends Component {
   render() {
     const { onRenderCaret, onRenderList, dropdownProps,
             style, children, onValueChange, ...props } = this.props;
-    const selectedOption = this.state.shownOptions[this.state.highlightedIndex];
+    const selectedOption = this.props.options[this.state.selectedIndex];
+
+    const value = this.state.value === null ? '' : this.state.value;
 
     return (
       <InputPopup {...props}
                   value={this.state.isActive ?
-                          this.state.value :
+                          value :
                           getOptionText(selectedOption)}
-                  proxyProps={{ textValue: this.state.value }}
-                  defaultValue={null}
+                  proxyProps={{ textValue: value }}
                   onChange={this.handleChange}
                   onKeyDown={this.handleKeyDown}
                   inputPopupProps={dropdownProps}
@@ -268,10 +270,8 @@ export default class Dropdown extends Component {
     const { options, optionFilters } = this.props;
     const value = e.target.value;
 
-    if (this.props.value === undefined) {
-      this.setState({ value });
-      this.updateHighlightedIndex(value, options, optionFilters);
-    }
+    this.setState({ value });
+    this.updateHighlightedIndex(value, options, optionFilters);
 
     if (this.props.onChange) {
       this.props.onChange(e);
