@@ -36,22 +36,37 @@ export default class Autocomplete extends Component {
   shouldComponentUpdate = shouldPureComponentUpdate
 
   componentWillMount() {
+    document.addEventListener('selectionchange', this.handleSelectionChange);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('selectionchange', this.handleSelectionChange);
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.value !== nextProps.value) {
-      this.setValue(nextProps.value);
+      this.setValue(nextProps.value, nextProps.options);
     }
   }
 
-  setValue(value) {
-    const match = findMatchingTextIndex(value, this.props.options);
+  componentWillUpdate(nextProps, nextState) {
+    if (this.props.options !== nextProps.options &&
+      this.props.value === nextProps.value) {
+      const match = findMatchingTextIndex(nextState.value, nextProps.options);
+      const [, matchingText] = match;
+      this.setState({ matchingText });
+    }
+  }
+
+  setValue(value, options) {
+    const match = findMatchingTextIndex(value, options);
     const [, matchingText] = match;
     this.setState({ value, matchingText });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.value !== prevState.value) {
+    if (this.state.value !== prevState.value ||
+        this.state.matchingText !== prevState.matchingText) {
       if (this.state.matchingText) {
         const input = this.getInput();
         setSelection(input, this.state.value, this.state.matchingText);
@@ -88,12 +103,18 @@ export default class Autocomplete extends Component {
     }
   }
 
+  handleSelectionChange = () => {
+    const input = this.getInput();
+    if (input.selectionStart === input.selectionEnd &&
+      input.value !== this.state.value) {
+      this.setValue(input.value, this.props.options);
+    }
+  }
+
   handleChange = e => {
     const value = e.target.value;
 
-    if (this.props.value === undefined) {
-      this.setValue(value);
-    }
+    this.setValue(value, this.props.options);
 
     if (this.props.onChange) {
       this.props.onChange(e);
