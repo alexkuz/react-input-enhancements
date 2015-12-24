@@ -103,7 +103,6 @@ export default class Dropdown extends Component {
     value: PropTypes.string,
     options: PropTypes.arrayOf(shapes.ITEM_OR_STRING),
     onRenderOption: PropTypes.func,
-    onRenderCaret: PropTypes.func,
     onRenderList: PropTypes.func,
     optionFilters: PropTypes.arrayOf(PropTypes.func)
   }
@@ -194,7 +193,7 @@ export default class Dropdown extends Component {
   }
 
   render() {
-    const { onRenderCaret, onRenderList, dropdownProps,
+    const { onRenderList, dropdownProps,
             style, children, onValueChange, ...props } = this.props;
 
     const value = this.state.value === null ? '' : this.state.value;
