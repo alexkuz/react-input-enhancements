@@ -61,7 +61,7 @@ export default function applyMaskToString(string, pattern, emptyChar) {
       }
       break;
     }
-  };
+  }
 
   return {
     result,

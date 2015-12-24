@@ -91,7 +91,7 @@ export default class Autosize extends Component {
       this.setDefaultWidth(defaultWidth);
     }
 
-    this.updateWidth(this.props.value, defaultWidth);
+    this.updateWidth(this.props.value || this.props.placeholder, defaultWidth);
   }
 
   setDefaultWidth(defaultWidth) {
@@ -106,7 +106,7 @@ export default class Autosize extends Component {
 
   componentWillUpdate(nextProps, nextState) {
     if (nextState.value !== this.state.value) {
-      this.updateWidth(nextState.value, nextState.defaultWidth);
+      this.updateWidth(nextState.value || nextProps.placeholder, nextState.defaultWidth);
     }
   }
 
@@ -170,7 +170,7 @@ export default class Autosize extends Component {
   }
 
   handleWindownResize = () => {
-    this.updateWidth(this.state.value, this.state.defaultWidth);
+    this.updateWidth(this.state.value || this.props.placeholder, this.state.defaultWidth);
   }
 
   handleChange = e => {

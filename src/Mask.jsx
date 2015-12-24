@@ -3,16 +3,37 @@ import ReactDOM from 'react-dom';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import applyMaskToString from './applyMaskToString';
 
+function getStateFromProps(value, props) {
+  value = props.onValuePreUpdate(value);
+  let processedValue = applyMaskToString(value, props.pattern, props.emptyChar);
+  const validatedValue = props.onValidate(value, processedValue);
+  if (validatedValue && validatedValue.result) {
+    processedValue = validatedValue;
+  } else if (validatedValue) {
+    processedValue.isValid = false;
+  }
+  const state = processedValue.isValid ?
+    { value: processedValue.result, lastIndex: processedValue.lastIndex } :
+    {};
+
+  if (!processedValue.unmaskedValue && props.placeholder) {
+    state.value = '';
+  }
+
+  return [state, processedValue];
+}
+
 export default class Mask extends Component {
   constructor(props) {
     super(props);
 
-    const value = props.value || props.defaultValue || '';
-    const maskedValue = applyMaskToString(value, props.pattern, props.emptyChar);
 
+    const value = props.value || props.defaultValue || '';
+    const [state] = getStateFromProps(value, props);
     this.state = {
-      value: maskedValue.isValid ? maskedValue.result : value,
-      lastIndex: 0
+      value,
+      lastIndex: 0,
+      ...state
     };
   }
 
@@ -26,7 +47,8 @@ export default class Mask extends Component {
 
   static defaultProps = {
     emptyChar: ' ',
-    onValidate: () => {}
+    onValidate: () => {},
+    onValuePreUpdate: v => v
   }
 
   shouldComponentUpdate = shouldPureComponentUpdate
@@ -41,16 +63,16 @@ export default class Mask extends Component {
   }
 
   setValue(value, props) {
-    const processedValue = applyMaskToString(value, props.pattern, props.emptyChar);
-    const isValid = processedValue.isValid && !this.props.onValidate(value, processedValue.result);
-    const state = isValid ?
-      { value: processedValue.result, lastIndex: processedValue.lastIndex } :
-      {};
+    const [state, processedValue] = getStateFromProps(value, props);
 
-    this.setState(
-      state,
-      () => this.setSelectionRange(this.state.lastIndex)
-    );
+    if (processedValue.isValid) {
+      this.setState(
+        state,
+        () => this.setSelectionRange(this.state.lastIndex)
+      );
+    } else {
+      this.setSelectionRange(this.state.lastIndex);
+    }
 
     return processedValue;
   }

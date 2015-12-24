@@ -5,6 +5,7 @@ import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import Collapse from 'react-bootstrap/lib/Collapse';
 import Static from 'react-bootstrap/lib/FormControls/Static';
 import Button from 'react-bootstrap/lib/Button';
+import moment from 'moment';
 
 import countries from './countries';
 import pure from './pure';
@@ -202,6 +203,7 @@ const code6 = `
 
 const ValueInput7 = pure(({ value, onChange, onUnmaskedValueChange }) =>
   <Mask pattern='0000-0000-0000-0000'
+        placeholder='1234-5678-1234-5678'
         defaultValue={value}
         onChange={e => onChange(e.target.value)}
         onUnmaskedValueChange={onUnmaskedValueChange}
@@ -220,6 +222,7 @@ const ValueInput7 = pure(({ value, onChange, onUnmaskedValueChange }) =>
 
 const code7 = `
   <Mask pattern='0000-0000-0000-0000'
+        placeholder='1234-5678-1234-5678'
         defaultValue={value}
         onChange={e => onChange(e.target.value)}
         onUnmaskedValueChange={onUnmaskedValueChange}
@@ -239,6 +242,7 @@ const code7 = `
 
 const ValueInput8 = pure(({ value, onChange, onUnmaskedValueChange }) =>
   <Mask pattern='+\ 7\ (000) 000-00-00'
+        placeholder='+ 7 (123) 456-78-90'
         defaultValue={value}
         onChange={e => onChange(e.target.value)}
         onUnmaskedValueChange={onUnmaskedValueChange}
@@ -257,6 +261,7 @@ const ValueInput8 = pure(({ value, onChange, onUnmaskedValueChange }) =>
 
 const code8 = `
   <Mask pattern='+\ 7\ (000) 000-00-00'
+        placeholder='+ 7 (123) 456-78-90'
         defaultValue={value}
         onChange={e => onChange(e.target.value)}
         onUnmaskedValueChange={onUnmaskedValueChange}
@@ -275,12 +280,12 @@ const code8 = `
 `;
 
 const ValueInput9 = pure(({ value, onChange }) =>
-  <Input label='DatePicker:'
+  <Input label={<span>DatePicker <b>(WIP)</b>:</span>}
          labelClassName='col-xs-3'
          wrapperClassName='col-xs-6'>
-    <DatePicker defaultValue={value}
+    <DatePicker defaultValue={moment(value).format('ddd DD/MM/YYYY')}
                 defaultWidth={100}
-                onChange={e => onChange(e.target.value)}
+                onChange={onChange}
                 inputStyle={{ fontFamily: 'monospace' }}>
       {inputProps =>
         <input {...inputProps}
@@ -291,22 +296,20 @@ const ValueInput9 = pure(({ value, onChange }) =>
   </Input>);
 
 const code9 = `
-  <Mask pattern='+\ 7\ (000) 000-00-00'
-        defaultValue={value}
-        onChange={e => onChange(e.target.value)}
-        onUnmaskedValueChange={onUnmaskedValueChange}
-        style={{ fontFamily: 'monospace' }}>
-    {inputProps =>
-      <Autosize defaultWidth={100} {...inputProps}>
-        <Input type='text'
-               label='Mask + Autosize (phone number):'
-               labelClassName='col-xs-3'
-               wrapperClassName='col-xs-1'
-               groupClassName='autosize-addon-input'
-               addonAfter={<Glyphicon glyph='phone' />} />
-      </Autosize>
-    }
-  </Mask>
+  <Input label='DatePicker:'
+         labelClassName='col-xs-3'
+         wrapperClassName='col-xs-6'>
+    <DatePicker defaultValue={moment(value).format('ddd DD/MM/YYYY')}
+                defaultWidth={100}
+                onChange={onChange}
+                inputStyle={{ fontFamily: 'monospace' }}>
+      {inputProps =>
+        <input {...inputProps}
+               type='text'
+               className={\`$\{inputProps.className\} form-control\`} />
+      }
+    </DatePicker>
+  </Input>
 `;
 
 export default class DemoApp extends React.Component {
@@ -403,11 +406,11 @@ export default class DemoApp extends React.Component {
                      wrapperClassName='col-xs-9'
                      value={this.state.unmaskedValue8} />
             {this.renderCode(code8, 'code8open')}
-            {/*
+            {/**/}
             <ValueInput9 value={this.state.value9}
                          onChange={this.handleValue9Change} />
             {this.renderCode(code9, 'code8open')}
-            */}
+            {/**/}
           </form>
         </div>
       </div>
@@ -457,6 +460,7 @@ const styles = {
   header: {
   },
   content: {
-    paddingTop: '20px'
+    paddingTop: '20px',
+    paddingBottom: '300px'
   }
 };
