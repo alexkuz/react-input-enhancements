@@ -77,7 +77,8 @@ export default class Autocomplete extends Component {
       ...props,
       value: matchingText || value,
       onKeyDown: this.handleKeyDown,
-      onChange: this.handleChange
+      onChange: this.handleChange,
+      onBlur: this.handleBlur
     };
 
     if (typeof children === 'function') {
@@ -130,4 +131,10 @@ export default class Autocomplete extends Component {
     setSelection(input, this.state.matchingText, this.state.matchingText);
     input.blur();
   }
+
+  handleBlur = () => {
+    const input = this.getInput();
+    setSelection(input, this.state.matchingText, this.state.matchingText);
+  }
+  
 }
