@@ -95,7 +95,6 @@ function getStateFromProps(props) {
 export default class Dropdown extends Component {
   constructor(props) {
     super(props);
-    this.optionRefs = {};
 
     this.state = getStateFromProps(props);
   }
@@ -166,6 +165,8 @@ export default class Dropdown extends Component {
       const selectedIndex = findOptionIndex(options, shownOptions[highlightedIndex]);
 
       this.setState({ selectedIndex });
+    } else if (this.state.isActive && !nextState.isActive) {
+      this.setState({ value: getOptionText(nextProps.options[nextState.selectedIndex]) });
     }
   }
 
@@ -182,7 +183,7 @@ export default class Dropdown extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.state.highlightedIndex !== prevState.highlightedIndex &&
       this.state.highlightedIndex !== null) {
-      const optionEl = this.optionRefs['option-' + this.state.highlightedIndex];
+      const optionEl = this.highlightedEl;
       if (optionEl) {
         const optionHeight = optionEl.offsetHeight;
         const listEl = optionEl.parentNode;
@@ -195,15 +196,12 @@ export default class Dropdown extends Component {
   render() {
     const { onRenderCaret, onRenderList, dropdownProps,
             style, children, onValueChange, ...props } = this.props;
-    const selectedOption = this.props.options[this.state.selectedIndex];
 
     const value = this.state.value === null ? '' : this.state.value;
 
     return (
       <InputPopup {...props}
-                  value={this.state.isActive ?
-                          value :
-                          getOptionText(selectedOption)}
+                  value={value}
                   proxyProps={{ textValue: value }}
                   onChange={this.handleChange}
                   onKeyDown={this.handleKeyDown}
@@ -241,19 +239,16 @@ export default class Dropdown extends Component {
     const disabled = opt && opt.disabled;
 
     return (
-      React.cloneElement(
-        onRenderOption(
+      <div key={getOptionKey(opt, idx)}
+           onMouseDown={this.handleOptionClick.bind(this, idx)}
+           ref={c => {if (highlighted) { this.highlightedEl = c; }}}>
+        {onRenderOption(
           getOptionClassName(opt, highlighted, disabled),
           null,
           opt,
           highlighted
-        ),
-        {
-          key: getOptionKey(opt, idx),
-          ref: o => this.optionRefs['option-' + idx] = o,
-          onMouseDown: this.handleOptionClick.bind(this, idx)
-        }
-      )
+        )}
+      </div>
     );
   }
 
