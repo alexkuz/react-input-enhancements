@@ -12,8 +12,6 @@ const jss = create();
 jss.use(jssNested());
 jss.use(jssVendorPrefixer());
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
 const VALIDATORS = {
   YYYY: () => false,
   MM: val => parseInt(val, 10) > 12 ? '12' : false,
@@ -22,7 +20,7 @@ const VALIDATORS = {
 };
 
 function getStateFromProps(value, props) {
-  const date = moment(value, props.pattern);
+  const date = moment(value === null ? undefined : value, props.pattern, props.locale);
 
   return {
     date,
@@ -43,14 +41,16 @@ export default class DatePicker extends Component {
   static defaultProps = {
     pattern: 'ddd DD/MM/YYYY',
     placeholder: moment().format('ddd DD/MM/YYYY'),
-    onRenderCalendar: (className, style, date, isActive, popupShown, onSelect) =>
+    onRenderCalendar: (className, style, date, isActive, popupShown, onSelect, locale) =>
       popupShown && (
         <div {...{ className, style }}>
           <ReactDatePicker date={date.format('YYYY-MM-DD')}
                            className={sheet.classes.datePicker}
-                           onChange={date => onSelect(moment(date, 'YYYY-MM-DD'))} />
+                           onChange={date => onSelect(moment(date, 'YYYY-MM-DD', locale))}
+                           locale={locale} />
         </div>
-      )
+      ),
+    locale: 'en'
   }
 
   shouldComponentUpdate = shouldPureComponentUpdate
@@ -78,7 +78,9 @@ export default class DatePicker extends Component {
         <InputPopup {...props}
                     onRenderPopup={this.renderPopup}
                     onPopupShownChange={this.handlePopupShownChange}
-                    popupShown={this.state.popupShown}>
+                    onIsActiveChange={this.handleIsActiveChange}
+                    popupShown={this.state.popupShown}
+                    isActive={this.state.isActive}>
           {children}
         </InputPopup>
       </Mask>
@@ -87,6 +89,10 @@ export default class DatePicker extends Component {
 
   handlePopupShownChange = popupShown => {
     this.setState({ popupShown });
+  }
+
+  handleIsActiveChange = isActive => {
+    this.setState({ isActive });
   }
 
   handleChange = e => {
@@ -98,16 +104,24 @@ export default class DatePicker extends Component {
   }
 
   handleValuePreUpdate = value => {
-    return value.replace(RegExp(`(${DAYS.join('|')})`, 'g'), 'ddd');
+    const localeData = moment.localeData(this.props.locale);
+    const days = localeData._weekdaysShort;
+
+    return value.replace(RegExp(`(${days.join('|').replace('.', '\\.')})`, 'g'), 'ddd');
   }
 
   handleValueUpdate = value => {
-    const state = getStateFromProps(value, this.props);
-    return value.replace(/ddd/g, DAYS[state.date.day()]);
+    const localeData = moment.localeData(this.props.locale);
+    const state = getStateFromProps(
+      value.replace(/ddd/g, localeData.weekdaysShort(this.state.date)),
+      this.props
+    );
+
+    return value.replace(/ddd/g, localeData.weekdaysShort(state.date));
   }
 
   renderPopup = (popupClassName, popupStyle, isActive, popupShown) => {
-    const { onRenderCalendar } = this.props;
+    const { onRenderCalendar, locale } = this.props;
 
     return onRenderCalendar(
       popupClassName,
@@ -115,14 +129,18 @@ export default class DatePicker extends Component {
       this.state.date,
       isActive,
       popupShown,
-      this.handleSelect
+      this.handleSelect,
+      locale
     );
   }
 
   handleSelect = date => {
-    const value = moment(date).format(this.props.pattern);
+    const localeMoment = moment(date);
+    localeMoment.locale(this.props.locale);
+    const value = localeMoment.format(this.props.pattern);
     this.setState({
       popupShown: false,
+      isActive: false,
       ...getStateFromProps(value, this.props)
     });
     this.props.onChange && this.props.onChange(date);
@@ -162,9 +180,12 @@ const sheet = jss.createStyleSheet({
     flex: '1 0 auto',
     'box-sizing': 'border-box',
     width: '28rem',
+    height: '30rem',
 
     '& *': {
-      'box-sizing': 'border-box'
+      'box-sizing': 'border-box',
+      'user-select': 'none',
+      outline: 'none'
     },
 
     '& .dp-header': {
@@ -181,6 +202,16 @@ const sheet = jss.createStyleSheet({
       'flex-direction': 'row',
       'justify-content': 'space-around',
       padding: '0.5rem'
+    },
+
+    '& .dp-footer-today, & .dp-footer-selected': {
+      padding: '0.5rem 1rem',
+      'border-radius': '2rem',
+      cursor: 'pointer'
+    },
+
+    '& .dp-footer-today:hover, & .dp-footer-selected:hover': {
+      'background-color': '#F0F0F0'
     },
 
     '& .dp-body': {
@@ -219,6 +250,57 @@ const sheet = jss.createStyleSheet({
       padding: '0.5rem'
     },
 
+    '& .dp-day': {
+      position: 'relative',
+      cursor: 'pointer',
+
+      '&:before': {
+        content: '""',
+        position: 'absolute',
+        'z-index': '-1',
+        width: '3.1rem',
+        height: '3.1rem',
+        'border-radius': '2rem',
+        left: '0.5rem',
+        top: '0.1rem'
+      }
+    },
+
+
+    '& .dp-day:hover:before': {
+      'background-color': '#F0F0F0'
+    },
+
+    '& .dp-value': {
+      color: '#FFF',
+      '&:before': {
+        'background-color': '#2196f3'
+      },
+      '&:hover:before': {
+        'background-color': '#0A6EBD'
+      }
+    },
+
+    '& .dp-month.dp-value': {
+      'background-color': '#2196f3',
+      '&:hover': {
+        'background-color': '#0A6EBD'
+      }
+    },
+
+    '& .dp-year.dp-value': {
+      'background-color': '#2196f3',
+      '&:hover': {
+        'background-color': '#0A6EBD'
+      }
+    },
+
+    '& .dp-current': {
+      '&:before': {
+        'box-shadow': '0 0 0 1px #FFF, 0 0 0 2px #2196f3'
+      },
+    },
+
     '& .dp-nav-table': {
       width: '100%',
       display: 'flex',
@@ -226,17 +308,25 @@ const sheet = jss.createStyleSheet({
       flex: 1,
 
       '& .dp-cell': {
-        flex: 7
+        flex: 7,
+        cursor: 'pointer',
+        '&:hover': {
+          'background-color': '#E0E0E0'
+        }
       },
 
       '& .dp-nav-cell': {
-        flex: 1,
-        cursor: 'pointer'
-      },
-
-      '& .dp-nav-cell:hover': {
-        'background-color': '#EEE'
+        flex: 1
       }
+    },
+
+    '& .dp-month, & .dp-year': {
+      cursor: 'pointer',
+      'border-radius': '0.5rem'
+    },
+
+    '& .dp-month:hover, & .dp-year:hover': {
+      'background-color': '#F0F0F0'
     }
   }
 }).attach();

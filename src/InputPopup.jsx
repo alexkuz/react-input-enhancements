@@ -1,5 +1,4 @@
 import React, { Component, PropTypes, Children } from 'react';
-import ReactDOM from 'react-dom';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import classNames from 'classnames';
 import { create } from 'jss';
@@ -15,9 +14,9 @@ export default class InputPopup extends Component {
     super(props);
 
     this.state = {
-      isActive: false,
+      isActive: props.isActive,
+      popupShown: props.popupShown,
       hover: false,
-      popupShown: false
     };
   }
 
@@ -51,9 +50,19 @@ export default class InputPopup extends Component {
 
   shouldComponentUpdate = shouldPureComponentUpdate
 
+  componentWillUnmount() {
+    if (this.blurTimeout) {
+      clearTimeout(this.blurTimeout);
+    }
+  }
+
   componentWillUpdate(nextProps) {
     if (nextProps.popupShown !== this.props.popupShown) {
       this.setState({ popupShown: nextProps.popupShown })
+    }
+
+    if (nextProps.isActive !== this.props.isActive) {
+      this.setState({ isActive: nextProps.isActive })
     }
   }
 
@@ -80,8 +89,6 @@ export default class InputPopup extends Component {
       <div className={classNames(classes.inputPopup, className)}
            onFocus={this.handleFocus}
            onBlur={this.handleBlur}
-           onMouseEnter={() => this.setState({ hover: true })}
-           onMouseLeave={() => this.setState({ hover: false })}
            {...inputPopupProps}>
         {this.renderInput()}
         {onRenderCaret(caretClassName, null, isActive, caret)}
@@ -105,6 +112,8 @@ export default class InputPopup extends Component {
       ...props,
       onFocus: onInputFocus,
       onBlur: onInputBlur,
+      onMouseEnter: this.handleMouseEnter,
+      onMouseLeave: this.handleMouseLeave,
       className: classNames(classes.input, inputClassName),
       onKeyDown: this.handleKeyDown,
       style: {
@@ -119,6 +128,22 @@ export default class InputPopup extends Component {
       const input = Children.only(children);
 
       return React.cloneElement(input, { ...inputProps, ...input.props });
+    }
+  }
+
+  handleMouseEnter = e => {
+    this.setState({ hover: true });
+
+    if (this.props.onInputMouseEnter) {
+      this.props.onInputMouseEnter(e);
+    }
+  }
+
+  handleMouseLeave = e => {
+    this.setState({ hover: false });
+
+    if (this.props.onInputMouseLeave) {
+      this.props.onInputMouseLeave(e);
     }
   }
 

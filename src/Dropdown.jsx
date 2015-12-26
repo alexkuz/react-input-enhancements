@@ -208,7 +208,8 @@ export default class Dropdown extends Component {
                   onRenderPopup={this.renderPopup}
                   onIsActiveChange={this.handleIsActiveChange}
                   onPopupShownChange={this.handlePopupShownChange}
-                  popupShown={this.state.listShown}>
+                  popupShown={this.state.listShown}
+                  isActive={this.state.isActive}>
         {children}
       </InputPopup>
     );
@@ -326,6 +327,7 @@ export default class Dropdown extends Component {
       value: getOptionText(option),
       highlightedIndex: findOptionIndex(shownOptions, option),
       selectedIndex: index,
+      isActive: false,
       shownOptions
     });
     if (fireOnChange && this.props.onValueChange) {

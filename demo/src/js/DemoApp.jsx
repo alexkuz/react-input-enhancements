@@ -280,10 +280,10 @@ const code8 = `
 `;
 
 const ValueInput9 = pure(({ value, onChange }) =>
-  <Input label={<span>DatePicker <b>(WIP)</b>:</span>}
+  <Input label='DatePicker:'
          labelClassName='col-xs-3'
          wrapperClassName='col-xs-6'>
-    <DatePicker defaultValue={moment(value).format('ddd DD/MM/YYYY')}
+    <DatePicker defaultValue={moment(value || undefined).format('ddd DD/MM/YYYY')}
                 defaultWidth={100}
                 onChange={onChange}
                 inputStyle={{ fontFamily: 'monospace' }}>
@@ -299,10 +299,62 @@ const code9 = `
   <Input label='DatePicker:'
          labelClassName='col-xs-3'
          wrapperClassName='col-xs-6'>
-    <DatePicker defaultValue={moment(value).format('ddd DD/MM/YYYY')}
+    <DatePicker defaultValue={moment(value || undefined).format('ddd DD/MM/YYYY')}
                 defaultWidth={100}
                 onChange={onChange}
                 inputStyle={{ fontFamily: 'monospace' }}>
+      {inputProps =>
+        <input {...inputProps}
+               type='text'
+               className={\`$\{inputProps.className\} form-control\`} />
+      }
+    </DatePicker>
+  </Input>
+`;
+
+const ValueInput10 = pure(({ value, onChange }) => {
+  const frCurrent = moment(value || undefined);
+  frCurrent.locale('fr');
+  const frNow = moment();
+  frNow.locale('fr');
+
+  return (
+    <Input label='DatePicker (FR):'
+           labelClassName='col-xs-3'
+           wrapperClassName='col-xs-6'>
+      <DatePicker defaultValue={frCurrent.format('YYYY.MM.DD ddd')}
+                  placeholder={frNow.format('YYYY.MM.DD ddd')}
+                  pattern='YYYY.MM.DD ddd'
+                  defaultWidth={100}
+                  onChange={onChange}
+                  inputStyle={{ fontFamily: 'monospace' }}
+                  locale='fr'>
+        {inputProps =>
+          <input {...inputProps}
+                 type='text'
+                 className={`${inputProps.className} form-control`} />
+        }
+      </DatePicker>
+    </Input>
+  );
+});
+
+const code10 = `
+  const frCurrent = moment(value || undefined);
+  frCurrent.locale('fr');
+  const frNow = moment();
+  frNow.locale('fr');
+
+  <Input label='DatePicker (FR):'
+         labelClassName='col-xs-3'
+         wrapperClassName='col-xs-6'>
+    <DatePicker defaultValue={frCurrent.format('YYYY.MM.DD ddd')}
+                placeholder={frNow.format('YYYY.MM.DD ddd')}
+                pattern='YYYY.MM.DD ddd'
+                defaultWidth={100}
+                onChange={onChange}
+                inputStyle={{ fontFamily: 'monospace' }}
+                locale='fr'>
       {inputProps =>
         <input {...inputProps}
                type='text'
@@ -326,13 +378,17 @@ export default class DemoApp extends React.Component {
       unmaskedValue7: null,
       value8: null,
       unmaskedValue8: null,
+      value9: null,
+      value10: null,
       code1and2open: false,
       code3open: false,
       code4open: false,
       code5open: false,
       code6open: false,
       code7open: false,
-      code8open: false
+      code8open: false,
+      code9open: false,
+      code10open: false
     };
   }
 
@@ -406,11 +462,12 @@ export default class DemoApp extends React.Component {
                      wrapperClassName='col-xs-9'
                      value={this.state.unmaskedValue8} />
             {this.renderCode(code8, 'code8open')}
-            {/**/}
             <ValueInput9 value={this.state.value9}
                          onChange={this.handleValue9Change} />
-            {this.renderCode(code9, 'code8open')}
-            {/**/}
+            {this.renderCode(code9, 'code9open')}
+            <ValueInput10 value={this.state.value10}
+                          onChange={this.handleValue10Change} />
+            {this.renderCode(code10, 'code10open')}
           </form>
         </div>
       </div>
@@ -448,6 +505,8 @@ export default class DemoApp extends React.Component {
   handleValue8Change = value => this.setState({ value8: value })
 
   handleValue9Change = value => this.setState({ value9: value })
+
+  handleValue10Change = value => this.setState({ value10: value })
 }
 
 
