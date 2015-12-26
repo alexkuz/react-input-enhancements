@@ -9,6 +9,7 @@ There are currently four components:
 2. [`<Autocomplete />`](#autocomplete)
 3. [`<Dropdown />`](#dropdown)
 4. [`<Mask />`](#mask)
+5. [`<DatePicker />`](#datepicker)
 
 All components accept `function` as a child, providing props as a first argument, which you should pass to your `input` component. If there is nothing else except `input`, it could be passed as a child directly (for simplicity).
 
@@ -122,10 +123,39 @@ http://alexkuz.github.io/react-input-enhancements/
 * **`value`** *string* - Input value (for a controlled component)
 * **`defaultValue`** *string* - Initial value (for a uncontrolled component)
 * **`getInputElement`** *function()* - Optional callback that provides input DOM element
-* **`pattern`** *string* - Pattern for formating string. Only '0' (digit) or 'a' (letter) pattern chars are currently supported.
+* **`pattern`** *string* - String formatting pattern. Only '0' (digit) or 'a' (letter) pattern chars are currently supported.
 * **`emptyChar`** *string* - Character used as an empty symbol (`' '` by default)
+* **`placeholder`** *string* - If set, it is shown when `unmaskedValue` is empty
 * **`onUnmaskedValueChange`** *function(text)* - Fires when value is changed, providing unmasked value
- 
+
+## DatePicker
+
+`DatePicker` uses `Mask` to format date and shows calendar ([react-date-picker](https://github.com/zippyui/react-date-picker) by default) in popup.
+
+```js
+<DatePicker defaultValue={moment(value).format('ddd DD/MM/YYYY')}
+            placeholder={moment().format('ddd DD/MM/YYYY')}
+            pattern='ddd DD/MM/YYYY'
+            locale='en'>
+  {(inputProps, { value }) =>
+    <input type='text' {...inputProps} />
+  }
+</DatePicker>
+```
+
+### DatePicker Props
+
+* **`value`** *string* - Input value (for a controlled component)
+* **`defaultValue`** *string* - Initial value (for a uncontrolled component)
+* **`pattern`** *string* - Date formatting pattern. For now, only these tokens are supported:
+  * `DD` - day of month
+  * `MM` - month
+  * `YYYY` - year
+  * `ddd` - day of week *(not editable)*
+* **`placeholder`** *string* - If set, it is shown when `unmaskedValue` is empty
+* **`locale`** *string* - Date locale
+* **`onRenderCalendar`** *function(className, style, date, isActive, popupShown, onSelect, locale)* - Returns calendar component shown in popup ([react-date-picker](https://github.com/zippyui/react-date-picker) by default)
+* **`onChange`** *function(date)* - Fires when date is selected, providing [moment.js](http://momentjs.com/) object
 
 ## Combobox
 
