@@ -4,10 +4,6 @@ function getOptionText(opt) {
     opt.text || opt.value) || '';
 }
 
-function isEmpty(value) {
-  return value === null || value === '';
-}
-
 export default function findMatchingTextIndex(value, options, allMatches) {
   const lowerText = value && value.toLowerCase();
 
@@ -18,8 +14,7 @@ export default function findMatchingTextIndex(value, options, allMatches) {
     const optText = getOptionText(opt);
     const matchPosition = optText.toLowerCase().indexOf(lowerText);
 
-    if (optValue === value ||
-      isEmpty(optValue) && isEmpty(value) ||
+    if (optValue === value && opt !== null ||
       optText && lowerText && (allMatches ? matchPosition !== -1 : matchPosition === 0)) {
 
       return [...opts, [idx, optText, optValue, matchPosition, optText.toLowerCase()]];
