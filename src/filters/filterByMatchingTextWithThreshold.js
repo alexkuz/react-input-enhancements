@@ -1,10 +1,4 @@
-function getOptionText(opt) {
-  return typeof opt === 'string' ?
-    opt :
-    typeof opt.label === 'string' ?
-      opt.label :
-      opt.text || opt.value;
-}
+import getOptionText from '../utils/getOptionText';
 
 function isStatic(opt) {
   return opt === null || opt.static === true;

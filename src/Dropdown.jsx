@@ -8,6 +8,9 @@ import jssVendorPrefixer from 'jss-vendor-prefixer';
 import findMatchingTextIndex from './utils/findMatchingTextIndex';
 import * as filters from './filters';
 import InputPopup from './InputPopup';
+import getOptionText from './utils/getOptionText';
+import getOptionLabel from './utils/getOptionLabel';
+import getOptionValue from './utils/getOptionValue';
 
 const jss = create();
 jss.use(jssNested());
@@ -15,24 +18,6 @@ jss.use(jssVendorPrefixer());
 
 function isStatic(opt) {
   return opt === null || opt.static === true;
-}
-
-function getOptionText(opt) {
-  return (typeof opt === 'string' || !opt ?
-    opt :
-    opt.text || opt.value) || '';
-}
-
-function getOptionValue(opt) {
-  return typeof opt === 'string' || !opt ?
-    opt :
-    opt.value;
-}
-
-function getOptionLabel(opt) {
-  return typeof opt === 'string' || !opt ?
-    opt :
-    (opt.label || opt.text || opt.value);
 }
 
 function getOptionClassName(opt, isHighlighted, isDisabled) {

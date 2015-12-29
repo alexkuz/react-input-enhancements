@@ -1,8 +1,4 @@
-function getOptionText(opt) {
-  return (typeof opt === 'string' || !opt ?
-    opt :
-    opt.text || opt.value) || '';
-}
+import getOptionText from './getOptionText';
 
 export default function findMatchingTextIndex(value, options, allMatches) {
   const lowerText = value && value.toLowerCase();
