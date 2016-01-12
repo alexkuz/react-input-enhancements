@@ -1,6 +1,4 @@
-function isStatic(opt) {
-  return opt === null || opt.static === true;
-}
+import isStatic from '../utils/isStatic';
 
 function getEmptyOption(message) {
   return { label: message, static: true, disabled: true };

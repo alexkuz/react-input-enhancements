@@ -1,16 +1,6 @@
 import sort from 'lodash.sortby';
-
-function getOptionText(opt) {
-  return typeof opt === 'string' ?
-    opt :
-    typeof opt.label === 'string' ?
-      opt.label :
-      opt.text || opt.value;
-}
-
-function isStatic(opt) {
-  return opt === null || opt.static === true;
-}
+import getOptionText from '../utils/getOptionText';
+import isStatic from '../utils/isStatic';
 
 export default function sortByMatchingText(options, value) {
   value = value && value.toLowerCase();

@@ -1,4 +1,4 @@
-import React, { Component, PropTypes, Children } from 'react';
+import React, { Component, PropTypes } from 'react';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import * as shapes from './shapes';
 import classNames from 'classnames';
@@ -11,14 +11,11 @@ import InputPopup from './InputPopup';
 import getOptionText from './utils/getOptionText';
 import getOptionLabel from './utils/getOptionLabel';
 import getOptionValue from './utils/getOptionValue';
+import isStatic from './utils/isStatic';
 
 const jss = create();
 jss.use(jssNested());
 jss.use(jssVendorPrefixer());
-
-function isStatic(opt) {
-  return opt === null || opt.static === true;
-}
 
 function getOptionClassName(opt, isHighlighted, isDisabled) {
   return classNames(

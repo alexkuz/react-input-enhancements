@@ -1,8 +1,5 @@
 import getOptionText from '../utils/getOptionText';
-
-function isStatic(opt) {
-  return opt === null || opt.static === true;
-}
+import isStatic from '../utils/isStatic';
 
 export default function filterByMatchingTextWithThreshold(threshold) {
   return (options, value) => {
