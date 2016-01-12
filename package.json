@@ -50,7 +50,6 @@
     "raw-loader": "^0.5.1",
     "react-addons-perf": "^0.14.3",
     "react-bootstrap": "^0.28.1",
-    "react-pure-render": "^1.0.2",
     "react-transform-hmr": "^1.0.1",
     "style-loader": "^0.13.0",
     "webpack": "^1.11.0",
@@ -67,7 +66,8 @@
     "jss-nested": "^1.0.1",
     "jss-vendor-prefixer": "^1.0.1",
     "lodash.sortby": "^3.1.5",
-    "react-date-picker": "^3.1.9"
+    "react-date-picker": "^3.1.9",
+    "react-pure-render": "^1.0.2"
   },
   "author": "Alexander <alexkuz@gmail.com> (http://kuzya.org/)",
   "license": "MIT"
