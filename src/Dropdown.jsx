@@ -90,10 +90,10 @@ export default class Dropdown extends Component {
   }
 
   static defaultProps = {
-    onRenderOption: (className, style, opt) =>
+    onRenderOption: (className, style, opt, highlighted) =>
       opt !== null ?
         <div {...{ className, style }}>
-          {getOptionLabel(opt)}
+          {getOptionLabel(opt, highlighted)}
         </div> :
         <div className={sheet.classes.separator} />,
 

@@ -1,5 +1,7 @@
-export default function getOptionLabel(opt) {
+export default function getOptionLabel(opt, highlighted) {
   return typeof opt === 'string' || !opt ?
     opt :
-    (opt.label || opt.text || opt.value);
+    typeof opt.label === 'function' ?
+      opt.label(opt, highlighted) :
+      (opt.label || opt.text || opt.value);
 }
