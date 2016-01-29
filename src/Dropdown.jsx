@@ -12,6 +12,7 @@ import getOptionText from './utils/getOptionText';
 import getOptionLabel from './utils/getOptionLabel';
 import getOptionValue from './utils/getOptionValue';
 import isStatic from './utils/isStatic';
+import DropdownOption from './DropdownOption';
 
 const jss = create();
 jss.use(jssNested());
@@ -161,19 +162,6 @@ export default class Dropdown extends Component {
     return [highlightedIndex, shownOptions];
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.highlightedIndex !== prevState.highlightedIndex &&
-      this.state.highlightedIndex !== null) {
-      const optionEl = this.highlightedEl;
-      if (optionEl) {
-        const optionHeight = optionEl.offsetHeight;
-        const listEl = optionEl.parentNode;
-        const listHeight = listEl.clientHeight;
-        listEl.scrollTop = optionEl.offsetTop - (listHeight - optionHeight) / 2;
-      }
-    }
-  }
-
   render() {
     const { onRenderList, dropdownProps,
             style, children, onValueChange, ...props } = this.props;
@@ -221,16 +209,16 @@ export default class Dropdown extends Component {
     const disabled = opt && opt.disabled;
 
     return (
-      <div key={getOptionKey(opt, idx)}
-           onMouseDown={this.handleOptionClick.bind(this, idx)}
-           ref={c => {if (highlighted) { this.highlightedEl = c; }}}>
+      <DropdownOption key={getOptionKey(opt, idx)}
+                      onMouseDown={this.handleOptionClick.bind(this, idx)}
+                      highlighted={highlighted}>
         {onRenderOption(
           getOptionClassName(opt, highlighted, disabled),
           null,
           opt,
           highlighted
         )}
-      </div>
+      </DropdownOption>
     );
   }
 

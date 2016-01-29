@@ -126,7 +126,7 @@ const ValueInput5 = pure(({ value, onChange }) =>
          labelClassName='col-xs-3'
          wrapperClassName='col-xs-6'>
     <Combobox defaultValue={value}
-              options={countries}
+              options={[...countries, 'random-string-' + Math.random()]}
               dropdownProps={{ style: { minWidth: '100%' } }}
               onValueChange={onChange}
               onChange={e => onChange(e.target.value)}
