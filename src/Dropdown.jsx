@@ -147,6 +147,12 @@ export default class Dropdown extends Component {
       const selectedIndex = findOptionIndex(options, shownOptions[highlightedIndex]);
 
       this.setState({ selectedIndex });
+
+      const state = getStateFromProps(nextProps);
+
+      if (state.value !== this.state.value) {
+        this.setState(state);
+      }
     } else if (this.state.isActive && !nextState.isActive) {
       this.setState({ value: getOptionText(nextProps.options[nextState.selectedIndex]) });
     }

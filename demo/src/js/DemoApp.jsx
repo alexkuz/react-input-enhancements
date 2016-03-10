@@ -160,14 +160,14 @@ const code5 = `
   </Input>
 `;
 
-const ValueInput6 = pure(({ value, onChange, addonAfter }) =>
+const ValueInput6 = pure(({ value, onChange, addonAfter, options }) =>
   <Input label='Combobox (Dropdown + Autosize + Autocomplete, defaultWidth=100):'
          labelClassName='col-xs-3'
          wrapperClassName='col-xs-6'
          addonAfter={addonAfter}>
     <Combobox defaultValue={value}
               value={value}
-              options={[...countries]}
+              options={options}
               defaultWidth={100}
               onValueChange={onChange}
               autosize
@@ -364,6 +364,7 @@ export default class DemoApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      countries,
       value1: null,
       value2: null,
       value3: null,
@@ -394,7 +395,16 @@ export default class DemoApp extends React.Component {
 
   setDelayedState = () => {
     this.setState({ value4: 'value--Albania' });
-  }
+  };
+
+  alterCountries = () => {
+    this.setState({
+      countries: countries.map(country => country && ({
+        ...country,
+        text: country.text && country.text + ' ' + Math.random().toFixed(2)
+      }))
+    });
+  };
 
   render() {
     return (
@@ -426,6 +436,7 @@ export default class DemoApp extends React.Component {
             {this.renderCode(code5, 'code5open')}
             <ValueInput6 value={this.state.value6}
                          onChange={this.handleValue6Change}
+                         options={this.state.countries}
                          addonAfter={
                           <div style={{ display: 'flex' }}>
                             <Button onClick={() => this.setState({ value6: null })}>
@@ -434,6 +445,10 @@ export default class DemoApp extends React.Component {
                             <Button onClick={() => this.setState({ value6: 'value--Andorra' })}
                                     style={{ marginLeft: '2rem' }}>
                               Set Andorra
+                            </Button>
+                            <Button onClick={this.alterCountries}
+                                    style={{ marginLeft: '2rem' }}>
+                              Alter Options
                             </Button>
                           </div>
                          } />
