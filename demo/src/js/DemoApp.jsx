@@ -166,7 +166,6 @@ const ValueInput6 = pure(({ value, onChange, addonAfter, options }) =>
          wrapperClassName='col-xs-6'
          addonAfter={addonAfter}>
     <Combobox defaultValue={value}
-              value={value}
               options={options}
               defaultWidth={100}
               onValueChange={onChange}
@@ -385,7 +384,8 @@ export default class DemoApp extends React.Component {
       code7open: false,
       code8open: false,
       code9open: false,
-      code10open: false
+      code10open: false,
+      asyncAlterCountries: false
     };
   }
 
@@ -405,6 +405,16 @@ export default class DemoApp extends React.Component {
       }))
     });
   };
+
+  toggleAsyncAlterCountries = () => {
+    const asyncAlterCountries = !this.state.asyncAlterCountries;
+    this.setState({ asyncAlterCountries });
+
+    clearTimeout(this.alterCountriesTimeout);
+    if (asyncAlterCountries) {
+      this.alterCountriesTimeout = setInterval(this.alterCountries, 5000);
+    }
+  }
 
   render() {
     return (
@@ -449,6 +459,11 @@ export default class DemoApp extends React.Component {
                             <Button onClick={this.alterCountries}
                                     style={{ marginLeft: '2rem' }}>
                               Alter Options
+                            </Button>
+                            <Button onClick={this.toggleAsyncAlterCountries}
+                                    style={{ marginLeft: '2rem' }}>
+                              {this.state.asyncAlterCountries ?
+                                'Async Alter On' : 'Async Alter Off'}
                             </Button>
                           </div>
                          } />

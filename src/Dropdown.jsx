@@ -150,7 +150,7 @@ export default class Dropdown extends Component {
 
       const state = getStateFromProps(nextProps);
 
-      if (state.value !== this.state.value) {
+      if (state.value !== this.state.value && !nextState.isActive) {
         this.setState(state);
       }
     } else if (this.state.isActive && !nextState.isActive) {
