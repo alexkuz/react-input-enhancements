@@ -81,8 +81,6 @@ export default class Mask extends Component {
     const input = this.getInput();
     if (input === document.activeElement) {
       input.setSelectionRange(lastIndex, lastIndex);
-      // HACK
-      setTimeout(() => input.setSelectionRange(lastIndex, lastIndex));
     }
   }
 
