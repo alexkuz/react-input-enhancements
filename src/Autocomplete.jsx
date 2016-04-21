@@ -35,7 +35,7 @@ export default class Autocomplete extends Component {
 
   shouldComponentUpdate = shouldPureComponentUpdate
 
-  componentWillMount() {
+  componentDidMount() {
     document.addEventListener('selectionchange', this.handleSelectionChange);
   }
 

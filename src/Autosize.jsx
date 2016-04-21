@@ -55,7 +55,7 @@ export default class Autosize extends Component {
 
   shouldComponentUpdate = shouldPureComponentUpdate
 
-  componentWillMount() {
+  componentDidMount() {
     if (!sizersListEl) {
       sizersListEl = document.createElement('div');
       for(const [key, val] of Object.entries(sizerContainerStyle)) {
