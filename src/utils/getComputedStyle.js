@@ -1,6 +1,6 @@
 // Source: https://github.com/jonathantneal/Polyfills-for-IE8/blob/master/getComputedStyle.js
 
-!('getComputedStyle' in window) && (window.getComputedStyle = (function (window) {
+typeof window != "undefined" && !('getComputedStyle' in window) && (window.getComputedStyle = (function (window) {
   function getPixelSize(element, style, property, fontSize) {
     const sizeWithSuffix = style[property];
     const size = parseFloat(sizeWithSuffix);
