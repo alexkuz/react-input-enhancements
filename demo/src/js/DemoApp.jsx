@@ -144,7 +144,7 @@ const code5 = `
   <Input label='Combobox (Dropdown + Autosize):'
          labelClassName='col-xs-3'
          wrapperClassName='col-xs-6'>
-    <Combobox defaultValue={value}
+    <Combobox value={value}
               options={countries}
               dropdownProps={{ style: { minWidth: '100%' } }}
               onValueChange={onChange}
@@ -165,7 +165,7 @@ const ValueInput6 = pure(({ value, onChange, addonAfter, options }) =>
          labelClassName='col-xs-3'
          wrapperClassName='col-xs-6'
          addonAfter={addonAfter}>
-    <Combobox defaultValue={value}
+    <Combobox value={value}
               options={options}
               defaultWidth={100}
               onValueChange={onChange}

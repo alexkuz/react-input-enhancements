@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import * as shapes from './shapes';
 import classNames from 'classnames';
@@ -297,6 +298,7 @@ export default class Dropdown extends Component {
 
     setTimeout(() => {
       this.selectOption(findOptionIndex(this.props.options, option), true);
+      this.getInput().blur();
     });
   }
 
@@ -318,6 +320,17 @@ export default class Dropdown extends Component {
         getOptionText(option)
       );
     }
+  }
+
+  getInput() {
+    if (this.props.getInputElement) {
+      return this.props.getInputElement();
+    }
+
+    const el = ReactDOM.findDOMNode(this);
+    return el.tagName === 'INPUT' ?
+      el:
+      el.getElementsByTagName('INPUT')[0];
   }
 
   handleIsActiveChange = isActive => {
