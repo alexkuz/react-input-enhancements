@@ -1,6 +1,8 @@
 export default [
   { label: 'No Country', text: '', value: null, static: true },
   null,
+  { text: 'Disabled Option', disabled: true, static: true },
+  null,
   { text: 'Afghanistan', value: 'value--Afghanistan' },
   { text: 'Albania', value: 'value--Albania' },
   { text: 'Algeria', value: 'value--Algeria' },

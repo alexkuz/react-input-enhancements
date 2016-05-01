@@ -93,7 +93,7 @@ http://alexkuz.github.io/react-input-enhancements/
 * **`text`** - text used as input value when option is selected
 * **`label`** - text or component rendered in list
 * **`static`** - option is never filtered out or sorted
-* **`disable`** - option is not selectable
+* **`disabled`** - option is not selectable
 
 `null` option is rendered as a separator
 

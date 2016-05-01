@@ -4,6 +4,10 @@ export default function findMatchingTextIndex(value, options, allMatches) {
   const lowerText = value && value.toLowerCase();
 
   const foundOptions = options.reduce((opts, opt, idx) => {
+    if (opt && opt.disabled) {
+      return opts;
+    }
+
     const optValue = opt && opt.hasOwnProperty('value') ?
       opt.value :
       typeof opt === 'string' ? opt : null;

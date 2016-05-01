@@ -228,8 +228,14 @@ export default class Dropdown extends Component {
     );
   }
 
-  handleOptionClick(idx) {
+  handleOptionClick(idx, e) {
     const option = this.state.shownOptions[idx];
+
+    if (option.disabled) {
+      e.preventDefault();
+      return;
+    }
+
     this.setState({
       listShown: false
     }, () => {
