@@ -39,7 +39,7 @@ export default class Autosize extends Component {
     this.state = {
       width: props.defaultWidth,
       defaultWidth: props.defaultWidth,
-      value: props.value || props.defaultValue
+      value: (typeof props.value === 'undefined') ? props.defaultValue : props.value
     };
   }
 

@@ -17,10 +17,10 @@
     "no-console": [1],
     "indent": [1, 2],
     "quotes": [1, "single", "avoid-escape"],
+    "jsx-quotes": 1,
     "curly": [0],
 
     "react/jsx-boolean-value": 1,
-    "react/jsx-quotes": 1,
     "react/jsx-no-undef": 2,
     "react/jsx-uses-react": 2,
     "react/jsx-uses-vars": 2,

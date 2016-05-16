@@ -20,7 +20,7 @@ export default class Autocomplete extends Component {
     super(props);
     this.state = {
       matchingText: null,
-      value: props.value || props.defaultValue
+      value: (typeof props.value === 'undefined') ? props.defaultValue : props.value
     };
   }
 

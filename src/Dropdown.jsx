@@ -61,7 +61,8 @@ function findOptionIndex(options, option) {
 }
 
 function getStateFromProps(props) {
-  const match = findMatchingTextIndex(props.value || props.defaultValue, props.options);
+  const value = (typeof props.value === 'undefined') ? props.defaultValue : props.value;
+  const match = findMatchingTextIndex(value, props.options);
   const [selectedIndex, matchingText] = match;
   const shownOptions = getShownOptions(matchingText, props.options, props.optionFilters);
   const highlightedIndex = findOptionIndex(shownOptions, props.options[selectedIndex]);
