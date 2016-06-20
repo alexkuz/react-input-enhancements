@@ -20,10 +20,10 @@ const VALIDATORS = {
 };
 
 function getStateFromProps(value, props) {
-  const date = moment(value === null ? undefined : value, props.pattern, props.locale);
+  const date = moment(value === null ? undefined : value, value ? props.pattern : '', props.locale);
 
   return {
-    date,
+    date: date.isValid() ? date : moment(undefined, '', props.locale),
     value,
     pattern: props.pattern.replace(/ddd/g, '\\d\\d\\d').replace(/[DMY]/g, '0')
   };
