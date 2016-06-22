@@ -41,7 +41,7 @@ http://alexkuz.github.io/react-input-enhancements/
 
 ## Autocomplete
 
-`Autocomplete` prompts a value based on provided `options` (see also [react-autocomplete](https://github.com/rackt/react-autocomplete) for the same behaviour)
+`Autocomplete` prompts a value based on provided `options` (see also [react-autocomplete](https://github.com/reactjs/react-autocomplete) for the same behaviour)
 
 ```js
 <Autocomplete defaultValue={value}
