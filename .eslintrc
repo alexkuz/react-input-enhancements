@@ -17,7 +17,7 @@
     "no-console": [1],
     "indent": [1, 2],
     "quotes": [1, "single", "avoid-escape"],
-    "jsx-quotes": 1,
+    "jsx-quotes": [1, "prefer-single"],
     "curly": [0],
 
     "react/jsx-boolean-value": 1,

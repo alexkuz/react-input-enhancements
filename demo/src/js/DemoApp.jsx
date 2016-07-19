@@ -1,12 +1,15 @@
 import React from 'react';
 import PageHeader from 'react-bootstrap/lib/PageHeader';
-import Input from 'react-bootstrap/lib/Input';
+import FormGroup from 'react-bootstrap/lib/FormGroup';
+import InputGroup from 'react-bootstrap/lib/InputGroup';
+import FormControl from 'react-bootstrap/lib/FormControl';
+import ControlLabel from 'react-bootstrap/lib/ControlLabel';
+import Col from 'react-bootstrap/lib/Col';
 import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import Collapse from 'react-bootstrap/lib/Collapse';
 import Static from 'react-bootstrap/lib/FormControls/Static';
 import Button from 'react-bootstrap/lib/Button';
 import moment from 'moment';
-
 import countries from './countries';
 import pure from './pure';
 
@@ -19,294 +22,433 @@ import DatePicker from 'DatePicker';
 import pkg from '../../../package.json';
 import './bootstrap-input-inline.css';
 
+import Input from 'react-bootstrap/lib/Input';
+
 const ValueInput1 = pure(({ value, onChange }) =>
-  <Autosize defaultValue={value}
-            onChange={e => onChange(e.target.value)}>
-    <Input type='text'
-           standalone
-           groupClassName='inline-input'
-           addonAfter={<Glyphicon glyph='star' />} />
-  </Autosize>);
+  <div className='inline-input'>
+    <InputGroup>
+      <Autosize
+        defaultValue={value}
+        onChange={e => onChange(e.target.value)}
+      >
+        <FormControl type='text' />
+      </Autosize>
+      <InputGroup.Addon>
+        <Glyphicon glyph='star' />
+      </InputGroup.Addon>
+    </InputGroup>
+  </div>
+);
 
 const ValueInput2 = pure(({ value, onChange }) =>
-  <Autosize defaultValue={value}
-            defaultWidth={100}
-            onChange={e => onChange(e.target.value)}>
-    <Input type='text'
-           standalone
-           groupClassName='inline-input'
-           addonBefore={<Glyphicon glyph='asterisk' />} />
-  </Autosize>);
+  <div className='inline-input'>
+    <InputGroup>
+      <Autosize
+        defaultValue={value}
+        defaultWidth={100}
+        onChange={e => onChange(e.target.value)}
+      >
+        <FormControl type='text' />
+      </Autosize>
+      <InputGroup.Addon>
+        <Glyphicon glyph='asterisk' />
+      </InputGroup.Addon>
+    </InputGroup>
+  </div>
+);
 
 const code1and2 = `
   This text has no default width:{' '}
-  <Autosize defaultValue={value}
-            onChange={e => onChange(e.target.value)}>
-    <Input type='text'
-           standalone
-           groupClassName='inline-input'
-           addonAfter={<Glyphicon glyph='star' />} />
-  </Autosize>
+  <div className='inline-input'>
+    <InputGroup>
+      <Autosize
+        defaultValue={value}
+        onChange={e => onChange(e.target.value)}
+      >
+        <FormControl type='text' />
+      </Autosize>
+      <InputGroup.Addon>
+        <Glyphicon glyph='star' />
+      </InputGroup.Addon>
+    </InputGroup>
+  </div>
   and this has 100px default width:{' '}
-  <Autosize defaultValue={value}
-            defaultWidth={100}
-            onChange={e => onChange(e.target.value)}
-            >
-    <Input type='text'
-           standalone
-           groupClassName='inline-input'
-           addonBefore={<Glyphicon glyph='asterisk' />} />
-  </Autosize>
+  <div className='inline-input'>
+    <InputGroup>
+      <Autosize
+        defaultValue={value}
+        defaultWidth={100}
+        onChange={e => onChange(e.target.value)}
+      >
+        <FormControl type='text' />
+      </Autosize>
+      <InputGroup.Addon>
+        <Glyphicon glyph='asterisk' />
+      </InputGroup.Addon>
+    </InputGroup>
+  </div>
 `;
 
 const ValueInput3 = pure(({ value, onChange }) =>
-  <Autocomplete defaultValue={value}
-                options={countries}
-                onChange={e => onChange(e.target.value)}>
-    <Input type='text'
-           label='Autocomplete:'
-           labelClassName='col-xs-3'
-           wrapperClassName='col-xs-6'
-           placeholder='No Country' />
-  </Autocomplete>);
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      Autocomplete:
+    </Col>
+    <Col xs={6}>
+      <Autocomplete
+        defaultValue={value}
+        options={countries}
+        onChange={e => onChange(e.target.value)}
+      >
+        <FormControl type='text' />
+      </Autocomplete>
+    </Col>
+  </FormGroup>
+);
 
 const code3 = `
-  <Autocomplete defaultValue={value}
-                options={countries}
-                onChange={e => onChange(e.target.value)}>
-    <Input type='text'
-           label='Autocomplete:'
-           labelClassName='col-xs-3'
-           wrapperClassName='col-xs-6'
-           placeholder='No Country' />
-  </Autocomplete>
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      Autocomplete:
+    </Col>
+    <Col xs={6}>
+      <Autocomplete
+        defaultValue={value}
+        options={countries}
+        onChange={e => onChange(e.target.value)}
+      >
+        <FormControl type='text' />
+      </Autocomplete>
+    </Col>
+  </FormGroup>
 `;
 
 const ValueInput4 = pure(({ value, onChange }) =>
-  <Input label='Combobox (Dropdown + Autocomplete):'
-         labelClassName='col-xs-3'
-         wrapperClassName='col-xs-6'>
-    <Combobox defaultValue={value}
-              options={countries}
-              dropdownProps={{ style: { width: '100%' } }}
-              onValueChange={onChange}
-              onChange={e => onChange(e.target.value)}
-              autocomplete>
-      {inputProps =>
-        <input {...inputProps}
-               type='text'
-               className={`${inputProps.className} form-control`}
-               placeholder='No Country' />
-      }
-    </Combobox>
-  </Input>);
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      Combobox (Dropdown + Autocomplete):
+    </Col>
+    <Col xs={6}>
+      <Combobox
+        defaultValue={value}
+        options={countries}
+        dropdownProps={{ style: { width: '100%' } }}
+        onValueChange={onChange}
+        onChange={e => onChange(e.target.value)}
+        autocomplete
+      >
+        {inputProps =>
+          <FormControl
+            {...inputProps}
+            type='text'
+            placeholder='No Country'
+          />
+        }
+      </Combobox>
+    </Col>
+  </FormGroup>
+);
 
 const code4 = `
-  <Input label='Combobox (Dropdown + Autocomplete):'
-         labelClassName='col-xs-3'
-         wrapperClassName='col-xs-6'>
-    <Combobox defaultValue={value}
-              options={countries}
-              dropdownProps={{ style: { width: '100%' } }}
-              onValueChange={onChange}
-              onChange={e => onChange(e.target.value)}
-              autocomplete>
-      {inputProps =>
-        <input {...inputProps}
-               type='text'
-               className={\`\$\{inputProps.className\} form-control\`\}
-               placeholder='No Country' />
-      }
-    </Combobox>
-  </Input>
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      Combobox (Dropdown + Autocomplete):
+    </Col>
+    <Col xs={6}>
+      <Combobox
+        defaultValue={value}
+        options={countries}
+        dropdownProps={{ style: { minWidth: '100%' } }}
+        onValueChange={onChange}
+        onChange={e => onChange(e.target.value)}
+        autocomplete
+      >
+        {inputProps =>
+          <FormControl
+            {...inputProps}
+            type='text'
+            placeholder='No Country'
+          />
+        }
+      </Combobox>
+    </Col>
+  </FormGroup>
 `;
 
 const ValueInput5 = pure(({ value, onChange }) =>
-  <Input label='Combobox (Dropdown + Autosize):'
-         labelClassName='col-xs-3'
-         wrapperClassName='col-xs-6'>
-    <Combobox defaultValue={value}
-              options={[...countries, 'random-string-' + Math.random()]}
-              dropdownProps={{ style: { minWidth: '100%' } }}
-              onValueChange={onChange}
-              onChange={e => onChange(e.target.value)}
-              autosize>
-      {inputProps =>
-        <input {...inputProps}
-               type='text'
-               className={`${inputProps.className} form-control`}
-               placeholder='No Country' />
-      }
-    </Combobox>
-  </Input>);
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      Combobox (Dropdown + Autosize):
+    </Col>
+    <Col xs={6}>
+      <Combobox
+        defaultValue={value}
+        options={[...countries, 'random-string-' + Math.random()]}
+        onValueChange={onChange}
+        onChange={e => onChange(e.target.value)}
+        autosize
+      >
+        {inputProps =>
+          <FormControl
+            {...inputProps}
+            type='text'
+            placeholder='No Country'
+          />
+        }
+      </Combobox>
+    </Col>
+  </FormGroup>
+);
 
 const code5 = `
-  <Input label='Combobox (Dropdown + Autosize):'
-         labelClassName='col-xs-3'
-         wrapperClassName='col-xs-6'>
-    <Combobox value={value}
-              options={countries}
-              dropdownProps={{ style: { minWidth: '100%' } }}
-              onValueChange={onChange}
-              onChange={e => onChange(e.target.value)}
-              autosize>
-      {inputProps =>
-        <input {...inputProps}
-               type='text'
-               className={\`\$\{inputProps.className\} form-control\`\}
-               placeholder='No Country' />
-      }
-    </Combobox>
-  </Input>
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      Combobox (Dropdown + Autosize):
+    </Col>
+    <Col xs={6}>
+      <Combobox
+        defaultValue={value}
+        options={[...countries, 'random-string-' + Math.random()]}
+        onValueChange={onChange}
+        onChange={e => onChange(e.target.value)}
+        autosize
+      >
+        {inputProps =>
+          <FormControl
+            {...inputProps}
+            type='text'
+            placeholder='No Country'
+          />
+        }
+      </Combobox>
+    </Col>
+  </FormGroup>
 `;
 
 const ValueInput6 = pure(({ value, onChange, addonAfter, options }) =>
-  <Input label='Combobox (Dropdown + Autosize + Autocomplete, defaultWidth=100):'
-         labelClassName='col-xs-3'
-         wrapperClassName='col-xs-6'
-         addonAfter={addonAfter}>
-    <Combobox value={value}
-              options={options}
-              defaultWidth={100}
-              onValueChange={onChange}
-              autosize
-              autocomplete>
-      {inputProps =>
-        <input {...inputProps}
-               type='text'
-               className={`${inputProps.className} form-control`}
-               placeholder='No Country' />
-      }
-    </Combobox>
-  </Input>);
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      Combobox (Dropdown + Autosize + Autocomplete, defaultWidth=100):
+    </Col>
+    <Col xs={6}>
+      <InputGroup>
+        <Combobox
+          value={value}
+          options={options}
+          defaultWidth={100}
+          onValueChange={onChange}
+          autosize
+          autocomplete
+        >
+          {inputProps =>
+            <FormControl
+              {...inputProps}
+              type='text'
+              placeholder='No Country'
+            />
+          }
+        </Combobox>
+        <InputGroup.Addon>
+          {addonAfter}
+        </InputGroup.Addon>
+      </InputGroup>
+    </Col>
+  </FormGroup>
+);
 
 const code6 = `
-  <Input label='Combobox (Dropdown + Autosize + Autocomplete, defaultWidth=100):'
-         labelClassName='col-xs-3'
-         wrapperClassName='col-xs-6'>
-    <Combobox defaultValue={value}
-              options={countries}
-              defaultWidth={100}
-              onValueChange={onChange}
-              autosize
-              autocomplete>
-      {inputProps =>
-        <input {...inputProps}
-               type='text'
-               className={\`\$\{inputProps.className\} form-control\`\}
-               placeholder='No Country' />
-      }
-    </Combobox>
-  </Input>
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      Combobox (Dropdown + Autosize + Autocomplete, defaultWidth=100):
+    </Col>
+    <Col xs={6}>
+      <InputGroup>
+        <Combobox
+          value={value}
+          options={options}
+          defaultWidth={100}
+          onValueChange={onChange}
+          autosize
+          autocomplete
+        >
+          {inputProps =>
+            <FormControl
+              {...inputProps}
+              type='text'
+              placeholder='No Country'
+            />
+          }
+        </Combobox>
+        <InputGroup.Addon>
+          {addonAfter}
+        </InputGroup.Addon>
+      </InputGroup>
+    </Col>
+  </FormGroup>
 `;
 
 const ValueInput7 = pure(({ value, onChange, onUnmaskedValueChange }) =>
-  <Mask pattern='0000-0000-0000-0000'
-        placeholder='1234-5678-1234-5678'
-        defaultValue={value}
-        onChange={e => onChange(e.target.value)}
-        onUnmaskedValueChange={onUnmaskedValueChange}
-        style={{ fontFamily: 'monospace' }}>
-    {inputProps =>
-      <Autosize defaultWidth={100} {...inputProps}>
-        <Input type='text'
-               label='Mask + Autosize (credit card):'
-               labelClassName='col-xs-3'
-               wrapperClassName='col-xs-1'
-               groupClassName='autosize-addon-input'
-               addonAfter={<Glyphicon glyph='credit-card' />} />
-      </Autosize>
-    }
-  </Mask>);
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      Mask + Autosize (credit card):
+    </Col>
+    <Col xs={6}>
+      <InputGroup
+        style={{ display: 'inline-flex', alignItems: 'baseline', fontFamily: 'monospace' }}
+      >
+        <Mask
+          pattern='0000-0000-0000-0000'
+          placeholder='1234-5678-1234-5678'
+          defaultValue={value}
+          onChange={e => onChange(e.target.value)}
+          onUnmaskedValueChange={onUnmaskedValueChange}
+        >
+          {inputProps =>
+            <Autosize defaultWidth={100} {...inputProps}>
+              <FormControl type='text' />
+            </Autosize>
+          }
+        </Mask>
+        <InputGroup.Addon>
+          <Glyphicon glyph='credit-card' />
+        </InputGroup.Addon>
+      </InputGroup>
+    </Col>
+  </FormGroup>
+);
 
 const code7 = `
-  <Mask pattern='0000-0000-0000-0000'
-        placeholder='1234-5678-1234-5678'
-        defaultValue={value}
-        onChange={e => onChange(e.target.value)}
-        onUnmaskedValueChange={onUnmaskedValueChange}
-        style={{ fontFamily: 'monospace' }}>
-    {inputProps =>
-      <Autosize defaultWidth={100} {...inputProps}>
-        <Input type='text'
-               label='Mask + Autosize (credit card):'
-               labelClassName='col-xs-3'
-               wrapperClassName='col-xs-1'
-               groupClassName='autosize-addon-input'
-               addonAfter={<Glyphicon glyph='credit-card' />} />
-      </Autosize>
-    }
-  </Mask>
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      Mask + Autosize (credit card):
+    </Col>
+    <Col xs={6}>
+      <InputGroup
+        style={{ display: 'inline-flex', alignItems: 'baseline', fontFamily: 'monospace' }}
+      >
+        <Mask
+          pattern='0000-0000-0000-0000'
+          placeholder='1234-5678-1234-5678'
+          defaultValue={value}
+          onChange={e => onChange(e.target.value)}
+          onUnmaskedValueChange={onUnmaskedValueChange}
+        >
+          {inputProps =>
+            <Autosize defaultWidth={100} {...inputProps}>
+              <FormControl type='text' />
+            </Autosize>
+          }
+        </Mask>
+        <InputGroup.Addon>
+          <Glyphicon glyph='credit-card' />
+        </InputGroup.Addon>
+      </InputGroup>
+    </Col>
+  </FormGroup>
 `;
 
 const ValueInput8 = pure(({ value, onChange, onUnmaskedValueChange }) =>
-  <Mask pattern='+\ 7\ (000) 000-00-00'
-        placeholder='+ 7 (123) 456-78-90'
-        defaultValue={value}
-        onChange={e => onChange(e.target.value)}
-        onUnmaskedValueChange={onUnmaskedValueChange}
-        style={{ fontFamily: 'monospace' }}>
-    {inputProps =>
-      <Autosize defaultWidth={100} {...inputProps}>
-        <Input type='text'
-               label='Mask + Autosize (phone number):'
-               labelClassName='col-xs-3'
-               wrapperClassName='col-xs-1'
-               groupClassName='autosize-addon-input'
-               addonAfter={<Glyphicon glyph='phone' />} />
-      </Autosize>
-    }
-  </Mask>);
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      Mask + Autosize (phone number):
+    </Col>
+    <Col xs={6}>
+      <InputGroup
+        style={{ display: 'inline-flex', alignItems: 'baseline', fontFamily: 'monospace' }}
+      >
+        <Mask
+          pattern='+\ 7\ (000) 000-00-00'
+          placeholder='+ 7 (XXX) XXX-XX-XX'
+          defaultValue={value}
+          onChange={e => onChange(e.target.value)}
+          onUnmaskedValueChange={onUnmaskedValueChange}
+        >
+          {inputProps =>
+            <Autosize defaultWidth={100} {...inputProps}>
+              <FormControl type='text' />
+            </Autosize>
+          }
+        </Mask>
+        <InputGroup.Addon>
+          <Glyphicon glyph='phone' />
+        </InputGroup.Addon>
+      </InputGroup>
+    </Col>
+  </FormGroup>
+);
 
 const code8 = `
-  <Mask pattern='+\ 7\ (000) 000-00-00'
-        placeholder='+ 7 (123) 456-78-90'
-        defaultValue={value}
-        onChange={e => onChange(e.target.value)}
-        onUnmaskedValueChange={onUnmaskedValueChange}
-        style={{ fontFamily: 'monospace' }}>
-    {inputProps =>
-      <Autosize defaultWidth={100} {...inputProps}>
-        <Input type='text'
-               label='Mask + Autosize (phone number):'
-               labelClassName='col-xs-3'
-               wrapperClassName='col-xs-1'
-               groupClassName='autosize-addon-input'
-               addonAfter={<Glyphicon glyph='phone' />} />
-      </Autosize>
-    }
-  </Mask>
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      Mask + Autosize (phone number):
+    </Col>
+    <Col xs={6}>
+      <InputGroup
+        style={{ display: 'inline-flex', alignItems: 'baseline', fontFamily: 'monospace' }}
+      >
+        <Mask
+          pattern='+\ 7\ (000) 000-00-00'
+          placeholder='+ 7 (XXX) XXX-XX-XX'
+          defaultValue={value}
+          onChange={e => onChange(e.target.value)}
+          onUnmaskedValueChange={onUnmaskedValueChange}
+        >
+          {inputProps =>
+            <Autosize defaultWidth={100} {...inputProps}>
+              <FormControl type='text' />
+            </Autosize>
+          }
+        </Mask>
+        <InputGroup.Addon>
+          <Glyphicon glyph='phone' />
+        </InputGroup.Addon>
+      </InputGroup>
+    </Col>
+  </FormGroup>
 `;
 
 const ValueInput9 = pure(({ value, onChange }) =>
-  <Input label='DatePicker:'
-         labelClassName='col-xs-3'
-         wrapperClassName='col-xs-6'>
-    <DatePicker defaultValue={moment(value || undefined).format('ddd DD/MM/YYYY')}
-                onChange={onChange}
-                inputStyle={{ fontFamily: 'monospace' }}>
-      {inputProps =>
-        <input {...inputProps}
-               type='text'
-               className={`${inputProps.className} form-control`} />
-      }
-    </DatePicker>
-  </Input>);
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      DatePicker:
+    </Col>
+    <Col xs={6}>
+      <DatePicker
+        defaultValue={moment(value || undefined).format('ddd DD/MM/YYYY')}
+        onChange={onChange}
+        inputStyle={{ fontFamily: 'monospace' }}
+      >
+        {inputProps =>
+          <FormControl
+            {...inputProps}
+            type='text'
+          />
+        }
+      </DatePicker>
+    </Col>
+  </FormGroup>
+);
 
 const code9 = `
-  <Input label='DatePicker:'
-         labelClassName='col-xs-3'
-         wrapperClassName='col-xs-6'>
-    <DatePicker defaultValue={moment(value || undefined).format('ddd DD/MM/YYYY')}
-                onChange={onChange}
-                inputStyle={{ fontFamily: 'monospace' }}>
-      {inputProps =>
-        <input {...inputProps}
-               type='text'
-               className={\`$\{inputProps.className\} form-control\`} />
-      }
-    </DatePicker>
-  </Input>
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      DatePicker:
+    </Col>
+    <Col xs={6}>
+      <DatePicker
+        defaultValue={moment(value || undefined).format('ddd DD/MM/YYYY')}
+        onChange={onChange}
+        inputStyle={{ fontFamily: 'monospace' }}
+      >
+        {inputProps =>
+          <FormControl
+            {...inputProps}
+            type='text'
+          />
+        }
+      </DatePicker>
+    </Col>
+  </FormGroup>
 `;
 
 const ValueInput10 = pure(({ value, onChange }) => {
@@ -316,22 +458,28 @@ const ValueInput10 = pure(({ value, onChange }) => {
   frNow.locale('fr');
 
   return (
-    <Input label='DatePicker (FR):'
-           labelClassName='col-xs-3'
-           wrapperClassName='col-xs-6'>
-      <DatePicker defaultValue={frCurrent.format('YYYY.MM.DD ddd')}
-                  placeholder={frNow.format('YYYY.MM.DD ddd')}
-                  pattern='YYYY.MM.DD ddd'
-                  onChange={onChange}
-                  inputStyle={{ fontFamily: 'monospace' }}
-                  locale='fr'>
-        {inputProps =>
-          <input {...inputProps}
-                 type='text'
-                 className={`${inputProps.className} form-control`} />
-        }
-      </DatePicker>
-    </Input>
+    <FormGroup>
+      <Col componentClass={ControlLabel} xs={3}>
+        DatePicker (FR):
+      </Col>
+      <Col xs={6}>
+        <DatePicker
+          defaultValue={frCurrent.format('YYYY.MM.DD ddd')}
+          placeholder={frNow.format('YYYY.MM.DD ddd')}
+          pattern='YYYY.MM.DD ddd'
+          onChange={onChange}
+          inputStyle={{ fontFamily: 'monospace' }}
+          locale='fr'
+        >
+          {inputProps =>
+            <FormControl
+              {...inputProps}
+              type='text'
+            />
+          }
+        </DatePicker>
+      </Col>
+    </FormGroup>
   );
 });
 
@@ -341,22 +489,28 @@ const code10 = `
   const frNow = moment();
   frNow.locale('fr');
 
-  <Input label='DatePicker (FR):'
-         labelClassName='col-xs-3'
-         wrapperClassName='col-xs-6'>
-    <DatePicker defaultValue={frCurrent.format('YYYY.MM.DD ddd')}
-                placeholder={frNow.format('YYYY.MM.DD ddd')}
-                pattern='YYYY.MM.DD ddd'
-                onChange={onChange}
-                inputStyle={{ fontFamily: 'monospace' }}
-                locale='fr'>
-      {inputProps =>
-        <input {...inputProps}
-               type='text'
-               className={\`$\{inputProps.className\} form-control\`} />
-      }
-    </DatePicker>
-  </Input>
+  <FormGroup>
+    <Col componentClass={ControlLabel} xs={3}>
+      DatePicker (FR):
+    </Col>
+    <Col xs={6}>
+      <DatePicker
+        defaultValue={frCurrent.format('YYYY.MM.DD ddd')}
+        placeholder={frNow.format('YYYY.MM.DD ddd')}
+        pattern='YYYY.MM.DD ddd'
+        onChange={onChange}
+        inputStyle={{ fontFamily: 'monospace' }}
+        locale='fr'
+      >
+        {inputProps =>
+          <FormControl
+            {...inputProps}
+            type='text'
+          />
+        }
+      </DatePicker>
+    </Col>
+  </FormGroup>
 `;
 
 export default class DemoApp extends React.Component {

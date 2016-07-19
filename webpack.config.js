@@ -5,8 +5,6 @@ var CleanWebpackPlugin = require('clean-webpack-plugin');
 var ExportFilesWebpackPlugin = require('export-files-webpack-plugin');
 var NyanProgressWebpackPlugin = require('nyan-progress-webpack-plugin');
 
-require('babel-core/polyfill');
-
 var pkg = require('./package.json');
 var config = {
   port: 3000

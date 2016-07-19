@@ -3,9 +3,6 @@ import ReactDOM from 'react-dom';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import * as shapes from './shapes';
 import classNames from 'classnames';
-import { create } from 'jss';
-import jssNested from 'jss-nested';
-import jssVendorPrefixer from 'jss-vendor-prefixer';
 import findMatchingTextIndex from './utils/findMatchingTextIndex';
 import * as filters from './filters';
 import InputPopup from './InputPopup';
@@ -14,10 +11,8 @@ import getOptionLabel from './utils/getOptionLabel';
 import getOptionValue from './utils/getOptionValue';
 import isStatic from './utils/isStatic';
 import DropdownOption from './DropdownOption';
-
-const jss = create();
-jss.use(jssNested());
-jss.use(jssVendorPrefixer());
+import { createStyling } from 'react-base16-styling';
+import defaultTheme from './themes/default';
 
 function getOptionClassName(opt, isHighlighted, isDisabled) {
   return classNames(
@@ -57,7 +52,7 @@ function getShownOptions(value, options, optionFilters) {
 }
 
 function findOptionIndex(options, option) {
-  return options.findIndex(opt => opt === option);
+  return Array.findIndex(options, opt => opt === option);
 }
 
 function getStateFromProps(props) {
@@ -76,6 +71,28 @@ function getStateFromProps(props) {
     shownOptions
   };
 }
+
+function getStylingFromBase16(base16Theme) {
+  return {
+    myComponent: {
+      backgroundColor: base16Theme.base00
+    },
+
+    myComponentToggleColor({ style, className }, clickCount) {
+      return {
+        style: {
+          ...style,
+          backgroundColor: clickCount % 2 ? 'red' : 'blue'
+        }
+      }
+    }
+  };
+}
+
+const createStylingFromTheme = createStyling(getStylingFromBase16, {
+  defaultBase16: defaultTheme
+});
+
 
 export default class Dropdown extends Component {
   constructor(props) {
@@ -171,8 +188,7 @@ export default class Dropdown extends Component {
   }
 
   render() {
-    const { onRenderList, dropdownProps,
-            style, children, onValueChange, ...props } = this.props;
+    const { dropdownProps, children, ...props } = this.props;
 
     const value = this.state.value === null ? '' : this.state.value;
 

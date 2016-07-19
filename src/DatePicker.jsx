@@ -36,7 +36,11 @@ export default class DatePicker extends Component {
   }
 
   static propTypes = {
-  }
+    pattern: PropTypes.string,
+    placeholder: PropTypes.string,
+    onRenderCalendar: PropTypes.func,
+    locale: PropTypes.string
+  };
 
   static defaultProps = {
     pattern: 'ddd DD/MM/YYYY',
@@ -51,7 +55,7 @@ export default class DatePicker extends Component {
         </div>
       ),
     locale: 'en'
-  }
+  };
 
   shouldComponentUpdate = shouldPureComponentUpdate
 
@@ -65,7 +69,7 @@ export default class DatePicker extends Component {
   }
 
   render() {
-    const { pattern, children, value, defaultValue, onChange, placeholder, ...props } = this.props;
+    const { children, defaultValue, placeholder, ...props } = this.props;
 
     return (
       <Mask pattern={this.state.pattern}

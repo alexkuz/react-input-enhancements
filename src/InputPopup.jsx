@@ -77,7 +77,7 @@ export default class InputPopup extends Component {
   }
 
   render() {
-    const { className, onRenderCaret, onRenderPopup, inputPopupProps } = this.props;
+    const { className, onRenderCaret, onRenderPopup, inputPopupProps, ...restProps } = this.props;
     const { classes } = sheet;
     const { isActive, hover, popupShown } = this.state;
 
@@ -90,7 +90,7 @@ export default class InputPopup extends Component {
            onFocus={this.handleFocus}
            onBlur={this.handleBlur}
            {...inputPopupProps}>
-        {this.renderInput()}
+        {this.renderInput(restProps)}
         {onRenderCaret(caretClassName, null, isActive, caret)}
         {onRenderPopup(
           popupClassName,
@@ -102,10 +102,9 @@ export default class InputPopup extends Component {
     );
   }
 
-  renderInput() {
-    const { className, onRenderCaret, onRenderPopup, inputPopupProps,
-            popup, inputClassName, inputStyle, children,
-            onInputFocus, onInputBlur, proxyProps, ...props } = this.props;
+  renderInput(restProps) {
+    const { inputClassName, inputStyle, children,
+            onInputFocus, onInputBlur, proxyProps, ...props } = restProps;
     const { classes } = sheet;
 
     const inputProps = {
