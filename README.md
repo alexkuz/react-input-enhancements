@@ -3,6 +3,12 @@ Set of enhancements for input control
 
 The intention of creating this library was to bring `input` component out of the dropdown/autocomplete/whatever code, so it could be easily replaced with your custom component, and also to split independent functionality into different components, which could be combined with each other (still not quite sure it was worth it, though).
 
+---------------
+
+**NB:** these are not "high quality, ready for production components" - they are more of a concept (which is a fancy word for "they are still quite buggy"). Think twice before using it in production.
+
+---------------
+
 There are currently five components:
 
 1. [`<Autosize />`](#autosize)
