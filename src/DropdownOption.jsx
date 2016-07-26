@@ -1,13 +1,11 @@
-import React, { Component, PropTypes } from 'react';
+import React, { PureComponent, PropTypes } from 'react';
 import { findDOMNode } from 'react-dom';
-import shouldPureComponentUpdate from 'react-pure-render/function';
 
-export default class DropdownOption extends Component {
+export default class DropdownOption extends PureComponent {
   static propTypes = {
-    highlighted: PropTypes.bool
+    highlighted: PropTypes.bool,
+    onMouseDown: PropTypes.func
   };
-
-  shouldComponentUpdate = shouldPureComponentUpdate;
 
   componentDidMount() {
     if (this.props.highlighted) {
@@ -34,6 +32,10 @@ export default class DropdownOption extends Component {
   }
 
   render() {
-    return <div {...this.props} />;
+    return (
+      <div onMouseDown={this.props.onMouseDown}>
+        {this.props.children}
+      </div>
+    );
   }
 }

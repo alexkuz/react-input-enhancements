@@ -3,6 +3,12 @@ Set of enhancements for input control
 
 The intention of creating this library was to bring `input` component out of the dropdown/autocomplete/whatever code, so it could be easily replaced with your custom component, and also to split independent functionality into different components, which could be combined with each other (still not quite sure it was worth it, though).
 
+---------------
+
+**NB:** these are not "high quality, ready for production components" - they are more of a concept (which is a fancy word for "they are still quite buggy"). Think twice before using it in production.
+
+---------------
+
 There are currently five components:
 
 1. [`<Autosize />`](#autosize)
@@ -11,23 +17,85 @@ There are currently five components:
 4. [`<Mask />`](#mask)
 5. [`<DatePicker />`](#datepicker)
 
-All components accept `function` as a child, providing props as a first argument, which you should pass to your `input` component. If there is nothing else except `input`, it could be passed as a child directly (for simplicity).
-
 [`<Combobox />`](#combobox) is a combination of `Dropdown`, `Autosize` and/or `Autocomplete` components.
 
 ## Demo
 
 http://alexkuz.github.io/react-input-enhancements/
 
+## How it works
+
+* Each component is responsible for a corresponding behaviour (`<Autosize>` resizes `<input>` according to it's content length, `<Dropdown>` adds popup with options, and so on).
+* All components accept `function` as a child, providing props as a first argument, which you should pass to your `input` component. If there is nothing else except `input`, it could be passed as a child directly (for simplicity).
+* If you need to have combined behaviour in your component, let's say `<Autosize>` with `<Autocomplete>` just pass `<Autocomplete>` as a child to `<Autosize>` (see `<Combobox>` source code for reference)
+
+#### Registering `<input>`
+
+All components needs an access to `<input>` DOM element. To provide it, use `getInputComponent` prop:
+
+```jsx
+let input;
+
+getInput() {
+  return input;
+}
+
+<Autocomplete
+  options={options}
+  getInputComponent={getInput}
+>
+  {props =>
+    <input
+      ref={c => input = c}
+      {...props}
+    />
+  }
+</Autocomplete>
+```
+Or, if you don't want to store the node in your component:
+
+```jsx
+<Autocomplete
+  options={options}
+>
+  {(props, otherProps, registerInput) =>
+    <input
+      ref={c => registerInput(c)}
+      {...props}
+    />
+  }
+</Autocomplete>
+```
+The first option also allows you to use shorter form with implicit parameters passing:
+```jsx
+let input;
+
+getInput() {
+  return input;
+}
+
+<Autocomplete
+  options={options}
+  getInputComponent={getInput}
+>
+  <input
+    ref={c => input = c}
+  />
+</Autocomplete>
+```
+However, this is not preferable as there is too much magic happening.
+
+If `<input>` element wasn't provided, component tries to find node automatically, however this behaviour is deprecated and will be removed in future versions.
+
 ## Autosize
 
 `Autosize` resizes component to fit it's content.
 
-```js
+```jsx
 <Autosize defaultValue={value}
           minWidth={100}>
-  {(inputProps, { width }) =>
-    <input type='text' {...inputProps} />
+  {(inputProps, { width, registerInput }) =>
+    <input type='text' {...inputProps} ref={c => registerInput(c)} />
   }
 </Autosize>
 ```
@@ -36,18 +104,19 @@ http://alexkuz.github.io/react-input-enhancements/
 
 * **`value`** *string* - Input value (for a controlled component)
 * **`defaultValue`** *string* - Initial value (for a uncontrolled component)
-* **`getInputElement`** *function()* - Optional callback that provides input DOM element
+* **`getInputElement`** *function()* - Optional callback that provides `<input>` DOM element
+* **`registerInput`** *function* - Registers `<input>` DOM element
 * **`defaultWidth`** *number* - Minimum input width
 
 ## Autocomplete
 
 `Autocomplete` prompts a value based on provided `options` (see also [react-autocomplete](https://github.com/reactjs/react-autocomplete) for the same behaviour)
 
-```js
+```jsx
 <Autocomplete defaultValue={value}
               options={options}>
-  {(inputProps, { matchingText, value }) =>
-    <input type='text' {...inputProps} />
+  {(inputProps, { matchingText, value, registerInput }) =>
+    <input type='text' {...inputProps} ref={c => registerInput(c)} />
   }
 </Autocomplete>
 ```
@@ -56,7 +125,8 @@ http://alexkuz.github.io/react-input-enhancements/
 
 * **`value`** *string* - Input value (for a controlled component)
 * **`defaultValue`** *string* - Initial value (for a uncontrolled component)
-* **`getInputElement`** *function* - Optional callback that provides input DOM element
+* **`getInputElement`** *function* - Optional callback that provides `<input>` DOM element
+* **`registerInput`** *function* - Registers `<input>` DOM element
 * **`options`** *array* - Array of options that are used to predict a value
 
 `options` is an array of strings or objects with a `text` or `value` string properties.
@@ -65,7 +135,7 @@ http://alexkuz.github.io/react-input-enhancements/
 
 `Dropdown` shows a dropdown with a (optionally filtered) list of suitable options.
 
-```js
+```jsx
 <Dropdown defaultValue={value}
           options={options}>
   {(inputProps, { textValue }) =>
@@ -83,9 +153,10 @@ http://alexkuz.github.io/react-input-enhancements/
 * **`onRenderCaret`** *function(className, style, isActive, children)* - Renders a caret
 * **`onRenderList`** *function(className, style, isActive, listShown, children, header)* - Renders list of options
 * **`onRenderListHeader`** *function(allCount, shownCount, staticCount)* - Renders list header
-* **`dropdownClassName`** *string* - Dropdown root element class name
 * **`dropdownProps`** *object* - Custom props passed to dropdown root element
 * **`optionFilters`** *array* - List of option filters
+* **`getInputElement`** *function* - Optional callback that provides `<input>` DOM element
+* **`registerInput`** *function* - Registers `<input>` DOM element
 
 `options` is an array of strings or objects with a shape:
 
@@ -109,7 +180,7 @@ http://alexkuz.github.io/react-input-enhancements/
 
 `Mask` formats input value.
 
-```js
+```jsx
 <Mask defaultValue={value}
       pattern='0000-0000-0000-0000'>
   {(inputProps, { value }) =>
@@ -122,17 +193,19 @@ http://alexkuz.github.io/react-input-enhancements/
 
 * **`value`** *string* - Input value (for a controlled component)
 * **`defaultValue`** *string* - Initial value (for a uncontrolled component)
-* **`getInputElement`** *function()* - Optional callback that provides input DOM element
+* **`getInputElement`** *function* - Optional callback that provides `<input>` DOM element
+* **`registerInput`** *function* - Registers `<input>` DOM element
 * **`pattern`** *string* - String formatting pattern. Only '0' (digit) or 'a' (letter) pattern chars are currently supported.
 * **`emptyChar`** *string* - Character used as an empty symbol (`' '` by default)
 * **`placeholder`** *string* - If set, it is shown when `unmaskedValue` is empty
 * **`onUnmaskedValueChange`** *function(text)* - Fires when value is changed, providing unmasked value
+* **`onValuePreUpdate`** *function* - Optional callback to update value before it is parsed by `Mask`
 
 ## DatePicker
 
 `DatePicker` uses `Mask` to format date and shows calendar ([react-date-picker](https://github.com/zippyui/react-date-picker) by default) in popup.
 
-```js
+```jsx
 <DatePicker defaultValue={moment(value).format('ddd DD/MM/YYYY')}
             placeholder={moment().format('ddd DD/MM/YYYY')}
             pattern='ddd DD/MM/YYYY'
@@ -156,12 +229,20 @@ http://alexkuz.github.io/react-input-enhancements/
 * **`locale`** *string* - Date locale
 * **`onRenderCalendar`** *function(className, style, date, isActive, popupShown, onSelect, locale)* - Returns calendar component shown in popup ([react-date-picker](https://github.com/zippyui/react-date-picker) by default)
 * **`onChange`** *function(date)* - Fires when date is selected, providing [moment.js](http://momentjs.com/) object
+* **`getInputElement`** *function* - Optional callback that provides `<input>` DOM element
+* **`registerInput`** *function* - Registers `<input>` DOM element
+* **`onValuePreUpdate`** *function* - Optional callback to update value before it is parsed by `DatePicker`. In this example, it parses inserted timestamp:
+```js
+onValuePreUpdate={v => parseInt(v, 10) > 1e8 ?
+  moment(parseInt(v, 10)).format('ddd DD/MM/YYYY') : v
+}
+```
 
 ## Combobox
 
 `Combobox` combines `Dropdown`, `Autosize` and/or `Autocomplete` components.
 
-```js
+```jsx
 <Combobox defaultValue={value}
           options={options}
           autosize

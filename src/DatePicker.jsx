@@ -1,16 +1,10 @@
-import React, { Component, PropTypes } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import React, { PureComponent, PropTypes, Children } from 'react';
 import Mask from './Mask';
 import InputPopup from './InputPopup';
 import moment from 'moment';
-import ReactDatePicker from 'react-date-picker';
-import { create } from 'jss';
-import jssNested from 'jss-nested';
-import jssVendorPrefixer from 'jss-vendor-prefixer';
-
-const jss = create();
-jss.use(jssNested());
-jss.use(jssVendorPrefixer());
+import DayPicker, { DateUtils } from 'react-day-picker-themeable';
+import MomentLocaleUtils from 'react-day-picker-themeable/lib/addons/MomentLocaleUtils';
+import createStyling from './createStyling';
 
 const VALIDATORS = {
   YYYY: () => false,
@@ -29,31 +23,38 @@ function getStateFromProps(value, props) {
   };
 }
 
-export default class DatePicker extends Component {
+export default class DatePicker extends PureComponent {
   constructor(props) {
     super(props);
     this.state = getStateFromProps(props.value, props);
+    this.styling = createStyling(props.theme, props.invertTheme);
   }
 
   static propTypes = {
-  }
+    pattern: PropTypes.string,
+    placeholder: PropTypes.string,
+    onRenderCalendar: PropTypes.func,
+    getInputElement: PropTypes.func,
+    locale: PropTypes.string
+  };
 
   static defaultProps = {
     pattern: 'ddd DD/MM/YYYY',
     placeholder: moment().format('ddd DD/MM/YYYY'),
-    onRenderCalendar: (className, style, date, isActive, popupShown, onSelect, locale) =>
+    onRenderCalendar: (styling, date, isActive, popupShown, onSelect, locale) =>
       popupShown && (
-        <div {...{ className, style }}>
-          <ReactDatePicker date={date.format('YYYY-MM-DD')}
-                           className={sheet.classes.datePicker}
-                           onChange={date => onSelect(moment(date, 'YYYY-MM-DD', locale))}
-                           locale={locale} />
+        <div {...styling(['inputEnhancementsPopup', 'inputEnhancementsDatePickerPopup'])}>
+          <DayPicker
+            theme={styling(null)}
+            selectedDays={day => DateUtils.isSameDay(date.toDate(), day)}
+            onDayClick={(e, day) => onSelect(moment(day, null, locale))}
+            locale={locale}
+            localeUtils={MomentLocaleUtils}
+          />
         </div>
       ),
     locale: 'en'
-  }
-
-  shouldComponentUpdate = shouldPureComponentUpdate
+  };
 
   componentWillUpdate(nextProps, nextState) {
     const value = nextProps.value !== this.props.value ? nextProps.value : nextState.value;
@@ -65,24 +66,46 @@ export default class DatePicker extends Component {
   }
 
   render() {
-    const { pattern, children, value, defaultValue, onChange, placeholder, ...props } = this.props;
+    const { children, placeholder, registerInput, getInputElement } = this.props;
+
+    const child = (maskProps, otherProps, registerInput) =>
+      (typeof children === 'function') ?
+        children(maskProps, otherProps, registerInput) :
+        React.cloneElement(
+          Children.only(children),
+          { ...maskProps, ...Children.only(children).props }
+        );
 
     return (
-      <Mask pattern={this.state.pattern}
-            value={this.state.value}
-            defaultValue={defaultValue}
-            onValidate={this.handleValidate}
-            onChange={this.handleChange}
-            placeholder={placeholder}
-            onValuePreUpdate={this.handleValuePreUpdate}>
-        <InputPopup {...props}
-                    onRenderPopup={this.renderPopup}
-                    onPopupShownChange={this.handlePopupShownChange}
-                    onIsActiveChange={this.handleIsActiveChange}
-                    popupShown={this.state.popupShown}
-                    isActive={this.state.isActive}>
-          {children}
-        </InputPopup>
+      <Mask
+        pattern={this.state.pattern}
+        value={this.state.value}
+        onValidate={this.handleValidate}
+        onChange={this.handleChange}
+        placeholder={placeholder}
+        onValuePreUpdate={this.handleValuePreUpdate}
+        registerInput={registerInput}
+        getInputElement={getInputElement}
+      >
+        {(maskProps, otherProps, registerInput) =>
+          <InputPopup
+            {...maskProps}
+            styling={this.styling}
+            onRenderPopup={this.renderPopup}
+            onPopupShownChange={this.handlePopupShownChange}
+            onIsActiveChange={this.handleIsActiveChange}
+            popupShown={this.state.popupShown}
+            isActive={this.state.isActive}
+            registerInput={registerInput}
+            customProps={otherProps}
+          >
+            {(inputProps, otherProps, registerInput) => child(
+              inputProps,
+              otherProps,
+              registerInput
+            )}
+          </InputPopup>
+        }
       </Mask>
     );
   }
@@ -104,6 +127,9 @@ export default class DatePicker extends Component {
   }
 
   handleValuePreUpdate = value => {
+    if (this.props.onValuePreUpdate) {
+      value = this.props.onValuePreUpdate(value);
+    }
     const localeData = moment.localeData(this.props.locale);
     const days = localeData._weekdaysShort;
 
@@ -120,12 +146,11 @@ export default class DatePicker extends Component {
     return value.replace(/ddd/g, localeData.weekdaysShort(state.date));
   }
 
-  renderPopup = (popupClassName, popupStyle, isActive, popupShown) => {
+  renderPopup = (styling, isActive, popupShown) => {
     const { onRenderCalendar, locale } = this.props;
 
     return onRenderCalendar(
-      popupClassName,
-      popupStyle,
+      styling,
       this.state.date,
       isActive,
       popupShown,
@@ -172,161 +197,3 @@ export default class DatePicker extends Component {
     };
   }
 }
-
-const sheet = jss.createStyleSheet({
-  datePicker: {
-    display: 'flex',
-    'flex-direction': 'column',
-    flex: '1 0 auto',
-    'box-sizing': 'border-box',
-    width: '28rem',
-    height: '30rem',
-
-    '& *': {
-      'box-sizing': 'border-box',
-      'user-select': 'none',
-      outline: 'none'
-    },
-
-    '& .dp-header': {
-      background: '#f0f0f0',
-      'border-bottom': '1px solid #CCCCCC',
-      '& .dp-cell': {
-        padding: '0.5rem',
-        color: '#000'
-      }
-    },
-
-    '& .dp-footer': {
-      display: 'flex',
-      'flex-direction': 'row',
-      'justify-content': 'space-around',
-      padding: '0.5rem'
-    },
-
-    '& .dp-footer-today, & .dp-footer-selected': {
-      padding: '0.5rem 1rem',
-      'border-radius': '2rem',
-      cursor: 'pointer'
-    },
-
-    '& .dp-footer-today:hover, & .dp-footer-selected:hover': {
-      'background-color': '#F0F0F0'
-    },
-
-    '& .dp-body': {
-      display: 'flex',
-      'flex-direction': 'column',
-      flex: 1
-    },
-
-    '& .dp-week-day-names': {
-      color: '#000'
-    },
-
-    '& .dp-prev, & .dp-next': {
-      color: '#AAA'
-    },
-
-    '& .dp-table': {
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      'flex-direction': 'column',
-      flex: 1
-    },
-
-    '& .dp-row': {
-      display: 'flex',
-      'flex-direction': 'row',
-      flex: 1
-    },
-
-    '& .dp-cell': {
-      display: 'flex',
-      'align-items': 'center',
-      'justify-content': 'center',
-      flex: 1,
-      padding: '0.5rem'
-    },
-
-    '& .dp-day': {
-      position: 'relative',
-      cursor: 'pointer',
-
-      '&:before': {
-        content: '""',
-        position: 'absolute',
-        'z-index': '-1',
-        width: '3.1rem',
-        height: '3.1rem',
-        'border-radius': '2rem',
-        left: '0.5rem',
-        top: '0.1rem'
-      }
-    },
-
-
-    '& .dp-day:hover:before': {
-      'background-color': '#F0F0F0'
-    },
-
-    '& .dp-value': {
-      color: '#FFF',
-      '&:before': {
-        'background-color': '#2196f3'
-      },
-      '&:hover:before': {
-        'background-color': '#0A6EBD'
-      }
-    },
-
-    '& .dp-month.dp-value': {
-      'background-color': '#2196f3',
-      '&:hover': {
-        'background-color': '#0A6EBD'
-      }
-    },
-
-    '& .dp-year.dp-value': {
-      'background-color': '#2196f3',
-      '&:hover': {
-        'background-color': '#0A6EBD'
-      }
-    },
-
-    '& .dp-current': {
-      '&:before': {
-        'box-shadow': '0 0 0 1px #FFF, 0 0 0 2px #2196f3'
-      },
-    },
-
-    '& .dp-nav-table': {
-      width: '100%',
-      display: 'flex',
-      'flex-direction': 'row',
-      flex: 1,
-
-      '& .dp-cell': {
-        flex: 7,
-        cursor: 'pointer',
-        '&:hover': {
-          'background-color': '#E0E0E0'
-        }
-      },
-
-      '& .dp-nav-cell': {
-        flex: 1
-      }
-    },
-
-    '& .dp-month, & .dp-year': {
-      cursor: 'pointer',
-      'border-radius': '0.5rem'
-    },
-
-    '& .dp-month:hover, & .dp-year:hover': {
-      'background-color': '#F0F0F0'
-    }
-  }
-}).attach();

@@ -1,7 +1,8 @@
-import React, { Component, PropTypes, Children } from 'react';
-import ReactDOM from 'react-dom';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import { PureComponent, PropTypes } from 'react';
 import applyMaskToString from './applyMaskToString';
+import getInput from './utils/getInput';
+import registerInput from './utils/registerInput';
+import renderChild from './utils/renderChild';
 
 function getStateFromProps(value, props) {
   value = props.onValuePreUpdate(value);
@@ -23,12 +24,12 @@ function getStateFromProps(value, props) {
   return [state, processedValue];
 }
 
-export default class Mask extends Component {
+export default class Mask extends PureComponent {
   constructor(props) {
     super(props);
 
 
-    const value = props.value || props.defaultValue || '';
+    const value = props.value || '';
     const [state] = getStateFromProps(value, props);
     this.state = {
       value,
@@ -40,25 +41,21 @@ export default class Mask extends Component {
   static propTypes = {
     getInputElement: PropTypes.func,
     value: PropTypes.string,
-    defaultValue: PropTypes.string,
     pattern: PropTypes.string.isRequired,
     emptyChar: PropTypes.string
-  }
+  };
 
   static defaultProps = {
     emptyChar: ' ',
     onValidate: () => {},
     onValuePreUpdate: v => v
-  }
-
-  shouldComponentUpdate = shouldPureComponentUpdate
+  };
 
   componentWillReceiveProps(nextProps) {
     if (this.props.pattern !== nextProps.pattern ||
       this.props.value !== nextProps.value ||
-      this.props.defaultValue !== nextProps.defaultValue ||
       this.props.emptyChar !== nextProps.emptyChar) {
-      this.setValue(nextProps.value || nextProps.defaultValue, nextProps);
+      this.setValue(nextProps.value, nextProps);
     }
   }
 
@@ -78,41 +75,28 @@ export default class Mask extends Component {
   }
 
   setSelectionRange(lastIndex) {
-    const input = this.getInput();
+    const input = getInput(this);
     if (input === document.activeElement) {
       input.setSelectionRange(lastIndex, lastIndex);
     }
   }
 
-  getInput() {
-    if (this.props.getInputElement) {
-      return this.props.getInputElement();
-    }
-
-    const el = ReactDOM.findDOMNode(this);
-    return el.tagName === 'INPUT' ?
-      el:
-      el.getElementsByTagName('INPUT')[0];
-  }
+  registerInput = input => registerInput(this, input);
 
   render() {
-    const { children, ...props } = this.props;
+    const { children, placeholder } = this.props;
     const { value } = this.state;
     const inputProps = {
-      ...props,
       value,
-      onChange: this.handleChange
+      placeholder,
+      onInput: this.handleInput
     };
 
-    if (typeof children === 'function') {
-      return children(inputProps, { value });
-    } else {
-      const input = Children.only(children);
-      return React.cloneElement(input, { ...inputProps, ...input.props });
-    }
+    return renderChild(children, inputProps, { value }, this.registerInput);
   }
 
-  handleChange = e => {
+  // works better for IE than onChange
+  handleInput = e => {
     const value = e.target.value;
 
     if (this.props.value === undefined) {

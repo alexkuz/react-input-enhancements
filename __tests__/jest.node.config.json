@@ -1,0 +1,6 @@
+{
+  "testEnvironment": "node",
+  "moduleFileExtensions": ["js", "jsx"],
+  "testRegex": "/__tests__/.*\\.test\\.js$",
+  "setupTestFrameworkScriptFile": "__tests__/jest.node.setup.js"
+}

@@ -1,0 +1,15 @@
+exports[`Autosize renders correctly with element child 1`] = `
+<input
+  onChange={[Function anonymous]}
+  placeholder={undefined}
+  style={Object {}}
+  value="test" />
+`;
+
+exports[`Autosize renders correctly with function child 1`] = `
+<input
+  onChange={[Function anonymous]}
+  placeholder={undefined}
+  style={Object {}}
+  value="test" />
+`;

@@ -1,0 +1,13 @@
+exports[`Mask renders correctly with element child 1`] = `
+<input
+  onInput={[Function anonymous]}
+  placeholder={undefined}
+  value="1-2-3" />
+`;
+
+exports[`Mask renders correctly with function child 1`] = `
+<input
+  onInput={[Function anonymous]}
+  placeholder={undefined}
+  value="1-2-3" />
+`;

@@ -1,11 +1,5 @@
-import React, { Component, PropTypes } from 'react';
-import ReactDOM from 'react-dom';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import React, { PureComponent, PropTypes } from 'react';
 import * as shapes from './shapes';
-import classNames from 'classnames';
-import { create } from 'jss';
-import jssNested from 'jss-nested';
-import jssVendorPrefixer from 'jss-vendor-prefixer';
 import findMatchingTextIndex from './utils/findMatchingTextIndex';
 import * as filters from './filters';
 import InputPopup from './InputPopup';
@@ -14,18 +8,10 @@ import getOptionLabel from './utils/getOptionLabel';
 import getOptionValue from './utils/getOptionValue';
 import isStatic from './utils/isStatic';
 import DropdownOption from './DropdownOption';
-
-const jss = create();
-jss.use(jssNested());
-jss.use(jssVendorPrefixer());
-
-function getOptionClassName(opt, isHighlighted, isDisabled) {
-  return classNames(
-    sheet.classes.option,
-    isHighlighted && sheet.classes.optionHighlighted,
-    isDisabled && sheet.classes.optionDisabled
-  );
-}
+import createStyling from './createStyling';
+import deprecated from './utils/deprecated';
+import getInput from './utils/getInput';
+import registerInput from './utils/registerInput';
 
 function getOptionKey(opt, idx) {
   const value = getOptionValue(opt);
@@ -57,11 +43,11 @@ function getShownOptions(value, options, optionFilters) {
 }
 
 function findOptionIndex(options, option) {
-  return options.findIndex(opt => opt === option);
+  return Array.findIndex(options, opt => opt === option);
 }
 
 function getStateFromProps(props) {
-  const value = (typeof props.value === 'undefined') ? props.defaultValue : props.value;
+  const value = props.value;
   const match = findMatchingTextIndex(value, props.options);
   const [selectedIndex, matchingText] = match;
   const shownOptions = getShownOptions(matchingText, props.options, props.optionFilters);
@@ -77,11 +63,16 @@ function getStateFromProps(props) {
   };
 }
 
-export default class Dropdown extends Component {
+export default class Dropdown extends PureComponent {
   constructor(props) {
     super(props);
 
     this.state = getStateFromProps(props);
+    this.styling = createStyling(props.theme, props.invertTheme);
+
+    if (typeof props.onValueChange !== 'undefined') {
+      deprecated('`onValueChange` is deprecated, please use `onSelect` instead');
+    }
   }
 
   static propTypes = {
@@ -90,21 +81,21 @@ export default class Dropdown extends Component {
     onRenderOption: PropTypes.func,
     onRenderList: PropTypes.func,
     optionFilters: PropTypes.arrayOf(PropTypes.func)
-  }
+  };
 
   static defaultProps = {
-    onRenderOption: (className, style, opt, highlighted) =>
+    onRenderOption: (styling, opt, highlighted, disabled) =>
       opt !== null ?
-        <div {...{ className, style }}>
-          {getOptionLabel(opt, highlighted)}
+        <div {...styling('inputEnhancementsOption', highlighted, disabled)}>
+          {getOptionLabel(opt, highlighted, disabled)}
         </div> :
-        <div className={sheet.classes.separator} />,
+        <div {...styling('inputEnhancementsSeparator')} />,
 
-    onRenderList: (className, style, isActive, listShown, children, header) =>
+    onRenderList: (styling, isActive, listShown, children, header) =>
       listShown && (
-        <div {...{ className, style }}>
-          {header && <div className={sheet.classes.listHeader}>{header}</div>}
-          <div className={sheet.classes.listOptions}>{children}</div>
+        <div {...styling(['inputEnhancementsPopup', 'inputEnhancementsDropdownPopup'])}>
+          {header && <div {...styling('inputEnhancementsListHeader', isActive)}>{header}</div>}
+          <div {...styling('inputEnhancementsListOptions', isActive)}>{children}</div>
         </div>
       ),
 
@@ -129,12 +120,10 @@ export default class Dropdown extends Component {
     ]
   }
 
-  shouldComponentUpdate = shouldPureComponentUpdate
-
   componentWillUpdate(nextProps, nextState) {
     const { options, optionFilters } = nextProps;
 
-    if ((nextProps.defaultValue || nextProps.value) && nextState.value === null ||
+    if (nextProps.value && nextState.value === null ||
         this.props.value !== nextProps.value) {
       const state = getStateFromProps(nextProps);
 
@@ -171,35 +160,38 @@ export default class Dropdown extends Component {
   }
 
   render() {
-    const { onRenderList, dropdownProps,
-            style, children, onValueChange, ...props } = this.props;
+    const { dropdownProps, children } = this.props;
 
     const value = this.state.value === null ? '' : this.state.value;
 
     return (
-      <InputPopup {...props}
-                  value={value}
-                  proxyProps={{ textValue: value }}
-                  onChange={this.handleChange}
-                  onKeyDown={this.handleKeyDown}
-                  inputPopupProps={dropdownProps}
-                  onRenderPopup={this.renderPopup}
-                  onIsActiveChange={this.handleIsActiveChange}
-                  onPopupShownChange={this.handlePopupShownChange}
-                  popupShown={this.state.listShown}
-                  isActive={this.state.isActive}>
+      <InputPopup
+        styling={this.styling}
+        value={value}
+        customProps={{ textValue: value }}
+        onChange={this.handleChange}
+        onKeyDown={this.handleKeyDown}
+        inputPopupProps={dropdownProps}
+        onRenderPopup={this.renderPopup}
+        onIsActiveChange={this.handleIsActiveChange}
+        onPopupShownChange={this.handlePopupShownChange}
+        popupShown={this.state.listShown}
+        isActive={this.state.isActive}
+        registerInput={this.registerInput}
+      >
         {children}
       </InputPopup>
     );
   }
 
-  renderPopup = (popupClassName, popupStyle, isActive, popupShown) => {
+  registerInput = input => registerInput(this, input);
+
+  renderPopup = (styling, isActive, popupShown) => {
     const { onRenderList, onRenderListHeader, options } = this.props;
     const { shownOptions } = this.state;
 
     return onRenderList(
-      popupClassName,
-      popupStyle,
+      styling,
       isActive,
       popupShown,
       shownOptions.map(this.renderOption),
@@ -217,14 +209,16 @@ export default class Dropdown extends Component {
     const disabled = opt && opt.disabled;
 
     return (
-      <DropdownOption key={getOptionKey(opt, idx)}
-                      onMouseDown={this.handleOptionClick.bind(this, idx)}
-                      highlighted={highlighted}>
+      <DropdownOption
+        key={getOptionKey(opt, idx)}
+        onMouseDown={this.handleOptionClick.bind(this, idx)}
+        highlighted={highlighted}
+      >
         {onRenderOption(
-          getOptionClassName(opt, highlighted, disabled),
-          null,
+          this.styling,
           opt,
-          highlighted
+          highlighted,
+          disabled
         )}
       </DropdownOption>
     );
@@ -233,7 +227,7 @@ export default class Dropdown extends Component {
   handleOptionClick(idx, e) {
     const option = this.state.shownOptions[idx];
 
-    if (option.disabled) {
+    if (!option || option.disabled) {
       e.preventDefault();
       return;
     }
@@ -299,14 +293,16 @@ export default class Dropdown extends Component {
 
     setTimeout(() => {
       this.selectOption(findOptionIndex(this.props.options, option), true);
-      this.getInput().blur();
+      getInput(this).blur();
     });
   }
 
-  selectOption(index, fireOnChange) {
+  selectOption(index, fireOnSelect) {
     const { options, optionFilters } = this.props;
     const option = options[index];
     const shownOptions = getShownOptions(getOptionText(option), options, optionFilters);
+
+    const onSelect = this.props.onSelect || this.props.onValueChange;
 
     this.setState({
       value: getOptionText(option),
@@ -315,72 +311,19 @@ export default class Dropdown extends Component {
       isActive: false,
       shownOptions
     });
-    if (fireOnChange && this.props.onValueChange) {
-      this.props.onValueChange(
+    if (fireOnSelect && onSelect) {
+      onSelect(
         getOptionValue(option),
         getOptionText(option)
       );
     }
   }
 
-  getInput() {
-    if (this.props.getInputElement) {
-      return this.props.getInputElement();
-    }
-
-    const el = ReactDOM.findDOMNode(this);
-    return el.tagName === 'INPUT' ?
-      el:
-      el.getElementsByTagName('INPUT')[0];
-  }
-
   handleIsActiveChange = isActive => {
     this.setState({ isActive });
-  }
+  };
 
   handlePopupShownChange = popupShown => {
     this.setState({ listShown: popupShown });
-  }
+  };
 }
-
-const sheet = jss.createStyleSheet({
-  listHeader: {
-    'flex-shrink': 0,
-    height: '3rem',
-    'font-size': '0.8em',
-    color: '#999999',
-    'background-color': '#FAFAFA',
-    padding: '0.5rem 1rem',
-    'border-bottom': '1px solid #DDDDDD'
-  },
-  listOptions: {
-    'flex-grow': 1,
-    'overflow-y': 'auto'
-  },
-  option: {
-    padding: '1rem 1.5rem',
-    cursor: 'pointer',
-    '&:hover': {
-      'background-color': '#F0F0F0'
-    }
-  },
-  optionHighlighted: {
-    'background-color': '#3333FF',
-    color: '#FFFFFF',
-    '&:hover': {
-      'background-color': '#3333FF'
-    }
-  },
-  optionDisabled: {
-    color: '#999999',
-    '&:hover': {
-      'background-color': 'inherit'
-    }
-  },
-  separator: {
-    margin: '0.5rem 0',
-    width: '100%',
-    height: '1px',
-    'border-top': '1px solid #DDDDDD'
-  }
-}).attach();
