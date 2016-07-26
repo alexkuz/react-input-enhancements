@@ -105,7 +105,7 @@ export default class InputPopup extends Component {
   renderInput() {
     const { className, onRenderCaret, onRenderPopup, inputPopupProps,
             popup, inputClassName, inputStyle, children,
-            onInputFocus, onInputBlur, proxyProps, ...props } = this.props;
+            onInputFocus, onInputBlur, proxyProps, pattern, ...props } = this.props;
     const { classes } = sheet;
 
     const inputProps = {
