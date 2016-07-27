@@ -50,7 +50,6 @@
     "raw-loader": "^0.5.1",
     "react": ">=0.14.0",
     "react-dom": ">=0.14.0",
-    "react-addons-perf": "^0.14.3",
     "react-bootstrap": "^0.28.1",
     "react-transform-hmr": "^1.0.1",
     "style-loader": "^0.13.0",

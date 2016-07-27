@@ -9,7 +9,7 @@ require('babel-core/polyfill');
 
 var pkg = require('./package.json');
 var config = {
-  port: 3000
+  devServerPort: 3000
 };
 
 try {

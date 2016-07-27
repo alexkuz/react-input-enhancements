@@ -96,12 +96,12 @@ export default class Mask extends Component {
   }
 
   render() {
-    const { children, ...props } = this.props;
+    const { children, pattern, ...props } = this.props;
     const { value } = this.state;
     const inputProps = {
-      ...props,
       value,
-      onChange: this.handleChange
+      onChange: this.handleChange,
+      ...props,
     };
 
     if (typeof children === 'function') {
