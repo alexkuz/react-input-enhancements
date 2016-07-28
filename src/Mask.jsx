@@ -58,7 +58,7 @@ export default class Mask extends Component {
       this.props.value !== nextProps.value ||
       this.props.defaultValue !== nextProps.defaultValue ||
       this.props.emptyChar !== nextProps.emptyChar) {
-      this.setValue(nextProps.value || nextProps.defaultValue, nextProps);
+      this.setValue(nextProps.value, nextProps);
     }
   }
 
