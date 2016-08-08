@@ -355,7 +355,8 @@ const sheet = jss.createStyleSheet({
   },
   listOptions: {
     'flex-grow': 1,
-    'overflow-y': 'auto'
+    'overflow-y': 'auto',
+    'max-height': '27rem'
   },
   option: {
     padding: '1rem 1.5rem',
