@@ -83,5 +83,8 @@ module.exports = {
       colors: true
     },
     historyApiFallback: true
+  },
+  node: {
+    fs: 'empty'
   }
 };

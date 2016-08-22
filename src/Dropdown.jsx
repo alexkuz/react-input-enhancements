@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import shouldPureComponentUpdate from 'react-pure-render/function';
 import * as shapes from './shapes';
-import classNames from 'classnames';
 import findMatchingTextIndex from './utils/findMatchingTextIndex';
 import * as filters from './filters';
 import InputPopup from './InputPopup';
@@ -11,16 +10,7 @@ import getOptionLabel from './utils/getOptionLabel';
 import getOptionValue from './utils/getOptionValue';
 import isStatic from './utils/isStatic';
 import DropdownOption from './DropdownOption';
-import { createStyling } from 'react-base16-styling';
-import defaultTheme from './themes/default';
-
-function getOptionClassName(opt, isHighlighted, isDisabled) {
-  return classNames(
-    sheet.classes.option,
-    isHighlighted && sheet.classes.optionHighlighted,
-    isDisabled && sheet.classes.optionDisabled
-  );
-}
+import createStyling from './createStyling';
 
 function getOptionKey(opt, idx) {
   const value = getOptionValue(opt);
@@ -72,33 +62,12 @@ function getStateFromProps(props) {
   };
 }
 
-function getStylingFromBase16(base16Theme) {
-  return {
-    myComponent: {
-      backgroundColor: base16Theme.base00
-    },
-
-    myComponentToggleColor({ style, className }, clickCount) {
-      return {
-        style: {
-          ...style,
-          backgroundColor: clickCount % 2 ? 'red' : 'blue'
-        }
-      }
-    }
-  };
-}
-
-const createStylingFromTheme = createStyling(getStylingFromBase16, {
-  defaultBase16: defaultTheme
-});
-
-
 export default class Dropdown extends Component {
   constructor(props) {
     super(props);
 
     this.state = getStateFromProps(props);
+    this.styling = createStyling(props.theme, props.invertTheme);
   }
 
   static propTypes = {
@@ -110,18 +79,18 @@ export default class Dropdown extends Component {
   }
 
   static defaultProps = {
-    onRenderOption: (className, style, opt, highlighted) =>
+    onRenderOption: (styling, opt, highlighted, disabled) =>
       opt !== null ?
-        <div {...{ className, style }}>
-          {getOptionLabel(opt, highlighted)}
+        <div {...styling('inputEnhancementsOption', highlighted, disabled)}>
+          {getOptionLabel(opt, highlighted, disabled)}
         </div> :
-        <div className={sheet.classes.separator} />,
+        <div {...styling('inputEnhancementsSeparator')} />,
 
-    onRenderList: (className, style, isActive, listShown, children, header) =>
+    onRenderList: (styling, isActive, listShown, children, header) =>
       listShown && (
-        <div {...{ className, style }}>
-          {header && <div className={sheet.classes.listHeader}>{header}</div>}
-          <div className={sheet.classes.listOptions}>{children}</div>
+        <div {...styling(['inputEnhancementsPopup', 'inputEnhancementsDropdownPopup'])}>
+          {header && <div {...styling('inputEnhancementsListHeader', isActive)}>{header}</div>}
+          <div {...styling('inputEnhancementsListOptions', isActive)}>{children}</div>
         </div>
       ),
 
@@ -193,9 +162,10 @@ export default class Dropdown extends Component {
     const value = this.state.value === null ? '' : this.state.value;
 
     return (
-      <InputPopup {...props}
+      <InputPopup styling={this.styling}
                   value={value}
-                  proxyProps={{ textValue: value }}
+                  proxyProps={props}
+                  customProps={{ textValue: value }}
                   onChange={this.handleChange}
                   onKeyDown={this.handleKeyDown}
                   inputPopupProps={dropdownProps}
@@ -209,13 +179,12 @@ export default class Dropdown extends Component {
     );
   }
 
-  renderPopup = (popupClassName, popupStyle, isActive, popupShown) => {
+  renderPopup = (styling, isActive, popupShown) => {
     const { onRenderList, onRenderListHeader, options } = this.props;
     const { shownOptions } = this.state;
 
     return onRenderList(
-      popupClassName,
-      popupStyle,
+      styling,
       isActive,
       popupShown,
       shownOptions.map(this.renderOption),
@@ -237,10 +206,10 @@ export default class Dropdown extends Component {
                       onMouseDown={this.handleOptionClick.bind(this, idx)}
                       highlighted={highlighted}>
         {onRenderOption(
-          getOptionClassName(opt, highlighted, disabled),
-          null,
+          this.styling,
           opt,
-          highlighted
+          highlighted,
+          disabled
         )}
       </DropdownOption>
     );
@@ -249,7 +218,7 @@ export default class Dropdown extends Component {
   handleOptionClick(idx, e) {
     const option = this.state.shownOptions[idx];
 
-    if (option.disabled) {
+    if (!option || option.disabled) {
       e.preventDefault();
       return;
     }
@@ -358,45 +327,3 @@ export default class Dropdown extends Component {
     this.setState({ listShown: popupShown });
   }
 }
-
-const sheet = jss.createStyleSheet({
-  listHeader: {
-    'flex-shrink': 0,
-    height: '3rem',
-    'font-size': '0.8em',
-    color: '#999999',
-    'background-color': '#FAFAFA',
-    padding: '0.5rem 1rem',
-    'border-bottom': '1px solid #DDDDDD'
-  },
-  listOptions: {
-    'flex-grow': 1,
-    'overflow-y': 'auto'
-  },
-  option: {
-    padding: '1rem 1.5rem',
-    cursor: 'pointer',
-    '&:hover': {
-      'background-color': '#F0F0F0'
-    }
-  },
-  optionHighlighted: {
-    'background-color': '#3333FF',
-    color: '#FFFFFF',
-    '&:hover': {
-      'background-color': '#3333FF'
-    }
-  },
-  optionDisabled: {
-    color: '#999999',
-    '&:hover': {
-      'background-color': 'inherit'
-    }
-  },
-  separator: {
-    margin: '0.5rem 0',
-    width: '100%',
-    height: '1px',
-    'border-top': '1px solid #DDDDDD'
-  }
-}).attach();

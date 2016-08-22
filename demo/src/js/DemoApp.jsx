@@ -7,7 +7,6 @@ import ControlLabel from 'react-bootstrap/lib/ControlLabel';
 import Col from 'react-bootstrap/lib/Col';
 import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import Collapse from 'react-bootstrap/lib/Collapse';
-import Static from 'react-bootstrap/lib/FormControls/Static';
 import Button from 'react-bootstrap/lib/Button';
 import moment from 'moment';
 import countries from './countries';
@@ -21,8 +20,6 @@ import DatePicker from 'DatePicker';
 
 import pkg from '../../../package.json';
 import './bootstrap-input-inline.css';
-
-import Input from 'react-bootstrap/lib/Input';
 
 const ValueInput1 = pure(({ value, onChange }) =>
   <div className='inline-input'>
@@ -627,7 +624,7 @@ export default class DemoApp extends React.Component {
                          onUnmaskedValueChange={
                           value => this.setState({ unmaskedValue7: value })
                          } />
-            <Static label='Unmasked value:'
+            <FormControl.Static label='Unmasked value:'
                      labelClassName='col-xs-3'
                      wrapperClassName='col-xs-9'
                      value={this.state.unmaskedValue7} />
@@ -637,7 +634,7 @@ export default class DemoApp extends React.Component {
                          onUnmaskedValueChange={
                           value => this.setState({ unmaskedValue8: value })
                          } />
-            <Static label='Unmasked value:'
+            <FormControl.Static label='Unmasked value:'
                      labelClassName='col-xs-3'
                      wrapperClassName='col-xs-9'
                      value={this.state.unmaskedValue8} />
