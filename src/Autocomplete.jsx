@@ -1,8 +1,8 @@
-import React, { Component, PropTypes, Children } from 'react';
+import React, { PureComponent, PropTypes, Children } from 'react';
 import ReactDOM from 'react-dom';
-import shouldPureComponentUpdate from 'react-pure-render/function';
 import * as shapes from './shapes';
 import findMatchingTextIndex from './utils/findMatchingTextIndex';
+import deprecated from './utils/deprecated';
 
 function setSelection(input, text, matchingText) {
   if (text === null) {
@@ -15,25 +15,23 @@ function setSelection(input, text, matchingText) {
   }
 }
 
-export default class Autocomplete extends Component {
+export default class Autocomplete extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       matchingText: null,
-      value: (typeof props.value === 'undefined') ? props.defaultValue : props.value
+      value: props.value
     };
   }
 
   static propTypes = {
     getInputElement: PropTypes.func,
     value: PropTypes.string,
-    options: PropTypes.arrayOf(shapes.ITEM_OR_STRING)
-  }
+    options: PropTypes.arrayOf(shapes.ITEM_OR_STRING).isRequired
+  };
 
   static defaultProps = {
-  }
-
-  shouldComponentUpdate = shouldPureComponentUpdate
+  };
 
   componentWillMount() {
     document.addEventListener('selectionchange', this.handleSelectionChange);
@@ -79,6 +77,13 @@ export default class Autocomplete extends Component {
       return this.props.getInputElement();
     }
 
+    if (this.input) {
+      return this.input;
+    }
+
+    // eslint-disable-next-line
+    deprecated('Automatic input resolving is deprecated: please provide input instance via `getInputElement` or `registerInput`');
+
     const el = ReactDOM.findDOMNode(this);
     return el.tagName === 'INPUT' ?
       el:
@@ -86,22 +91,23 @@ export default class Autocomplete extends Component {
   }
 
   render() {
-    const { children, ...props } = this.props;
+    const { children } = this.props;
     const { matchingText, value } = this.state;
     const inputProps = {
-      ...props,
       value: matchingText || value,
       onKeyDown: this.handleKeyDown,
       onChange: this.handleChange
     };
 
     if (typeof children === 'function') {
-      return children(inputProps, { matchingText, value });
+      return children(inputProps, { matchingText, value, registerInput: this.registerInput });
     } else {
       const input = Children.only(children);
       return React.cloneElement(input, { ...inputProps, ...input.props });
     }
   }
+
+  registerInput = c => this.input = c;
 
   handleSelectionChange = () => {
     const input = this.getInput();

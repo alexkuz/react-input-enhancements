@@ -2,10 +2,8 @@ var path = require('path');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CleanWebpackPlugin = require('clean-webpack-plugin');
-var ExportFilesWebpackPlugin = require('export-files-webpack-plugin');
 var NyanProgressWebpackPlugin = require('nyan-progress-webpack-plugin');
 
-var pkg = require('./package.json');
 var config = {
   port: 3000
 };
@@ -27,28 +25,33 @@ module.exports = {
       './demo/src/js/index'
     ],
   output: {
-    path: __dirname,
-    filename: 'demo/dist/js/bundle.js',
+    path: path.resolve(__dirname, 'demo/dist'),
+    filename: 'js/bundle.js',
     hash: true
   },
   plugins: [
     new HtmlWebpackPlugin({
       inject: true,
       template: 'demo/src/index.html',
-      filename: 'index.html',
-      package: pkg
+      env: process.env
     }),
     new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify(process.env.NODE_ENV)
-      },
+      'process.env': [
+        'NODE_ENV',
+        'npm_package_version',
+        'npm_package_name',
+        'npm_package_description',
+        'npm_package_homepage'
+      ].reduce(function (env, key) {
+        env[key] = JSON.stringify(process.env[key]);
+        return env;
+      }, {})
     }),
     new webpack.NoErrorsPlugin(),
     new NyanProgressWebpackPlugin()
   ].concat(isProduction ? [
-    new CleanWebpackPlugin(['index.html', 'demo/dist', 'lib'])
+    new CleanWebpackPlugin(['demo/dist', 'lib'])
   ] : [
-    new ExportFilesWebpackPlugin('index.html'),
     new webpack.HotModuleReplacementPlugin()
   ]),
   resolve: {
@@ -75,6 +78,7 @@ module.exports = {
     }]
   },
   devServer: isProduction ? null : {
+    contentBase: 'demo/dist',
     quiet: false,
     port: config.devServerPort,
     hot: true,

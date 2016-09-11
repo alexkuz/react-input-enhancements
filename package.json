@@ -1,6 +1,6 @@
 {
   "name": "react-input-enhancements",
-  "version": "0.5.0-beta",
+  "version": "0.5.0-beta1",
   "description": "Set of enhancements for input control (bootstrap-ready)",
   "scripts": {
     "build:lib": "NODE_ENV=production babel src --out-dir lib",
@@ -9,8 +9,9 @@
     "start": "webpack-dev-server",
     "lint": "eslint src",
     "version": "npm run build:demo && git add -A .",
-    "postversion": "git push",
-    "prepublish": "npm run build:lib"
+    "postversion": "git push --tags",
+    "prepublish": "npm run build:lib",
+    "gh": "git subtree push --prefix demo/dist origin gh-pages"
   },
   "main": "lib/index.js",
   "repository": {
@@ -44,7 +45,6 @@
     "eslint-loader": "^1.5.0",
     "eslint-plugin-babel": "^3.3.0",
     "eslint-plugin-react": "^6.1.2",
-    "export-files-webpack-plugin": "0.0.1",
     "expose-loader": "^0.7.1",
     "html-webpack-plugin": "^2.22.0",
     "imports-loader": "^0.6.5",
@@ -65,18 +65,12 @@
     "react-dom": "^15.3.1"
   },
   "dependencies": {
-    "autoprefixer": "^6.4.0",
     "babel-runtime": "^6.11.6",
-    "classnames": "^2.2.5",
-    "css-vendor": "^0.3.4",
     "inline-style-prefixer": "^2.0.1",
     "lodash.sortby": "^4.7.0",
     "moment": "^2.14.1",
-    "postcss-js": "^0.1.3",
     "react-base16-styling": "^0.4.5",
-    "react-date-picker": "^5.3.28",
-    "react-day-picker-themeable": "^2.5.0",
-    "react-pure-render": "^1.0.2"
+    "react-day-picker-themeable": "^2.5.0"
   },
   "author": "Alexander <alexkuz@gmail.com> (http://kuzya.org/)",
   "license": "MIT"

@@ -1,6 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { PureComponent, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import shouldPureComponentUpdate from 'react-pure-render/function';
 import * as shapes from './shapes';
 import findMatchingTextIndex from './utils/findMatchingTextIndex';
 import * as filters from './filters';
@@ -11,6 +10,7 @@ import getOptionValue from './utils/getOptionValue';
 import isStatic from './utils/isStatic';
 import DropdownOption from './DropdownOption';
 import createStyling from './createStyling';
+import deprecated from './utils/deprecated';
 
 function getOptionKey(opt, idx) {
   const value = getOptionValue(opt);
@@ -46,7 +46,7 @@ function findOptionIndex(options, option) {
 }
 
 function getStateFromProps(props) {
-  const value = (typeof props.value === 'undefined') ? props.defaultValue : props.value;
+  const value = props.value;
   const match = findMatchingTextIndex(value, props.options);
   const [selectedIndex, matchingText] = match;
   const shownOptions = getShownOptions(matchingText, props.options, props.optionFilters);
@@ -62,12 +62,16 @@ function getStateFromProps(props) {
   };
 }
 
-export default class Dropdown extends Component {
+export default class Dropdown extends PureComponent {
   constructor(props) {
     super(props);
 
     this.state = getStateFromProps(props);
     this.styling = createStyling(props.theme, props.invertTheme);
+
+    if (typeof props.onValueChange !== 'undefined') {
+      deprecated('`onValueChange` is deprecated, please use `onSelect` instead');
+    }
   }
 
   static propTypes = {
@@ -76,7 +80,7 @@ export default class Dropdown extends Component {
     onRenderOption: PropTypes.func,
     onRenderList: PropTypes.func,
     optionFilters: PropTypes.arrayOf(PropTypes.func)
-  }
+  };
 
   static defaultProps = {
     onRenderOption: (styling, opt, highlighted, disabled) =>
@@ -115,12 +119,10 @@ export default class Dropdown extends Component {
     ]
   }
 
-  shouldComponentUpdate = shouldPureComponentUpdate
-
   componentWillUpdate(nextProps, nextState) {
     const { options, optionFilters } = nextProps;
 
-    if ((nextProps.defaultValue || nextProps.value) && nextState.value === null ||
+    if (nextProps.value && nextState.value === null ||
         this.props.value !== nextProps.value) {
       const state = getStateFromProps(nextProps);
 
@@ -157,23 +159,24 @@ export default class Dropdown extends Component {
   }
 
   render() {
-    const { dropdownProps, children, ...props } = this.props;
+    const { dropdownProps, children } = this.props;
 
     const value = this.state.value === null ? '' : this.state.value;
 
     return (
-      <InputPopup styling={this.styling}
-                  value={value}
-                  proxyProps={props}
-                  customProps={{ textValue: value }}
-                  onChange={this.handleChange}
-                  onKeyDown={this.handleKeyDown}
-                  inputPopupProps={dropdownProps}
-                  onRenderPopup={this.renderPopup}
-                  onIsActiveChange={this.handleIsActiveChange}
-                  onPopupShownChange={this.handlePopupShownChange}
-                  popupShown={this.state.listShown}
-                  isActive={this.state.isActive}>
+      <InputPopup
+        styling={this.styling}
+        value={value}
+        customProps={{ textValue: value }}
+        onChange={this.handleChange}
+        onKeyDown={this.handleKeyDown}
+        inputPopupProps={dropdownProps}
+        onRenderPopup={this.renderPopup}
+        onIsActiveChange={this.handleIsActiveChange}
+        onPopupShownChange={this.handlePopupShownChange}
+        popupShown={this.state.listShown}
+        isActive={this.state.isActive}
+      >
         {children}
       </InputPopup>
     );
@@ -202,9 +205,11 @@ export default class Dropdown extends Component {
     const disabled = opt && opt.disabled;
 
     return (
-      <DropdownOption key={getOptionKey(opt, idx)}
-                      onMouseDown={this.handleOptionClick.bind(this, idx)}
-                      highlighted={highlighted}>
+      <DropdownOption
+        key={getOptionKey(opt, idx)}
+        onMouseDown={this.handleOptionClick.bind(this, idx)}
+        highlighted={highlighted}
+      >
         {onRenderOption(
           this.styling,
           opt,
@@ -288,10 +293,12 @@ export default class Dropdown extends Component {
     });
   }
 
-  selectOption(index, fireOnChange) {
+  selectOption(index, fireOnSelect) {
     const { options, optionFilters } = this.props;
     const option = options[index];
     const shownOptions = getShownOptions(getOptionText(option), options, optionFilters);
+
+    const onSelect = this.props.onSelect || this.props.onValueChange;
 
     this.setState({
       value: getOptionText(option),
@@ -300,8 +307,8 @@ export default class Dropdown extends Component {
       isActive: false,
       shownOptions
     });
-    if (fireOnChange && this.props.onValueChange) {
-      this.props.onValueChange(
+    if (fireOnSelect && onSelect) {
+      onSelect(
         getOptionValue(option),
         getOptionText(option)
       );

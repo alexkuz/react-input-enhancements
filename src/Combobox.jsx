@@ -1,16 +1,13 @@
-import React, { Component, PropTypes, Children } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import React, { PureComponent, PropTypes, Children } from 'react';
 import Autocomplete from './Autocomplete';
 import Dropdown from './Dropdown';
 import Autosize from './Autosize';
 
-export default class Combobox extends Component {
+export default class Combobox extends PureComponent {
   static propTypes = {
     autosize: PropTypes.bool,
     autocomplete: PropTypes.bool
-  }
-
-  shouldComponentUpdate = shouldPureComponentUpdate
+  };
 
   render() {
     const { autosize, autocomplete, children, ...props } = this.props;
@@ -29,12 +26,30 @@ export default class Combobox extends Component {
   renderAutosizeAutocompleteDropdown(children, props) {
     return (
       <Dropdown {...props}>
-        {(dropdownInputProps) =>
-          <Autocomplete {...dropdownInputProps}>
-            {(inputProps, { matchingText }) =>
-              <Autosize {...inputProps}>
+        {(dropdownInputProps, { textValue }) =>
+          <Autocomplete
+            value={textValue}
+            onChange={dropdownInputProps.onChange}
+            onKeyDown={dropdownInputProps.onKeyDown}
+            options={props.options}
+            getInputElement={props.getInputElement}
+          >
+            {(inputProps, { matchingText, registerInput }) =>
+              <Autosize
+                value={inputProps.value}
+                onChange={inputProps.onChange}
+                defaultWidth={props.defaultWidth}
+                getInputElement={props.getInputElement}
+                getSizerContainer={props.getSizerContainer}
+              >
                   {(autosizeInputProps, { width }) =>
-                    this.renderChildren(children, autosizeInputProps, { matchingText, width })
+                    this.renderChildren(children, {
+                      ...dropdownInputProps,
+                      ...inputProps,
+                      ...autosizeInputProps
+                    }, {
+                      matchingText, width, registerInput
+                    })
                   }
               </Autosize>
             }
@@ -48,9 +63,19 @@ export default class Combobox extends Component {
     return (
       <Dropdown {...props}>
         {(inputProps, { textValue }) =>
-          <Autosize {...inputProps} value={textValue}>
+          <Autosize
+            value={textValue}
+            onChange={inputProps.onChange}
+            defaultWidth={props.defaultWidth}
+            getInputElement={props.getInputElement}
+            getSizerContainer={props.getSizerContainer}
+          >
               {(autosizeInputProps, { width }) =>
-                this.renderChildren(children, autosizeInputProps, { width })
+                this.renderChildren(
+                  children,
+                  { ...inputProps, ...autosizeInputProps },
+                  { width }
+                )
               }
           </Autosize>
         }
@@ -61,10 +86,19 @@ export default class Combobox extends Component {
   renderAutocompleteDropdown(children, props) {
     return (
       <Dropdown {...props}>
-        {(dropdownInputProps) =>
-          <Autocomplete {...dropdownInputProps}>
-            {(inputProps, { matchingText }) =>
-              this.renderChildren(children, inputProps, { matchingText })
+        {(dropdownInputProps, { textValue }) =>
+          <Autocomplete
+            value={textValue}
+            onChange={dropdownInputProps.onChange}
+            onKeyDown={dropdownInputProps.onKeyDown}
+            options={props.options}
+            getInputElement={props.getInputElement}
+          >
+            {(inputProps, { matchingText, registerInput }) =>
+              this.renderChildren(children, {
+                ...dropdownInputProps,
+                ...inputProps
+              }, { matchingText, registerInput })
             }
           </Autocomplete>
         }

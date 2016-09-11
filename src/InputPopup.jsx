@@ -1,7 +1,6 @@
-import React, { Component, PropTypes, Children } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import React, { PureComponent, PropTypes, Children } from 'react';
 
-export default class InputPopup extends Component {
+export default class InputPopup extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -17,7 +16,7 @@ export default class InputPopup extends Component {
     onRenderPopup: PropTypes.func,
     onIsActiveChange: PropTypes.func,
     onPopupShownChange: PropTypes.func
-  }
+  };
 
   static defaultProps = {
     onRenderCaret: (styling, isActive, isHovered, children) =>
@@ -40,8 +39,6 @@ export default class InputPopup extends Component {
       </svg>
     );
   }
-
-  shouldComponentUpdate = shouldPureComponentUpdate
 
   componentWillUnmount() {
     if (this.blurTimeout) {
@@ -88,11 +85,10 @@ export default class InputPopup extends Component {
   }
 
   renderInput(styling, restProps) {
-    const { children, onInputFocus, onInputBlur, proxyProps, customProps, onChange, value } = restProps;
+    const { children, onInputFocus, onInputBlur, customProps, onChange, value } = restProps;
     const { isActive, hover, popupShown } = this.state;
 
     const inputProps = {
-      ...proxyProps,
       ...styling('inputEnhancementsInput', isActive, hover, popupShown),
       value,
       onFocus: onInputFocus,

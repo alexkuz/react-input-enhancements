@@ -1,5 +1,4 @@
-import React, { Component, PropTypes } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import React, { PureComponent, PropTypes, Children } from 'react';
 import Mask from './Mask';
 import InputPopup from './InputPopup';
 import moment from 'moment';
@@ -24,7 +23,7 @@ function getStateFromProps(value, props) {
   };
 }
 
-export default class DatePicker extends Component {
+export default class DatePicker extends PureComponent {
   constructor(props) {
     super(props);
     this.state = getStateFromProps(props.value, props);
@@ -56,8 +55,6 @@ export default class DatePicker extends Component {
     locale: 'en'
   };
 
-  shouldComponentUpdate = shouldPureComponentUpdate
-
   componentWillUpdate(nextProps, nextState) {
     const value = nextProps.value !== this.props.value ? nextProps.value : nextState.value;
     const state = getStateFromProps(value, nextProps);
@@ -68,25 +65,36 @@ export default class DatePicker extends Component {
   }
 
   render() {
-    const { children, defaultValue, placeholder, ...props } = this.props;
+    const { children, placeholder } = this.props;
+
+    const child = (maskProps, otherProps) => (typeof children === 'function') ?
+      children(maskProps, otherProps) :
+      React.cloneElement(
+        Children.only(children),
+        { ...maskProps, ...Children.only(children).props }
+      );
 
     return (
-      <Mask pattern={this.state.pattern}
-            value={this.state.value}
-            defaultValue={defaultValue}
-            onValidate={this.handleValidate}
-            onChange={this.handleChange}
-            placeholder={placeholder}
-            onValuePreUpdate={this.handleValuePreUpdate}>
-        <InputPopup proxyProps={props}
-                    styling={this.styling}
-                    onRenderPopup={this.renderPopup}
-                    onPopupShownChange={this.handlePopupShownChange}
-                    onIsActiveChange={this.handleIsActiveChange}
-                    popupShown={this.state.popupShown}
-                    isActive={this.state.isActive}>
-          {children}
-        </InputPopup>
+      <Mask
+        pattern={this.state.pattern}
+        value={this.state.value}
+        onValidate={this.handleValidate}
+        onChange={this.handleChange}
+        placeholder={placeholder}
+        onValuePreUpdate={this.handleValuePreUpdate}
+      >
+        {(maskProps, otherProps) =>
+          <InputPopup
+            styling={this.styling}
+            onRenderPopup={this.renderPopup}
+            onPopupShownChange={this.handlePopupShownChange}
+            onIsActiveChange={this.handleIsActiveChange}
+            popupShown={this.state.popupShown}
+            isActive={this.state.isActive}
+          >
+            {child(maskProps, otherProps)}
+          </InputPopup>
+        }
       </Mask>
     );
   }

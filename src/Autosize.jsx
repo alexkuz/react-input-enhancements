@@ -1,6 +1,5 @@
-import React, { Component, PropTypes, Children } from 'react';
+import React, { PureComponent, PropTypes, Children } from 'react';
 import ReactDOM from 'react-dom';
-import shouldPureComponentUpdate from 'react-pure-render/function';
 import './utils/getComputedStyle';
 
 const ALLOWED_CSS_PROPS = [
@@ -33,27 +32,26 @@ const sizerContainerStyle = {
   top: 0
 };
 
-export default class Autosize extends Component {
+export default class Autosize extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       width: props.defaultWidth,
       defaultWidth: props.defaultWidth,
-      value: (typeof props.value === 'undefined') ? props.defaultValue : props.value
+      value: props.value
     };
   }
 
   static propTypes = {
     value: PropTypes.string,
     defaultWidth: PropTypes.number,
-    getInputElement: PropTypes.func
-  }
+    getInputElement: PropTypes.func,
+    getSizerContainer: PropTypes.func
+  };
 
   static defaultProps = {
     getSizerContainer: () => document.body
-  }
-
-  shouldComponentUpdate = shouldPureComponentUpdate
+  };
 
   componentWillMount() {
     if (!sizersListEl) {
@@ -149,14 +147,15 @@ export default class Autosize extends Component {
   }
 
   render() {
-    const { defaultWidth, children, ...props } = this.props;
+    const { children, style, placeholder, value } = this.props;
     const { width } = this.state;
     const inputProps = {
-      ...props,
       style: {
-        ...(props.style || {}),
+        ...(style || {}),
         ...(width ? { width: width + 'px' } : {})
       },
+      placeholder,
+      value,
       onChange: this.handleChange
     }
 
@@ -165,7 +164,7 @@ export default class Autosize extends Component {
     } else {
       const input = Children.only(children);
 
-      return React.cloneElement(input, { ...inputProps, ...input.props });
+      return React.cloneElement(input, { ...input.props, ...inputProps });
     }
   }
 

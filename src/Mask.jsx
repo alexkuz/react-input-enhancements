@@ -1,7 +1,7 @@
-import React, { Component, PropTypes, Children } from 'react';
+import React, { PureComponent, PropTypes, Children } from 'react';
 import ReactDOM from 'react-dom';
-import shouldPureComponentUpdate from 'react-pure-render/function';
 import applyMaskToString from './applyMaskToString';
+import deprecated from './utils/deprecated';
 
 function getStateFromProps(value, props) {
   value = props.onValuePreUpdate(value);
@@ -23,12 +23,12 @@ function getStateFromProps(value, props) {
   return [state, processedValue];
 }
 
-export default class Mask extends Component {
+export default class Mask extends PureComponent {
   constructor(props) {
     super(props);
 
 
-    const value = props.value || props.defaultValue || '';
+    const value = props.value || '';
     const [state] = getStateFromProps(value, props);
     this.state = {
       value,
@@ -40,25 +40,21 @@ export default class Mask extends Component {
   static propTypes = {
     getInputElement: PropTypes.func,
     value: PropTypes.string,
-    defaultValue: PropTypes.string,
     pattern: PropTypes.string.isRequired,
     emptyChar: PropTypes.string
-  }
+  };
 
   static defaultProps = {
     emptyChar: ' ',
     onValidate: () => {},
     onValuePreUpdate: v => v
-  }
-
-  shouldComponentUpdate = shouldPureComponentUpdate
+  };
 
   componentWillReceiveProps(nextProps) {
     if (this.props.pattern !== nextProps.pattern ||
       this.props.value !== nextProps.value ||
-      this.props.defaultValue !== nextProps.defaultValue ||
       this.props.emptyChar !== nextProps.emptyChar) {
-      this.setValue(nextProps.value || nextProps.defaultValue, nextProps);
+      this.setValue(nextProps.value, nextProps);
     }
   }
 
@@ -89,23 +85,32 @@ export default class Mask extends Component {
       return this.props.getInputElement();
     }
 
+    if (this.input) {
+      return this.input;
+    }
+
+    // eslint-disable-next-line
+    deprecated('Automatic input resolving is deprecated: please provide input instance via `getInputElement` or `registerInput`');
+
     const el = ReactDOM.findDOMNode(this);
     return el.tagName === 'INPUT' ?
       el:
       el.getElementsByTagName('INPUT')[0];
   }
 
+  registerInput = c => this.input = c;
+
   render() {
-    const { children, ...props } = this.props;
+    const { children, placeholder } = this.props;
     const { value } = this.state;
     const inputProps = {
-      ...props,
       value,
+      placeholder,
       onChange: this.handleChange
     };
 
     if (typeof children === 'function') {
-      return children(inputProps, { value });
+      return children(inputProps, { value, registerInput: this.registerInput });
     } else {
       const input = Children.only(children);
       return React.cloneElement(input, { ...inputProps, ...input.props });
