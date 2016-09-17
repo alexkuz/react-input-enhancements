@@ -1,4 +1,5 @@
-import React, { PureComponent, PropTypes, Children } from 'react';
+import React, { PureComponent, PropTypes } from 'react';
+import renderChild from './utils/renderChild';
 
 export default class InputPopup extends PureComponent {
   constructor(props) {
@@ -15,7 +16,8 @@ export default class InputPopup extends PureComponent {
     onRenderCaret: PropTypes.func,
     onRenderPopup: PropTypes.func,
     onIsActiveChange: PropTypes.func,
-    onPopupShownChange: PropTypes.func
+    onPopupShownChange: PropTypes.func,
+    registerInput: PropTypes.func
   };
 
   static defaultProps = {
@@ -85,12 +87,14 @@ export default class InputPopup extends PureComponent {
   }
 
   renderInput(styling, restProps) {
-    const { children, onInputFocus, onInputBlur, customProps, onChange, value } = restProps;
+    const { children, onInputFocus, onInputBlur, customProps,
+            onChange, value, registerInput, placeholder } = restProps;
     const { isActive, hover, popupShown } = this.state;
 
     const inputProps = {
       ...styling('inputEnhancementsInput', isActive, hover, popupShown),
       value,
+      placeholder,
       onFocus: onInputFocus,
       onBlur: onInputBlur,
       onChange,
@@ -99,13 +103,7 @@ export default class InputPopup extends PureComponent {
       onKeyDown: this.handleKeyDown
     };
 
-    if (typeof children === 'function') {
-      return children(inputProps, customProps);
-    } else {
-      const input = Children.only(children);
-
-      return React.cloneElement(input, { ...inputProps, ...input.props });
-    }
+    return renderChild(children, inputProps, customProps, registerInput);
   }
 
   handleMouseEnter = e => {

@@ -1,5 +1,4 @@
 import React, { PureComponent, PropTypes } from 'react';
-import ReactDOM from 'react-dom';
 import * as shapes from './shapes';
 import findMatchingTextIndex from './utils/findMatchingTextIndex';
 import * as filters from './filters';
@@ -11,6 +10,8 @@ import isStatic from './utils/isStatic';
 import DropdownOption from './DropdownOption';
 import createStyling from './createStyling';
 import deprecated from './utils/deprecated';
+import getInput from './utils/getInput';
+import registerInput from './utils/registerInput';
 
 function getOptionKey(opt, idx) {
   const value = getOptionValue(opt);
@@ -176,11 +177,14 @@ export default class Dropdown extends PureComponent {
         onPopupShownChange={this.handlePopupShownChange}
         popupShown={this.state.listShown}
         isActive={this.state.isActive}
+        registerInput={this.registerInput}
       >
         {children}
       </InputPopup>
     );
   }
+
+  registerInput = input => registerInput(this, input);
 
   renderPopup = (styling, isActive, popupShown) => {
     const { onRenderList, onRenderListHeader, options } = this.props;
@@ -289,7 +293,7 @@ export default class Dropdown extends PureComponent {
 
     setTimeout(() => {
       this.selectOption(findOptionIndex(this.props.options, option), true);
-      this.getInput().blur();
+      getInput(this).blur();
     });
   }
 
@@ -315,22 +319,11 @@ export default class Dropdown extends PureComponent {
     }
   }
 
-  getInput() {
-    if (this.props.getInputElement) {
-      return this.props.getInputElement();
-    }
-
-    const el = ReactDOM.findDOMNode(this);
-    return el.tagName === 'INPUT' ?
-      el:
-      el.getElementsByTagName('INPUT')[0];
-  }
-
   handleIsActiveChange = isActive => {
     this.setState({ isActive });
-  }
+  };
 
   handlePopupShownChange = popupShown => {
     this.setState({ listShown: popupShown });
-  }
+  };
 }

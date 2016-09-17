@@ -28,9 +28,10 @@ const ValueInput1 = pure(({ value, onChange }) =>
         value={value}
         onChange={e => onChange(e.target.value)}
       >
-        {inputProps =>
+        {(inputProps, otherProps, registerInput) =>
           <FormControl
             type='text'
+            ref={c => registerInput(ReactDOM.findDOMNode(c))}
             {...inputProps}
           />
         }
@@ -50,9 +51,10 @@ const ValueInput2 = pure(({ value, onChange }) =>
         defaultWidth={100}
         onChange={e => onChange(e.target.value)}
       >
-        {inputProps =>
+        {(inputProps, otherProps, registerInput) =>
           <FormControl
             type='text'
+            ref={c => registerInput(ReactDOM.findDOMNode(c))}
             {...inputProps}
           />
         }
@@ -117,7 +119,7 @@ const ValueInput3 = pure(({ value, onChange }) =>
         options={countries}
         onChange={e => onChange(e.target.value)}
       >
-        {(inputProps, { registerInput }) =>
+        {(inputProps, otherProps, registerInput) =>
           <FormControl
             ref={c => registerInput(ReactDOM.findDOMNode(c))}
             type='text'
@@ -165,7 +167,7 @@ const ValueInput4 = pure(({ value, onChange }) =>
         onSelect={onChange}
         autocomplete
       >
-        {(inputProps, { registerInput }) =>
+        {(inputProps, otherProps, registerInput) =>
           <FormControl
             {...inputProps}
             ref={c => registerInput(ReactDOM.findDOMNode(c))}
@@ -216,9 +218,10 @@ const ValueInput5 = pure(({ value, onChange }) =>
         onSelect={onChange}
         autosize
       >
-        {inputProps =>
+        {(inputProps, otherProps, registerInput) =>
           <FormControl
             {...inputProps}
+            ref={c => registerInput(ReactDOM.findDOMNode(c))}
             type='text'
             placeholder='No Country'
           />
@@ -267,7 +270,7 @@ const ValueInput6 = pure(({ value, onChange, addonAfter, options }) =>
           autosize
           autocomplete
         >
-          {(inputProps, { registerInput }) =>
+          {(inputProps, otherProps, registerInput) =>
             <FormControl
               {...inputProps}
               ref={c => registerInput(ReactDOM.findDOMNode(c))}
@@ -332,12 +335,13 @@ const ValueInput7 = pure(({ value, onChange, onUnmaskedValueChange }) =>
           onChange={e => onChange(e.target.value)}
           onUnmaskedValueChange={onUnmaskedValueChange}
         >
-          {(inputProps, { registerInput }) =>
+          {(inputProps, otherProps, registerInput) =>
             <Autosize
               defaultWidth={100}
               {...inputProps}
+              registerInput={registerInput}
             >
-              {(autosizeInputProps) =>
+              {(autosizeInputProps, otherProps, registerInput) =>
                 <FormControl
                   {...inputProps}
                   {...autosizeInputProps}
@@ -412,12 +416,13 @@ const ValueInput8 = pure(({ value, onChange, onUnmaskedValueChange }) =>
           onChange={e => onChange(e.target.value)}
           onUnmaskedValueChange={onUnmaskedValueChange}
         >
-          {(inputProps, { registerInput }) =>
+          {(inputProps, otherProps, registerInput) =>
             <Autosize
               defaultWidth={100}
               {...inputProps}
+              registerInput={registerInput}
             >
-              {(autosizeInputProps) =>
+              {(autosizeInputProps, otherProps, registerInput) =>
                 <FormControl
                   {...inputProps}
                   {...autosizeInputProps}
@@ -486,7 +491,7 @@ const ValueInput9 = pure(({ value, onChange }) =>
         value={moment(value || undefined).format('ddd DD/MM/YYYY')}
         onChange={onChange}
       >
-        {(inputProps, { registerInput }) =>
+        {(inputProps, otherProps, registerInput) =>
           <FormControl
             {...inputProps}
             style={{ ...inputProps.style, fontFamily: 'monospace' }}
@@ -522,6 +527,8 @@ const code9 = `
   </FormGroup>
 `;
 
+let frDatePicker = undefined;
+
 const ValueInput10 = pure(({ value, onChange }) => {
   const frCurrent = moment(value || undefined);
   frCurrent.locale('fr');
@@ -540,14 +547,13 @@ const ValueInput10 = pure(({ value, onChange }) => {
           pattern='YYYY.MM.DD ddd'
           onChange={onChange}
           locale='fr'
+          getInputElement={() => frDatePicker}
         >
-          {inputProps =>
-            <FormControl
-              {...inputProps}
-              style={{ ...inputProps.style, fontFamily: 'monospace' }}
-              type='text'
-            />
-          }
+          <FormControl
+            style={{ fontFamily: 'monospace' }}
+            ref={c => frDatePicker = ReactDOM.findDOMNode(c)}
+            type='text'
+          />
         </DatePicker>
       </Col>
     </FormGroup>
@@ -560,6 +566,8 @@ const code10 = `
   const frNow = moment();
   frNow.locale('fr');
 
+  // more compact and more magic form
+
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       DatePicker (FR):
@@ -571,14 +579,13 @@ const code10 = `
         pattern='YYYY.MM.DD ddd'
         onChange={onChange}
         locale='fr'
+        getInputElement={() => frDatePicker}
       >
-        {inputProps =>
-          <FormControl
-            {...inputProps}
-            style={{ ...inputProps.style, fontFamily: 'monospace' }}
-            type='text'
-          />
-        }
+        <FormControl
+          style={{ fontFamily: 'monospace' }}
+          ref={c => frDatePicker = ReactDOM.findDOMNode(c)}
+          type='text'
+        />
       </DatePicker>
     </Col>
   </FormGroup>

@@ -70,7 +70,7 @@
     "lodash.sortby": "^4.7.0",
     "moment": "^2.14.1",
     "react-base16-styling": "^0.4.5",
-    "react-day-picker-themeable": "^2.5.0"
+    "react-day-picker-themeable": "^2.5.1"
   },
   "author": "Alexander <alexkuz@gmail.com> (http://kuzya.org/)",
   "license": "MIT"

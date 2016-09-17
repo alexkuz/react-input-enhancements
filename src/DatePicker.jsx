@@ -34,6 +34,7 @@ export default class DatePicker extends PureComponent {
     pattern: PropTypes.string,
     placeholder: PropTypes.string,
     onRenderCalendar: PropTypes.func,
+    getInputElement: PropTypes.func,
     locale: PropTypes.string
   };
 
@@ -65,14 +66,15 @@ export default class DatePicker extends PureComponent {
   }
 
   render() {
-    const { children, placeholder } = this.props;
+    const { children, placeholder, registerInput, getInputElement } = this.props;
 
-    const child = (maskProps, otherProps) => (typeof children === 'function') ?
-      children(maskProps, otherProps) :
-      React.cloneElement(
-        Children.only(children),
-        { ...maskProps, ...Children.only(children).props }
-      );
+    const child = (maskProps, otherProps, registerInput) =>
+      (typeof children === 'function') ?
+        children(maskProps, otherProps, registerInput) :
+        React.cloneElement(
+          Children.only(children),
+          { ...maskProps, ...Children.only(children).props }
+        );
 
     return (
       <Mask
@@ -82,17 +84,26 @@ export default class DatePicker extends PureComponent {
         onChange={this.handleChange}
         placeholder={placeholder}
         onValuePreUpdate={this.handleValuePreUpdate}
+        registerInput={registerInput}
+        getInputElement={getInputElement}
       >
-        {(maskProps, otherProps) =>
+        {(maskProps, otherProps, registerInput) =>
           <InputPopup
+            {...maskProps}
             styling={this.styling}
             onRenderPopup={this.renderPopup}
             onPopupShownChange={this.handlePopupShownChange}
             onIsActiveChange={this.handleIsActiveChange}
             popupShown={this.state.popupShown}
             isActive={this.state.isActive}
+            registerInput={registerInput}
+            customProps={otherProps}
           >
-            {child(maskProps, otherProps)}
+            {(inputProps, otherProps, registerInput) => child(
+              inputProps,
+              otherProps,
+              registerInput
+            )}
           </InputPopup>
         }
       </Mask>

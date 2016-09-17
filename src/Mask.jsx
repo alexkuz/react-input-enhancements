@@ -1,7 +1,8 @@
-import React, { PureComponent, PropTypes, Children } from 'react';
-import ReactDOM from 'react-dom';
+import { PureComponent, PropTypes } from 'react';
 import applyMaskToString from './applyMaskToString';
-import deprecated from './utils/deprecated';
+import getInput from './utils/getInput';
+import registerInput from './utils/registerInput';
+import renderChild from './utils/renderChild';
 
 function getStateFromProps(value, props) {
   value = props.onValuePreUpdate(value);
@@ -74,31 +75,13 @@ export default class Mask extends PureComponent {
   }
 
   setSelectionRange(lastIndex) {
-    const input = this.getInput();
+    const input = getInput(this);
     if (input === document.activeElement) {
       input.setSelectionRange(lastIndex, lastIndex);
     }
   }
 
-  getInput() {
-    if (this.props.getInputElement) {
-      return this.props.getInputElement();
-    }
-
-    if (this.input) {
-      return this.input;
-    }
-
-    // eslint-disable-next-line
-    deprecated('Automatic input resolving is deprecated: please provide input instance via `getInputElement` or `registerInput`');
-
-    const el = ReactDOM.findDOMNode(this);
-    return el.tagName === 'INPUT' ?
-      el:
-      el.getElementsByTagName('INPUT')[0];
-  }
-
-  registerInput = c => this.input = c;
+  registerInput = input => registerInput(this, input);
 
   render() {
     const { children, placeholder } = this.props;
@@ -109,12 +92,7 @@ export default class Mask extends PureComponent {
       onChange: this.handleChange
     };
 
-    if (typeof children === 'function') {
-      return children(inputProps, { value, registerInput: this.registerInput });
-    } else {
-      const input = Children.only(children);
-      return React.cloneElement(input, { ...inputProps, ...input.props });
-    }
+    return renderChild(children, inputProps, { value }, this.registerInput);
   }
 
   handleChange = e => {

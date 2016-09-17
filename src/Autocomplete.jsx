@@ -1,8 +1,9 @@
-import React, { PureComponent, PropTypes, Children } from 'react';
-import ReactDOM from 'react-dom';
+import { PureComponent, PropTypes } from 'react';
 import * as shapes from './shapes';
 import findMatchingTextIndex from './utils/findMatchingTextIndex';
-import deprecated from './utils/deprecated';
+import getInput from './utils/getInput';
+import registerInput from './utils/registerInput';
+import renderChild from './utils/renderChild';
 
 function setSelection(input, text, matchingText) {
   if (text === null) {
@@ -66,29 +67,13 @@ export default class Autocomplete extends PureComponent {
     if (this.state.value !== prevState.value ||
         this.state.matchingText !== prevState.matchingText) {
       if (this.state.matchingText) {
-        const input = this.getInput();
+        const input = getInput(this);
         setSelection(input, this.state.value, this.state.matchingText);
       }
     }
   }
 
-  getInput() {
-    if (this.props.getInputElement) {
-      return this.props.getInputElement();
-    }
-
-    if (this.input) {
-      return this.input;
-    }
-
-    // eslint-disable-next-line
-    deprecated('Automatic input resolving is deprecated: please provide input instance via `getInputElement` or `registerInput`');
-
-    const el = ReactDOM.findDOMNode(this);
-    return el.tagName === 'INPUT' ?
-      el:
-      el.getElementsByTagName('INPUT')[0];
-  }
+  registerInput = input => registerInput(this, input);
 
   render() {
     const { children } = this.props;
@@ -99,18 +84,11 @@ export default class Autocomplete extends PureComponent {
       onChange: this.handleChange
     };
 
-    if (typeof children === 'function') {
-      return children(inputProps, { matchingText, value, registerInput: this.registerInput });
-    } else {
-      const input = Children.only(children);
-      return React.cloneElement(input, { ...inputProps, ...input.props });
-    }
+    return renderChild(children, inputProps, { matchingText, value }, this.registerInput);
   }
 
-  registerInput = c => this.input = c;
-
   handleSelectionChange = () => {
-    const input = this.getInput();
+    const input = getInput(this);
     if (input.selectionStart === input.selectionEnd &&
       input.value !== this.state.value) {
       this.setValue(input.value, this.props.options);
@@ -143,7 +121,7 @@ export default class Autocomplete extends PureComponent {
   }
 
   handleBackspaceKeyDown = () => {
-    const input = this.getInput();
+    const input = getInput(this);
     if (input.selectionStart !== input.selectionEnd &&
         input.selectionEnd === input.value.length &&
         input.selectionStart !== 0) {
@@ -152,7 +130,7 @@ export default class Autocomplete extends PureComponent {
   }
 
   handleEnterKeyDown = () => {
-    const input = this.getInput();
+    const input = getInput(this);
 
     setSelection(input, this.state.matchingText, this.state.matchingText);
     input.blur();
