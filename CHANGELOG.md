@@ -1,3 +1,23 @@
+0.5.0-beta2 / 2016-09-17
+------------------------
+* Just some refactoring
+* API changed - `registerInput` goes as a third parameter now:
+```jsx
+<Autocomplete
+  value={value}
+  options={countries}
+  onChange={e => onChange(e.target.value)}
+>
+  {(inputProps, otherProps, registerInput) =>
+    <FormControl
+      ref={c => registerInput(ReactDOM.findDOMNode(c))}
+      type='text'
+      {...inputProps}
+    />
+  }
+</Autocomplete>
+```
+
 0.5.0-beta1 / 2016-09-11
 ------------------------
 
