@@ -1,16 +1,16 @@
-import React, { Component, PropTypes, Children } from 'react';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import React, { PureComponent, PropTypes } from 'react';
 import Autocomplete from './Autocomplete';
 import Dropdown from './Dropdown';
 import Autosize from './Autosize';
+import renderChild from './utils/renderChild';
 
-export default class Combobox extends Component {
+const CARET_PADDING = 15;
+
+export default class Combobox extends PureComponent {
   static propTypes = {
     autosize: PropTypes.bool,
     autocomplete: PropTypes.bool
-  }
-
-  shouldComponentUpdate = shouldPureComponentUpdate
+  };
 
   render() {
     const { autosize, autocomplete, children, ...props } = this.props;
@@ -29,12 +29,36 @@ export default class Combobox extends Component {
   renderAutosizeAutocompleteDropdown(children, props) {
     return (
       <Dropdown {...props}>
-        {(dropdownInputProps) =>
-          <Autocomplete {...dropdownInputProps}>
-            {(inputProps, { matchingText }) =>
-              <Autosize {...inputProps}>
-                  {(autosizeInputProps, { width }) =>
-                    this.renderChildren(children, autosizeInputProps, { matchingText, width })
+        {(dropdownInputProps, { textValue }, registerInput) =>
+          <Autocomplete
+            value={textValue}
+            onChange={dropdownInputProps.onChange}
+            onKeyDown={dropdownInputProps.onKeyDown}
+            options={props.options}
+            registerInput={registerInput}
+            getInputComponent={props.getInputComponent}
+          >
+            {(inputProps, { matchingText }, registerInput) =>
+              <Autosize
+                value={inputProps.value}
+                onChange={inputProps.onChange}
+                defaultWidth={props.defaultWidth}
+                getSizerContainer={props.getSizerContainer}
+                registerInput={registerInput}
+                getInputComponent={props.getInputComponent}
+                padding={CARET_PADDING}
+              >
+                  {(autosizeInputProps, { width }, registerInput) =>
+                    renderChild(
+                      children,
+                      {
+                        ...dropdownInputProps,
+                        ...inputProps,
+                        ...autosizeInputProps
+                      },
+                      { matchingText, width },
+                      registerInput
+                    )
                   }
               </Autosize>
             }
@@ -47,10 +71,23 @@ export default class Combobox extends Component {
   renderAutosizeDropdown(children, props) {
     return (
       <Dropdown {...props}>
-        {(inputProps, { textValue }) =>
-          <Autosize {...inputProps} value={textValue}>
-              {(autosizeInputProps, { width }) =>
-                this.renderChildren(children, autosizeInputProps, { width })
+        {(inputProps, { textValue }, registerInput) =>
+          <Autosize
+            value={textValue}
+            onChange={inputProps.onChange}
+            defaultWidth={props.defaultWidth}
+            getSizerContainer={props.getSizerContainer}
+            registerInput={registerInput}
+            getInputComponent={props.getInputComponent}
+            padding={CARET_PADDING}
+          >
+              {(autosizeInputProps, { width }, registerInput) =>
+                renderChild(
+                  children,
+                  { ...inputProps, ...autosizeInputProps },
+                  { width },
+                  registerInput
+                )
               }
           </Autosize>
         }
@@ -61,10 +98,24 @@ export default class Combobox extends Component {
   renderAutocompleteDropdown(children, props) {
     return (
       <Dropdown {...props}>
-        {(dropdownInputProps) =>
-          <Autocomplete {...dropdownInputProps}>
-            {(inputProps, { matchingText }) =>
-              this.renderChildren(children, inputProps, { matchingText })
+        {(dropdownInputProps, { textValue }, registerInput) =>
+          <Autocomplete
+            value={textValue}
+            onChange={dropdownInputProps.onChange}
+            onKeyDown={dropdownInputProps.onKeyDown}
+            options={props.options}
+            registerInput={registerInput}
+            getInputComponent={props.getInputComponent}
+          >
+            {(inputProps, { matchingText }, registerInput) =>
+              renderChild(
+                children, {
+                  ...dropdownInputProps,
+                  ...inputProps
+                },
+                { matchingText },
+                registerInput
+              )
             }
           </Autocomplete>
         }
@@ -75,20 +126,15 @@ export default class Combobox extends Component {
   renderDropdown(children, props) {
     return (
       <Dropdown {...props}>
-        {inputProps =>
-          this.renderChildren(children, inputProps)
+        {(inputProps, otherProps, registerInput) =>
+          renderChild(
+            children,
+            inputProps,
+            otherProps,
+            registerInput
+          )
         }
       </Dropdown>
     );
-  }
-
-  renderChildren(children, props, params={}) {
-    if (typeof children === 'function') {
-      return children(props, params);
-    } else {
-      const input = Children.only(children);
-
-      return React.cloneElement(input, { ...props, ...input.props });
-    }
   }
 }

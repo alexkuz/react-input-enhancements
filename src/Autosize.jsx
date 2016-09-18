@@ -1,7 +1,8 @@
-import React, { Component, PropTypes, Children } from 'react';
-import ReactDOM from 'react-dom';
-import shouldPureComponentUpdate from 'react-pure-render/function';
+import { PureComponent, PropTypes } from 'react';
 import './utils/getComputedStyle';
+import getInput from './utils/getInput';
+import registerInput from './utils/registerInput';
+import renderChild from './utils/renderChild';
 
 const ALLOWED_CSS_PROPS = [
   'direction',
@@ -22,38 +23,39 @@ const ALLOWED_CSS_PROPS = [
 
 let sizersListEl = null;
 const sizerContainerStyle = {
-  position: 'absolute',
-  visibility: 'hidden',
+  position: 'fixed', // 'absolute',
+  // visibility: 'hidden',
   whiteSpace: 'nowrap',
   width: 'auto',
   minWidth: 'initial',
   maxWidth: 'initial',
   zIndex: 10000,
-  left: -1000,
-  top: 0
+  left: 200, //-1000,
+  top: 100
 };
 
-export default class Autosize extends Component {
+export default class Autosize extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       width: props.defaultWidth,
       defaultWidth: props.defaultWidth,
-      value: (typeof props.value === 'undefined') ? props.defaultValue : props.value
+      value: props.value
     };
   }
 
   static propTypes = {
     value: PropTypes.string,
     defaultWidth: PropTypes.number,
-    getInputElement: PropTypes.func
-  }
+    getInputElement: PropTypes.func,
+    getSizerContainer: PropTypes.func,
+    padding: PropTypes.number
+  };
 
   static defaultProps = {
-    getSizerContainer: () => document.body
-  }
-
-  shouldComponentUpdate = shouldPureComponentUpdate
+    getSizerContainer: () => document.body,
+    padding: 0
+  };
 
   componentWillMount() {
     if (!sizersListEl) {
@@ -86,12 +88,16 @@ export default class Autosize extends Component {
     let defaultWidth = this.props.defaultWidth;
 
     if (defaultWidth === undefined) {
-      const input = this.getInput();
+      const input = getInput(this);
       defaultWidth = input.offsetWidth;
       this.setDefaultWidth(defaultWidth);
     }
 
-    this.updateWidth(this.props.value || this.props.placeholder, defaultWidth);
+    this.updateWidth(
+      this.props.value || this.props.placeholder,
+      defaultWidth,
+      this.props.padding
+    );
   }
 
   setDefaultWidth(defaultWidth) {
@@ -105,24 +111,20 @@ export default class Autosize extends Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if (nextState.value !== this.state.value) {
-      this.updateWidth(nextState.value || nextProps.placeholder, nextState.defaultWidth);
+    if (nextState.value !== this.state.value ||
+      nextProps.padding !== this.props.padding) {
+      this.updateWidth(
+        nextState.value || nextProps.placeholder,
+        nextState.defaultWidth,
+        nextProps.padding
+      );
     }
   }
 
-  getInput() {
-    if (this.props.getInputElement) {
-      return this.props.getInputElement();
-    }
+  registerInput = input => registerInput(this, input);
 
-    const el = ReactDOM.findDOMNode(this);
-    return el.tagName === 'INPUT' ?
-      el:
-      el.getElementsByTagName('INPUT')[0];
-  }
-
-  updateWidth(value, defaultWidth) {
-    const input = this.getInput();
+  updateWidth(value, defaultWidth, padding) {
+    const input = getInput(this);
     const inputStyle = window.getComputedStyle(input, null);
 
     if (!value) {
@@ -132,9 +134,9 @@ export default class Autosize extends Component {
       return;
     }
 
-    for(const [key, val] of Object.entries(inputStyle)) {
+    for(const key in inputStyle) {
       if (ALLOWED_CSS_PROPS.indexOf(key) !== -1) {
-        this.sizerEl.style[key] = val;
+        this.sizerEl.style[key] = inputStyle[key];
       }
     }
 
@@ -142,35 +144,34 @@ export default class Autosize extends Component {
 
     this.setState({
       width: Math.max(
-        this.sizerEl.offsetWidth + 1,
+        this.sizerEl.offsetWidth + padding + 1,
         defaultWidth
       )
     });
   }
 
   render() {
-    const { defaultWidth, children, ...props } = this.props;
+    const { children, style, placeholder, value } = this.props;
     const { width } = this.state;
     const inputProps = {
-      ...props,
       style: {
-        ...(props.style || {}),
-        ...(width ? { width: width + 'px' } : {})
+        ...(style || {}),
+        ...(width ? { width } : {})
       },
+      placeholder,
+      value,
       onChange: this.handleChange
     }
 
-    if (typeof children === 'function') {
-      return children(inputProps, { width });
-    } else {
-      const input = Children.only(children);
-
-      return React.cloneElement(input, { ...inputProps, ...input.props });
-    }
+    return renderChild(children, inputProps, { width }, this.registerInput);
   }
 
   handleWindownResize = () => {
-    this.updateWidth(this.state.value || this.props.placeholder, this.state.defaultWidth);
+    this.updateWidth(
+      this.state.value || this.props.placeholder,
+      this.state.defaultWidth,
+      this.props.padding
+    );
   }
 
   handleChange = e => {

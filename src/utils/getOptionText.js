@@ -1,7 +1,8 @@
 export default function getOptionText(opt) {
   if (!opt) return '';
 
-  return [
-    opt, opt.text, opt.label, opt.value
-  ].find(value => typeof value === 'string') || '';
+  return Array.find(
+    [opt, opt.text, opt.label, opt.value],
+    value => typeof value === 'string'
+  ) || '';
 }
