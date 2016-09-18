@@ -4,3 +4,4 @@ demo
 .*
 webpack.config.js
 index.html
+__tests__
