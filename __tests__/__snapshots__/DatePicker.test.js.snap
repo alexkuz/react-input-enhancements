@@ -1,0 +1,111 @@
+exports[`DatePicker renders correctly with element child 1`] = `
+<div
+  onBlur={[Function anonymous]}
+  onFocus={[Function anonymous]}
+  style={
+    Object {
+      "display": "inline-block",
+      "position": "relative"
+    }
+  }>
+  <input
+    onBlur={undefined}
+    onChange={undefined}
+    onFocus={undefined}
+    onInput={[Function anonymous]}
+    onKeyDown={[Function anonymous]}
+    onMouseEnter={[Function anonymous]}
+    onMouseLeave={[Function anonymous]}
+    placeholder="Sun 18/09/2016"
+    style={
+      Object {
+        "paddingRight": "15px"
+      }
+    }
+    value="Thu 01/01/1970" />
+  <div
+    style={
+      Object {
+        "paddingLeft": "3px",
+        "paddingTop": "5px",
+        "position": "absolute",
+        "right": "5px",
+        "top": 0,
+        "verticalAlign": "middle",
+        "width": "10px"
+      }
+    }>
+    <svg
+      fill="currentColor"
+      height="5"
+      style={
+        Object {
+          "display": "inline-block",
+          "opacity": 0,
+          "transform": "translateY(5px)",
+          "transition": "opacity 0.15s linear, transform 0.15s linear"
+        }
+      }
+      width="10">
+      <path
+        d="M0 0 H10 L5 5 z" />
+    </svg>
+  </div>
+</div>
+`;
+
+exports[`DatePicker renders correctly with function child 1`] = `
+<div
+  onBlur={[Function anonymous]}
+  onFocus={[Function anonymous]}
+  style={
+    Object {
+      "display": "inline-block",
+      "position": "relative"
+    }
+  }>
+  <input
+    onBlur={undefined}
+    onChange={undefined}
+    onFocus={undefined}
+    onInput={[Function anonymous]}
+    onKeyDown={[Function anonymous]}
+    onMouseEnter={[Function anonymous]}
+    onMouseLeave={[Function anonymous]}
+    placeholder="Sun 18/09/2016"
+    style={
+      Object {
+        "paddingRight": "15px"
+      }
+    }
+    value="Thu 01/01/1970" />
+  <div
+    style={
+      Object {
+        "paddingLeft": "3px",
+        "paddingTop": "5px",
+        "position": "absolute",
+        "right": "5px",
+        "top": 0,
+        "verticalAlign": "middle",
+        "width": "10px"
+      }
+    }>
+    <svg
+      fill="currentColor"
+      height="5"
+      style={
+        Object {
+          "display": "inline-block",
+          "opacity": 0,
+          "transform": "translateY(5px)",
+          "transition": "opacity 0.15s linear, transform 0.15s linear"
+        }
+      }
+      width="10">
+      <path
+        d="M0 0 H10 L5 5 z" />
+    </svg>
+  </div>
+</div>
+`;

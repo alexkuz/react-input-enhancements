@@ -1,14 +1,16 @@
 import { createStyling } from 'react-base16-styling';
 import defaultTheme from './themes/default';
+import Prefixer from 'inline-style-prefixer';
 
-let prefixer;
-if (window && window.navigator) {
-  const Prefixer = require('inline-style-prefixer');
-  const prefixerInstance = new Prefixer(window.navigator);
-  prefixer = prefixerInstance.prefix.bind(prefixerInstance);
+let prefixerInstance;
+if (typeof window !== 'undefined' && window.navigator) {
+  prefixerInstance = new Prefixer(window.navigator);
 } else {
-  prefixer = require('inline-style-prefixer/static');
+  prefixerInstance = new Prefixer({
+    userAgent: 'Node.js (darwin; U; rv:v4.3.1) AppleWebKit/537.36 (KHTML, like Gecko)'
+  });
 }
+const prefixer = prefixerInstance.prefix.bind(prefixerInstance);
 
 const navButtonImg = type => (({
   /* eslint-disable max-len */

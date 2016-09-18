@@ -82,7 +82,6 @@ export default class Autocomplete extends PureComponent {
     const inputProps = {
       value: matchingText || value,
       onKeyDown: this.handleKeyDown,
-      onKeyUp: this.handleKeyUp,
       onChange: this.handleChange
     };
 

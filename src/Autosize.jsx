@@ -58,6 +58,10 @@ export default class Autosize extends PureComponent {
   };
 
   componentWillMount() {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
     if (!sizersListEl) {
       sizersListEl = document.createElement('div');
       for(const [key, val] of Object.entries(sizerContainerStyle)) {
@@ -85,6 +89,9 @@ export default class Autosize extends PureComponent {
   }
 
   componentDidMount() {
+    if (typeof window === 'undefined') {
+      return;
+    }
     let defaultWidth = this.props.defaultWidth;
 
     if (defaultWidth === undefined) {
