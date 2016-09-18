@@ -1,6 +1,6 @@
 {
   "name": "react-input-enhancements",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Set of enhancements for input control (bootstrap-ready)",
   "scripts": {
     "test:jsdom": "jest --config __tests__/jest.jsdom.config.json",
@@ -82,5 +82,8 @@
   },
   "author": "Alexander <alexkuz@gmail.com> (http://kuzya.org/)",
   "license": "MIT",
-  "pre-commit": ["lint", "test"]
+  "pre-commit": [
+    "lint",
+    "test"
+  ]
 }
