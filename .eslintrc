@@ -30,7 +30,7 @@
     "react/no-unknown-property": "warn",
     "react/react-in-jsx-scope": "warn",
     "react/self-closing-comp": "warn",
-    "react/wrap-multilines": "warn",
+    "react/jsx-wrap-multilines": "warn",
  
     "generator-star-spacing": "off",
     "new-cap": "off",

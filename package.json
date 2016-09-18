@@ -10,7 +10,7 @@
     "build:demo": "NODE_ENV=production webpack -p --optimize-dedupe",
     "stats": "webpack --profile --json > stats.json",
     "start": "webpack-dev-server",
-    "lint": "eslint src",
+    "lint": "eslint --ext js,jsx src",
     "version": "npm run build:demo && git add -A .",
     "postversion": "git push --tags",
     "prepublish": "npm run build:lib",

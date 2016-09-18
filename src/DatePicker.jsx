@@ -66,7 +66,7 @@ export default class DatePicker extends PureComponent {
   }
 
   render() {
-    const { children, placeholder, registerInput, getInputElement, onValuePreUpdate } = this.props;
+    const { children, placeholder, registerInput, getInputElement } = this.props;
 
     const child = (maskProps, otherProps, registerInput) =>
       (typeof children === 'function') ?
