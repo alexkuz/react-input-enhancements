@@ -503,6 +503,9 @@ const ValueInput9 = pure(({ value, onChange }) =>
       <DatePicker
         value={moment(value || undefined).format('ddd DD/MM/YYYY')}
         onChange={onChange}
+        onValuePreUpdate={v => parseInt(v, 10) > 1e6 ?
+          moment(parseInt(v, 10)).format('ddd DD/MM/YYYY') : v
+        }
       >
         {(inputProps, otherProps, registerInput) =>
           <FormControl
@@ -526,6 +529,10 @@ const code9 = `
       <DatePicker
         value={moment(value || undefined).format('ddd DD/MM/YYYY')}
         onChange={onChange}
+        // this callback will parse inserted timestamp
+        onValuePreUpdate={v => parseInt(v, 10) > 1e8 ?
+          moment(parseInt(v, 10)).format('ddd DD/MM/YYYY') : v
+        }
       >
         {(inputProps, { registerInput }) =>
           <FormControl

@@ -66,7 +66,7 @@ export default class DatePicker extends PureComponent {
   }
 
   render() {
-    const { children, placeholder, registerInput, getInputElement } = this.props;
+    const { children, placeholder, registerInput, getInputElement, onValuePreUpdate } = this.props;
 
     const child = (maskProps, otherProps, registerInput) =>
       (typeof children === 'function') ?
@@ -127,6 +127,9 @@ export default class DatePicker extends PureComponent {
   }
 
   handleValuePreUpdate = value => {
+    if (this.props.onValuePreUpdate) {
+      value = this.props.onValuePreUpdate(value);
+    }
     const localeData = moment.localeData(this.props.locale);
     const days = localeData._weekdaysShort;
 

@@ -1,3 +1,11 @@
+0.5.2 / 2016-09-18
+------------------
+* `DatePicker` value can be patched now with `onValuePreUpdate` callback.
+
+0.5.1 / 2016-09-18
+------------------
+* Fix server rendering, tests added
+
 0.5.0 / 2016-09-18
 ------------------
 * IE11 fixes

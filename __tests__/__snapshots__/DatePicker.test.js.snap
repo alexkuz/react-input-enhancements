@@ -16,7 +16,7 @@ exports[`DatePicker renders correctly with element child 1`] = `
     onKeyDown={[Function anonymous]}
     onMouseEnter={[Function anonymous]}
     onMouseLeave={[Function anonymous]}
-    placeholder="Sun 18/09/2016"
+    placeholder="Thu 01/01/1970"
     style={
       Object {
         "paddingRight": "15px"
@@ -72,7 +72,7 @@ exports[`DatePicker renders correctly with function child 1`] = `
     onKeyDown={[Function anonymous]}
     onMouseEnter={[Function anonymous]}
     onMouseLeave={[Function anonymous]}
-    placeholder="Sun 18/09/2016"
+    placeholder="Thu 01/01/1970"
     style={
       Object {
         "paddingRight": "15px"

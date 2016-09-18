@@ -200,6 +200,7 @@ If `<input>` element wasn't provided, component tries to find node automatically
 * **`emptyChar`** *string* - Character used as an empty symbol (`' '` by default)
 * **`placeholder`** *string* - If set, it is shown when `unmaskedValue` is empty
 * **`onUnmaskedValueChange`** *function(text)* - Fires when value is changed, providing unmasked value
+* **`onValuePreUpdate`** *function* - Optional callback to update value before it is parsed by `Mask`
 
 ## DatePicker
 
@@ -231,6 +232,12 @@ If `<input>` element wasn't provided, component tries to find node automatically
 * **`onChange`** *function(date)* - Fires when date is selected, providing [moment.js](http://momentjs.com/) object
 * **`getInputElement`** *function* - Optional callback that provides `<input>` DOM element
 * **`registerInput`** *function* - Registers `<input>` DOM element
+* **`onValuePreUpdate`** *function* - Optional callback to update value before it is parsed by `DatePicker`. In this example, it parses inserted timestamp:
+```js
+onValuePreUpdate={v => parseInt(v, 10) > 1e8 ?
+  moment(parseInt(v, 10)).format('ddd DD/MM/YYYY') : v
+}
+```
 
 ## Combobox
 

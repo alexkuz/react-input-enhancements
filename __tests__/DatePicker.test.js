@@ -10,6 +10,7 @@ describe('DatePicker', () => {
     const tree = renderer.create(
       <DatePicker
         value={now.format('ddd DD/MM/YYYY')}
+        placeholder={now.format('ddd DD/MM/YYYY')}
       >
         {props => <input {...props} />}
       </DatePicker>
@@ -21,6 +22,7 @@ describe('DatePicker', () => {
     const tree = renderer.create(
       <DatePicker
         value={now.format('ddd DD/MM/YYYY')}
+        placeholder={now.format('ddd DD/MM/YYYY')}
       >
         <input />
       </DatePicker>
