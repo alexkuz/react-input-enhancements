@@ -153,7 +153,6 @@ If `<input>` element wasn't provided, component tries to find node automatically
 * **`onRenderCaret`** *function(className, style, isActive, children)* - Renders a caret
 * **`onRenderList`** *function(className, style, isActive, listShown, children, header)* - Renders list of options
 * **`onRenderListHeader`** *function(allCount, shownCount, staticCount)* - Renders list header
-* **`dropdownClassName`** *string* - Dropdown root element class name
 * **`dropdownProps`** *object* - Custom props passed to dropdown root element
 * **`optionFilters`** *array* - List of option filters
 * **`getInputElement`** *function* - Optional callback that provides `<input>` DOM element
