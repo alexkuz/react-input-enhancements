@@ -12,7 +12,7 @@
     "start": "webpack-dev-server",
     "lint": "eslint --ext js,jsx src",
     "version": "npm run build:demo && git add -A .",
-    "postversion": "git push --tags",
+    "postversion": "git push && git push --tags",
     "prepublish": "npm run build:lib",
     "gh": "git subtree push --prefix demo/dist origin gh-pages"
   },
