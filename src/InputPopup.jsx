@@ -88,7 +88,7 @@ export default class InputPopup extends PureComponent {
 
   renderInput(styling, restProps) {
     const { children, onInputFocus, onInputBlur, customProps,
-            onChange, value, registerInput, placeholder } = restProps;
+            onChange, onInput, value, registerInput, placeholder } = restProps;
     const { isActive, hover, popupShown } = this.state;
 
     const inputProps = {
@@ -98,6 +98,7 @@ export default class InputPopup extends PureComponent {
       onFocus: onInputFocus,
       onBlur: onInputBlur,
       onChange,
+      onInput,
       onMouseEnter: this.handleMouseEnter,
       onMouseLeave: this.handleMouseLeave,
       onKeyDown: this.handleKeyDown

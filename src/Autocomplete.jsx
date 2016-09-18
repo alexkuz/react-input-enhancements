@@ -5,13 +5,21 @@ import getInput from './utils/getInput';
 import registerInput from './utils/registerInput';
 import renderChild from './utils/renderChild';
 
+function updateInputSelection(input, start, end) {
+  input.setSelectionRange(start, end);
+}
+
+function updateInputNode(input, value) {
+  input.value = value;
+}
+
 function setSelection(input, text, matchingText) {
   if (text === null) {
-    input.value = null;
+    updateInputNode(input, null);
   } else {
-    input.value = matchingText;
+    updateInputNode(input, matchingText);
     if (text.length !== matchingText.length) {
-      input.setSelectionRange(text.length, matchingText.length);
+      updateInputSelection(input, text.length, matchingText.length);
     }
   }
 }
@@ -31,19 +39,9 @@ export default class Autocomplete extends PureComponent {
     options: PropTypes.arrayOf(shapes.ITEM_OR_STRING).isRequired
   };
 
-  static defaultProps = {
-  };
-
-  componentWillMount() {
-    document.addEventListener('selectionchange', this.handleSelectionChange);
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('selectionchange', this.handleSelectionChange);
-  }
-
   componentWillReceiveProps(nextProps) {
-    if (this.props.value !== nextProps.value) {
+    if (this.props.value !== nextProps.value &&
+      nextProps.value !== this.state.value) {
       this.setValue(nextProps.value, nextProps.options);
     }
   }
@@ -58,18 +56,21 @@ export default class Autocomplete extends PureComponent {
   }
 
   setValue(value, options) {
+    if (value === this.state.value) {
+      return;
+    }
     const match = findMatchingTextIndex(value, options);
     const [, matchingText] = match;
     this.setState({ value, matchingText });
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.value !== prevState.value ||
-        this.state.matchingText !== prevState.matchingText) {
-      if (this.state.matchingText) {
-        const input = getInput(this);
-        setSelection(input, this.state.value, this.state.matchingText);
-      }
+  componentDidUpdate() {
+    const matchingText = this.state.matchingText || '';
+    const value = this.state.value || '';
+
+    if (matchingText && value.length !== matchingText.length) {
+      const input = getInput(this);
+      setSelection(input, this.state.value, this.state.matchingText);
     }
   }
 
@@ -81,22 +82,15 @@ export default class Autocomplete extends PureComponent {
     const inputProps = {
       value: matchingText || value,
       onKeyDown: this.handleKeyDown,
+      onKeyUp: this.handleKeyUp,
       onChange: this.handleChange
     };
 
     return renderChild(children, inputProps, { matchingText, value }, this.registerInput);
   }
 
-  handleSelectionChange = () => {
-    const input = getInput(this);
-    if (input.selectionStart === input.selectionEnd &&
-      input.value !== this.state.value) {
-      this.setValue(input.value, this.props.options);
-    }
-  }
-
   handleChange = e => {
-    const value = e.target.value;
+    let value = e.target.value;
 
     this.setValue(value, this.props.options);
 
@@ -125,7 +119,9 @@ export default class Autocomplete extends PureComponent {
     if (input.selectionStart !== input.selectionEnd &&
         input.selectionEnd === input.value.length &&
         input.selectionStart !== 0) {
-      input.value = input.value.substr(0, input.selectionStart);
+      const value = input.value.substr(0, input.selectionStart);
+      this.setValue(value.substr(0, value.length - 1), this.props.options);
+      updateInputNode(input, value);
     }
   }
 

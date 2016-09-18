@@ -89,13 +89,14 @@ export default class Mask extends PureComponent {
     const inputProps = {
       value,
       placeholder,
-      onChange: this.handleChange
+      onInput: this.handleInput
     };
 
     return renderChild(children, inputProps, { value }, this.registerInput);
   }
 
-  handleChange = e => {
+  // works better for IE than onChange
+  handleInput = e => {
     const value = e.target.value;
 
     if (this.props.value === undefined) {

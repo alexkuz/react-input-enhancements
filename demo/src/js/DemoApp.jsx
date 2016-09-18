@@ -20,6 +20,11 @@ import Mask from 'Mask';
 import DatePicker from 'DatePicker';
 
 import './bootstrap-input-inline.css';
+import './ie.css';
+
+import Prefixer from 'inline-style-prefixer';
+const prefixerInstance = new Prefixer(window.navigator);
+const prefixer = prefixerInstance.prefix.bind(prefixerInstance);
 
 const ValueInput1 = pure(({ value, onChange }) =>
   <div className='inline-input'>
@@ -163,7 +168,7 @@ const ValueInput4 = pure(({ value, onChange }) =>
       <Combobox
         value={value}
         options={countries}
-        dropdownProps={{ style: { width: '100%' } }}
+        dropdownProps={{ style: { width: '100%', position: 'relative' } }}
         onSelect={onChange}
         autocomplete
       >
@@ -326,7 +331,11 @@ const ValueInput7 = pure(({ value, onChange, onUnmaskedValueChange }) =>
     </Col>
     <Col xs={6}>
       <InputGroup
-        style={{ display: 'inline-flex', alignItems: 'baseline', fontFamily: 'monospace' }}
+        style={prefixer({
+          display: 'inline-flex',
+          alignItems: 'baseline',
+          fontFamily: 'monospace'
+        })}
       >
         <Mask
           pattern='0000-0000-0000-0000'
@@ -352,7 +361,7 @@ const ValueInput7 = pure(({ value, onChange, onUnmaskedValueChange }) =>
             </Autosize>
           }
         </Mask>
-        <InputGroup.Addon>
+        <InputGroup.Addon style={{ display: 'block' }}>
           <Glyphicon glyph='credit-card' />
         </InputGroup.Addon>
       </InputGroup>
@@ -392,7 +401,7 @@ const code7 = `
             </Autosize>
           }
         </Mask>
-        <InputGroup.Addon>
+        <InputGroup.Addon style={{ display: 'block' }}>
           <Glyphicon glyph='credit-card' />
         </InputGroup.Addon>
       </InputGroup>
@@ -407,7 +416,11 @@ const ValueInput8 = pure(({ value, onChange, onUnmaskedValueChange }) =>
     </Col>
     <Col xs={6}>
       <InputGroup
-        style={{ display: 'inline-flex', alignItems: 'baseline', fontFamily: 'monospace' }}
+        style={prefixer({
+          display: 'inline-flex',
+          alignItems: 'baseline',
+          fontFamily: 'monospace'
+        })}
       >
         <Mask
           pattern='+\ 7\ (000) 000-00-00'
@@ -433,7 +446,7 @@ const ValueInput8 = pure(({ value, onChange, onUnmaskedValueChange }) =>
             </Autosize>
           }
         </Mask>
-        <InputGroup.Addon>
+        <InputGroup.Addon style={{ display: 'block' }}>
           <Glyphicon glyph='phone' />
         </InputGroup.Addon>
       </InputGroup>
@@ -473,7 +486,7 @@ const code8 = `
             </Autosize>
           }
         </Mask>
-        <InputGroup.Addon>
+        <InputGroup.Addon style={{ display: 'block' }}>
           <Glyphicon glyph='phone' />
         </InputGroup.Addon>
       </InputGroup>

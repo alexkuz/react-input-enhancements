@@ -23,15 +23,15 @@ const ALLOWED_CSS_PROPS = [
 
 let sizersListEl = null;
 const sizerContainerStyle = {
-  position: 'absolute',
-  visibility: 'hidden',
+  position: 'fixed', // 'absolute',
+  // visibility: 'hidden',
   whiteSpace: 'nowrap',
   width: 'auto',
   minWidth: 'initial',
   maxWidth: 'initial',
   zIndex: 10000,
-  left: -1000,
-  top: 0
+  left: 200, //-1000,
+  top: 100
 };
 
 export default class Autosize extends PureComponent {
@@ -134,9 +134,9 @@ export default class Autosize extends PureComponent {
       return;
     }
 
-    for(const [key, val] of Object.entries(inputStyle)) {
+    for(const key in inputStyle) {
       if (ALLOWED_CSS_PROPS.indexOf(key) !== -1) {
-        this.sizerEl.style[key] = val;
+        this.sizerEl.style[key] = inputStyle[key];
       }
     }
 
