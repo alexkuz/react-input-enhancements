@@ -23,14 +23,14 @@ const ALLOWED_CSS_PROPS = [
 
 let sizersListEl = null;
 const sizerContainerStyle = {
-  position: 'fixed', // 'absolute',
-  // visibility: 'hidden',
+  position: 'absolute',
+  visibility: 'hidden',
   whiteSpace: 'nowrap',
   width: 'auto',
   minWidth: 'initial',
   maxWidth: 'initial',
   zIndex: 10000,
-  left: 200, //-1000,
+  left: -1000,
   top: 100
 };
 
