@@ -761,10 +761,6 @@ export default class DemoApp extends React.Component {
             <ValueInput10 value={this.state.value10}
                           onChange={this.handleValue10Change} />
             {this.renderCode(code10, 'code10open')}
-
-            <div className="pull-right">
-              <Button bsStyle="primary" type='submit'>Submit</Button>
-            </div>
           </form>
         </div>
       </div>
