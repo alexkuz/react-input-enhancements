@@ -1,8 +1,11 @@
 export default function getOptionText(opt) {
   if (!opt) return '';
 
-  return Array.find(
+  const text = Array.find(
     [opt, opt.text, opt.label, opt.value],
-    value => typeof value === 'string'
-  ) || '';
+    value => typeof value === 'string' || typeof value === 'number'
+  );
+
+  return typeof text === 'number' ?
+    text.toString() : (text || '');
 }

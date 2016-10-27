@@ -1,7 +1,10 @@
 import getOptionText from './getOptionText';
 
+const toLower = (val='') =>
+  (val === null ? '' : val).toString().toLowerCase();
+
 export default function findMatchingTextIndex(value, options, allMatches) {
-  const lowerText = value && value.toLowerCase();
+  const lowerText = toLower(value);
 
   const foundOptions = options.reduce((opts, opt, idx) => {
     if (opt && opt.disabled) {
@@ -12,7 +15,7 @@ export default function findMatchingTextIndex(value, options, allMatches) {
       opt.value :
       typeof opt === 'string' ? opt : null;
     const optText = getOptionText(opt);
-    const matchPosition = optText.toLowerCase().indexOf(lowerText);
+    const matchPosition = toLower(optText).indexOf(lowerText);
 
     if (optValue === value && opt !== null ||
       optText && lowerText && (allMatches ? matchPosition !== -1 : matchPosition === 0)) {
