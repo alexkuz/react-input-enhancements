@@ -82,7 +82,8 @@ export default class Autocomplete extends PureComponent {
     const inputProps = {
       value: matchingText || value,
       onKeyDown: this.handleKeyDown,
-      onChange: this.handleChange
+      onChange: this.handleChange,
+      onBlur: this.handleBlur
     };
 
     return renderChild(children, inputProps, { matchingText, value }, this.registerInput);
@@ -130,4 +131,10 @@ export default class Autocomplete extends PureComponent {
     setSelection(input, this.state.matchingText, this.state.matchingText);
     input.blur();
   }
+
+  handleBlur = () => {
+    const input = this.getInput();
+    setSelection(input, this.state.matchingText, this.state.matchingText);
+  }
+  
 }
