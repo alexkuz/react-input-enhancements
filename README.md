@@ -1,4 +1,5 @@
-# react-input-enhancements
+# react-input-enhancements [![Gitter chat](https://img.shields.io/gitter/room/gitterHQ/gitter.svg)](https://gitter.im/react-input-enhancements)
+
 Set of enhancements for input control
 
 The intention of creating this library was to bring `input` component out of the dropdown/autocomplete/whatever code, so it could be easily replaced with your custom component, and also to split independent functionality into different components, which could be combined with each other (still not quite sure it was worth it, though).
