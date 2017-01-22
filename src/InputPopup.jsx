@@ -1,14 +1,58 @@
+// @flow
 import React, { PureComponent, PropTypes } from 'react';
 import renderChild from './utils/renderChild';
 
-export default class InputPopup extends PureComponent {
-  constructor(props) {
+import type { StylingFunction } from './types';
+import type { Element } from 'react';
+
+type DefaultProps = {
+  onRenderCaret: (
+    styling: StylingFunction, isActive: boolean, isHovered: boolean, children: any
+  ) => any,
+  onRenderPopup: (
+    styling: StylingFunction, isActive: boolean, popupShown: boolean
+  ) => any,
+  inputPopupProps: Object
+};
+
+type Props = DefaultProps & {
+  isActive: boolean,
+  popupShown: boolean
+};
+
+type State = {
+  isActive: boolean,
+  popupShown: boolean,
+  hover: boolean
+};
+
+const renderCaretSVG = (
+  styling: StylingFunction, isActive: boolean, hovered: boolean, popupShown: boolean
+): Element<*> => {
+  const svgStyling = styling('inputEnhancementsCaretSvg', isActive, hovered, popupShown);
+  return popupShown ? (
+    <svg {...svgStyling} width='10' height='5' fill='currentColor'>
+      <path d='M0 5 H10 L5 0 z'/>
+    </svg>
+  ) : (
+    <svg {...svgStyling} width='10' height='5' fill='currentColor'>
+      <path d='M0 0 H10 L5 5 z'/>
+    </svg>
+  );
+};
+
+
+export default class InputPopup extends PureComponent<DefaultProps, Props, State> {
+  state: State;
+  blurTimeout: ?number;
+
+  constructor(props: Props) {
     super(props);
 
     this.state = {
       isActive: props.isActive,
       popupShown: props.popupShown,
-      hover: false,
+      hover: false
     };
   }
 
@@ -20,7 +64,7 @@ export default class InputPopup extends PureComponent {
     registerInput: PropTypes.func
   };
 
-  static defaultProps = {
+  static defaultProps: DefaultProps = {
     onRenderCaret: (styling, isActive, isHovered, children) =>
       <div {...styling('inputEnhancementsCaret', isActive, isHovered)}>{children}</div>,
 
@@ -29,26 +73,13 @@ export default class InputPopup extends PureComponent {
     inputPopupProps: {}
   }
 
-  renderCaretSVG(styling, isActive, hovered, popupShown) {
-    const svgStyling = styling('inputEnhancementsCaretSvg', isActive, hovered, popupShown);
-    return popupShown ? (
-      <svg {...svgStyling} width='10' height='5' fill='currentColor'>
-        <path d='M0 5 H10 L5 0 z'/>
-      </svg>
-    ) : (
-      <svg {...svgStyling} width='10' height='5' fill='currentColor'>
-        <path d='M0 0 H10 L5 5 z'/>
-      </svg>
-    );
-  }
-
   componentWillUnmount() {
     if (this.blurTimeout) {
       clearTimeout(this.blurTimeout);
     }
   }
 
-  componentWillUpdate(nextProps) {
+  componentWillUpdate(nextProps: Props) {
     if (nextProps.popupShown !== this.props.popupShown) {
       this.setState({ popupShown: nextProps.popupShown })
     }
@@ -58,7 +89,7 @@ export default class InputPopup extends PureComponent {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     if (prevState.isActive !== this.state.isActive && this.props.onIsActiveChange) {
       this.props.onIsActiveChange(this.state.isActive);
     }
@@ -72,7 +103,7 @@ export default class InputPopup extends PureComponent {
     const { onRenderCaret, onRenderPopup, inputPopupProps, styling, ...restProps } = this.props;
     const { isActive, hover, popupShown } = this.state;
 
-    const caret = this.renderCaretSVG(styling, isActive, hover, popupShown);
+    const caret = renderCaretSVG(styling, isActive, hover, popupShown);
 
     return (
       <div {...styling('inputEnhancementsPopupWrapper')}
@@ -86,9 +117,10 @@ export default class InputPopup extends PureComponent {
     );
   }
 
-  renderInput(styling, restProps) {
+  renderInput(styling: StylingFunction, restProps: Props) {
     const { children, onInputFocus, onInputBlur, customProps,
-            onChange, onInput, value, registerInput, placeholder } = restProps;
+            onChange, onInput, value, registerInput, placeholder,
+            onMouseDown, onMouseUp } = restProps;
     const { isActive, hover, popupShown } = this.state;
 
     const inputProps = {
@@ -101,13 +133,15 @@ export default class InputPopup extends PureComponent {
       onInput,
       onMouseEnter: this.handleMouseEnter,
       onMouseLeave: this.handleMouseLeave,
-      onKeyDown: this.handleKeyDown
+      onKeyDown: this.handleKeyDown,
+      onMouseDown,
+      onMouseUp
     };
 
     return renderChild(children, inputProps, customProps, registerInput);
   }
 
-  handleMouseEnter = e => {
+  handleMouseEnter = (e: SyntheticMouseEvent) => {
     this.setState({ hover: true });
 
     if (this.props.onInputMouseEnter) {
@@ -115,7 +149,7 @@ export default class InputPopup extends PureComponent {
     }
   }
 
-  handleMouseLeave = e => {
+  handleMouseLeave = (e: SyntheticMouseEvent) => {
     this.setState({ hover: false });
 
     if (this.props.onInputMouseLeave) {
@@ -123,7 +157,7 @@ export default class InputPopup extends PureComponent {
     }
   }
 
-  handleKeyDown = e => {
+  handleKeyDown = (e: SyntheticKeyboardEvent) => {
     const keyMap = {
       Escape: this.handleEscapeKeyDown,
       Enter: this.handleEnterKeyDown
@@ -154,7 +188,7 @@ export default class InputPopup extends PureComponent {
     });
   }
 
-  handleFocus = e => {
+  handleFocus = (e: SyntheticUIEvent) => {
     if (this.blurTimeout) {
       clearTimeout(this.blurTimeout);
       this.blurTimeout = null;
@@ -171,7 +205,7 @@ export default class InputPopup extends PureComponent {
     }
   }
 
-  handleBlur = e => {
+  handleBlur = (e: SyntheticUIEvent) => {
     this.blurTimeout = setTimeout(() => {
       this.setState({
         isActive: false,

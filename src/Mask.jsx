@@ -1,49 +1,85 @@
-import { PureComponent, PropTypes } from 'react';
-import applyMaskToString from './applyMaskToString';
+// @flow
+import { PureComponent } from 'react';
+import applyMaskToString from './utils/applyMaskToString';
 import getInput from './utils/getInput';
 import registerInput from './utils/registerInput';
 import renderChild from './utils/renderChild';
+import locateCursorPosition from './utils/locateCursorPosition';
 
-function getStateFromProps(value, props) {
-  value = props.onValuePreUpdate(value);
-  let processedValue = applyMaskToString(value, props.pattern, props.emptyChar);
-  const validatedValue = props.onValidate(value, processedValue);
+import type { MaskResult } from './utils/applyMaskToString';
+
+type DefaultProps = {
+  emptyChar: string,
+  onValidate: (value: string, processedValue: MaskResult) => any,
+  onValuePreUpdate: (value: string) => string
+};
+
+type Props = DefaultProps & {
+  getInputElement: () => HTMLInputElement,
+  value?: string,
+  pattern: string,
+  placeholder?: string,
+  children?: any,
+  onUnmaskedValueChange?: (unmaskedValue: string) => void,
+  onChange?: (e: SyntheticInputEvent) => void,
+  onKeyDown?: (e: SyntheticKeyboardEvent) => void,
+  onMouseUp?: (e: SyntheticMouseEvent) => void,
+};
+
+type State = {
+  value: string,
+  preUpdateValue: string,
+  isValid: boolean,
+  unmaskedValue: string,
+  lastIndex: number
+};
+
+function getStateFromProps(
+  props: Props, value: string, lastIndex: number
+): State {
+  let stateValue = props.onValuePreUpdate(value);
+  const preUpdateValue = stateValue;
+  let processedValue = applyMaskToString(stateValue, props.pattern, props.emptyChar);
+  const validatedValue = props.onValidate(stateValue, processedValue);
+
   if (validatedValue && validatedValue.result) {
     processedValue = validatedValue;
   } else if (validatedValue) {
-    processedValue.isValid = false;
-  }
-  const state = processedValue.isValid ?
-    { value: processedValue.result, lastIndex: processedValue.lastIndex } :
-    {};
-
-  if (!processedValue.unmaskedValue && props.placeholder) {
-    state.value = '';
-  }
-
-  return [state, processedValue];
-}
-
-export default class Mask extends PureComponent {
-  constructor(props) {
-    super(props);
-
-
-    const value = props.value || '';
-    const [state] = getStateFromProps(value, props);
-    this.state = {
-      value,
-      lastIndex: 0,
-      ...state
+    processedValue = {
+      result: processedValue.result,
+      unmaskedValue: processedValue.unmaskedValue,
+      isValid: false
     };
   }
 
-  static propTypes = {
-    getInputElement: PropTypes.func,
-    value: PropTypes.string,
-    pattern: PropTypes.string.isRequired,
-    emptyChar: PropTypes.string
+  if (processedValue.isValid) {
+    stateValue = processedValue.result;
+    lastIndex = processedValue.lastIndex;
+  }
+
+  if (!processedValue.unmaskedValue && props.placeholder) {
+    stateValue= '';
+  }
+
+  return {
+    value: stateValue,
+    preUpdateValue,
+    isValid: processedValue.isValid,
+    unmaskedValue: processedValue.unmaskedValue,
+    lastIndex
   };
+}
+
+export default class Mask extends PureComponent<DefaultProps, Props, State> {
+  state: State;
+  cursorPosition: number;
+
+  constructor(props: Props) {
+    super(props);
+
+    const value = props.value || '';
+    this.state = getStateFromProps(props, value, 0);
+  }
 
   static defaultProps = {
     emptyChar: ' ',
@@ -51,37 +87,35 @@ export default class Mask extends PureComponent {
     onValuePreUpdate: v => v
   };
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: Props) {
     if (this.props.pattern !== nextProps.pattern ||
       this.props.value !== nextProps.value ||
       this.props.emptyChar !== nextProps.emptyChar) {
-      this.setValue(nextProps.value, nextProps);
-    }
-  }
-
-  setValue(value, props) {
-    const [state, processedValue] = getStateFromProps(value, props);
-
-    if (processedValue.isValid) {
-      this.setState(
-        state,
-        () => this.setSelectionRange(this.state.lastIndex)
+      const nextState = getStateFromProps(
+        nextProps, nextProps.value || '', this.state.lastIndex
       );
-    } else {
-      this.setSelectionRange(this.state.lastIndex);
-    }
 
-    return processedValue;
+      if (nextState.value !== this.state.value ||
+        nextState.lastIndex !== this.state.lastIndex) {
+        this.setState(nextState);
+      }
+    }
   }
 
-  setSelectionRange(lastIndex) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    if (prevState.value !== this.state.value) {
+      this.setSelectionRange(this.cursorPosition);
+    }
+  }
+
+  setSelectionRange(position: number) {
     const input = getInput(this);
     if (input === document.activeElement) {
-      input.setSelectionRange(lastIndex, lastIndex);
+      input.setSelectionRange(position, position);
     }
   }
 
-  registerInput = input => registerInput(this, input);
+  registerInput = (input: HTMLInputElement) => registerInput(this, input);
 
   render() {
     const { children, placeholder } = this.props;
@@ -89,32 +123,83 @@ export default class Mask extends PureComponent {
     const inputProps = {
       value,
       placeholder,
-      onInput: this.handleInput
+      onInput: this.handleInput,
+      onKeyDown: this.handleKeyDown,
+      onMouseUp: this.handleMouseUp
     };
 
     return renderChild(children, inputProps, { value }, this.registerInput);
   }
 
   // works better for IE than onChange
-  handleInput = e => {
+  handleInput = (e: SyntheticInputEvent) => {
     const value = e.target.value;
 
-    if (this.props.value === undefined) {
-      const processedValue = this.setValue(value, this.props);
-      if (!processedValue.isValid) {
-        e.preventDefault();
-        return;
-      }
+    const nextState = getStateFromProps(
+      this.props, value, this.state.lastIndex
+    );
+    if (!nextState.isValid) {
+      e.preventDefault();
+      setTimeout(() =>
+        this.setSelectionRange(this.cursorPosition)
+      );
+      return;
+    }
 
-      e.target.value = processedValue.result;
+    const cursorPosition = Math.min(
+      nextState.lastIndex,
+      locateCursorPosition(
+        e.target.selectionStart, nextState.preUpdateValue, this.props.pattern, this.props.emptyChar
+      )
+    );
 
-      if (this.props.onUnmaskedValueChange) {
-        this.props.onUnmaskedValueChange(processedValue.unmaskedValue);
-      }
+    if(this.cursorPosition !== cursorPosition) {
+      this.cursorPosition = cursorPosition;
+      setTimeout(() => this.setSelectionRange(this.cursorPosition));
+    }
+
+    if (e.target.value !== nextState.value) {
+      e.target.value = nextState.value;
+    }
+
+    if (this.props.onUnmaskedValueChange) {
+      this.props.onUnmaskedValueChange(nextState.unmaskedValue);
     }
 
     if (this.props.onChange) {
       this.props.onChange(e);
+    }
+  }
+
+  handleKeyDown = (e: SyntheticKeyboardEvent) => {
+    const input = getInput(this);
+
+    if (e.key === 'ArrowRight' && input.selectionStart >= this.state.lastIndex) {
+      this.setSelectionRange(this.state.lastIndex);
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key === 'ArrowRight' && e.metaKey && input.selectionStart < this.state.lastIndex) {
+      this.setSelectionRange(this.state.lastIndex);
+      e.preventDefault();
+      return;
+    }
+
+    if (this.props.onKeyDown) {
+      this.props.onKeyDown(e);
+    }
+  }
+
+  handleMouseUp = (e: SyntheticMouseEvent) => {
+    const input = getInput(this);
+
+    if (input.selectionStart >= this.state.lastIndex) {
+      this.setSelectionRange(this.state.lastIndex);
+    }
+
+    if (this.props.onMouseUp) {
+      this.props.onMouseUp(e);
     }
   }
 }

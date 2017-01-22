@@ -1,5 +1,5 @@
-import React, { PureComponent, PropTypes } from 'react';
-import * as shapes from './shapes';
+// @flow
+import React, { PureComponent } from 'react';
 import findMatchingTextIndex from './utils/findMatchingTextIndex';
 import * as filters from './filters';
 import InputPopup from './InputPopup';
@@ -13,16 +13,76 @@ import deprecated from './utils/deprecated';
 import getInput from './utils/getInput';
 import registerInput from './utils/registerInput';
 
-function getOptionKey(opt, idx) {
+import type { Option, OptionFilter } from './types';
+
+type StateValue = string;
+
+type DefaultProps = {
+  onRenderOption: (styling: Function, opt: Option, highlighted: boolean, disabled: boolean) => any,
+  onRenderList: (
+    styling: Function, isActive: boolean, listShown: boolean, children: any, header: any
+  ) => any,
+  onRenderListHeader: (allCount: number, shownCount: number, staticCount: number) => any,
+  dropdownProps: Object,
+  optionFilters: OptionFilter[]
+};
+
+type Props = DefaultProps & {
+  theme: string | Object,
+  invertTheme: boolean,
+
+  value: any,
+  options: Option[],
+  children: any,
+  onChange: (e: SyntheticInputEvent) => void,
+  onKeyDown: (e: SyntheticKeyboardEvent) => void,
+  onSelect: (value: any, text: string) => void,
+
+  // deprecated
+  onValueChange?: Function
+};
+
+type State = {
+  value: StateValue,
+  selectedIndex: number,
+  highlightedIndex: number,
+  shownOptions: Option[],
+  isActive: boolean,
+  listShown: boolean
+};
+
+function isOptionDisabled(opt: Option): boolean {
+  if (opt === null) {
+    deprecated('Using null for separator option is deprecated; use { separator: true }');
+    opt = { separator: true };
+  }
+
+  if (typeof opt === 'string') {
+    return false;
+  }
+
+  return !!(opt.separator || opt.disabled);
+}
+
+function isSeparatorOption(opt: Option): boolean {
+  if (opt === null) {
+    deprecated('Using null for separator option is deprecated; use { separator: true }');
+    opt = { separator: true };
+  }
+
+  return typeof opt !== 'string' && !!(opt.separator);
+}
+
+function getOptionKey(opt: Option, idx: number): string {
   const value = getOptionValue(opt);
 
-  return opt === null ?
+  return isSeparatorOption(opt) ?
     `option-separator-${idx}` :
     `option-${typeof value === 'string' ? value : (getOptionText(opt) + idx)}`;
 }
 
-function getSiblingIndex(idx, options, next) {
-  if (idx === null) {
+function getSiblingIndex(idx: number, options: Option[], next: boolean) {
+  if (idx === -1) {
     idx = next ? -1 : options.length;
   }
 
@@ -30,7 +90,7 @@ function getSiblingIndex(idx, options, next) {
 
   for (let i = 0; i < options.length; i++) {
     const currentIdx = (idx + (i + 1) * step + options.length) % options.length;
-    if (options[currentIdx] !== null && !options[currentIdx].disabled) {
+    if (!isOptionDisabled(options[currentIdx])) {
       return currentIdx;
     }
   }
@@ -38,23 +98,34 @@ function getSiblingIndex(idx, options, next) {
   return idx;
 }
 
-function getShownOptions(value, options, optionFilters) {
+function getShownOptions(
+  value: StateValue, options: Option[], optionFilters: OptionFilter[]
+): Option[] {
   return optionFilters.reduce((o, filter) => filter(o, value), options);
 }
 
-function findOptionIndex(options, option) {
-  return Array.findIndex(options, opt => opt === option);
+function findOptionIndex(options: Option[], option: Option) {
+  return options.indexOf(option);
 }
 
-function getStateFromProps(props) {
-  const value = props.value;
-  const match = findMatchingTextIndex(value, props.options);
-  const [selectedIndex, matchingText] = match;
-  const shownOptions = getShownOptions(matchingText, props.options, props.optionFilters);
-  const highlightedIndex = findOptionIndex(shownOptions, props.options[selectedIndex]);
+function getStateFromProps({ value, options, optionFilters }: Props): State {
+  const match = findMatchingTextIndex(value, options);
+  if (match.noResult) {
+    return {
+      value: '',
+      isActive: false,
+      listShown: false,
+      selectedIndex: -1,
+      highlightedIndex: -1,
+      shownOptions: getShownOptions('', options, optionFilters)
+    };
+  }
+  const { index: selectedIndex, text: matchingText } = match;
+  const shownOptions = getShownOptions(matchingText, options, optionFilters);
+  const highlightedIndex = findOptionIndex(shownOptions, options[selectedIndex]);
 
   return {
-    value: matchingText || null,
+    value: matchingText,
     isActive: false,
     listShown: false,
     selectedIndex,
@@ -63,8 +134,11 @@ function getStateFromProps(props) {
   };
 }
 
-export default class Dropdown extends PureComponent {
-  constructor(props) {
+export default class Dropdown extends PureComponent<DefaultProps, Props, State> {
+  styling: any;
+  state: State;
+
+  constructor(props: Props) {
     super(props);
 
     this.state = getStateFromProps(props);
@@ -75,17 +149,9 @@ export default class Dropdown extends PureComponent {
     }
   }
 
-  static propTypes = {
-    value: PropTypes.string,
-    options: PropTypes.arrayOf(shapes.ITEM_OR_STRING),
-    onRenderOption: PropTypes.func,
-    onRenderList: PropTypes.func,
-    optionFilters: PropTypes.arrayOf(PropTypes.func)
-  };
-
-  static defaultProps = {
+  static defaultProps: DefaultProps = {
     onRenderOption: (styling, opt, highlighted, disabled) =>
-      opt !== null ?
+      !isSeparatorOption(opt) ?
         <div {...styling('inputEnhancementsOption', highlighted, disabled)}>
           {getOptionLabel(opt, highlighted, disabled)}
         </div> :
@@ -100,7 +166,8 @@ export default class Dropdown extends PureComponent {
       ),
 
     onRenderListHeader: (allCount, shownCount, staticCount) => {
-      if (allCount - staticCount < 20) return null;
+      if (allCount - staticCount < 20) return;
+
       const allItems = `${allCount - staticCount} ${
         (allCount - staticCount) === 1 ? 'item' : 'items'
       }`;
@@ -118,19 +185,21 @@ export default class Dropdown extends PureComponent {
       filters.notFoundMessage('No matches found'),
       filters.filterRedudantSeparators
     ]
-  }
+  };
 
-  componentWillUpdate(nextProps, nextState) {
+  componentWillUpdate(nextProps: Props, nextState: State) {
     const { options, optionFilters } = nextProps;
 
-    if (nextProps.value && nextState.value === null ||
+    const optionsChanged = this.props.options !== options;
+
+    if (nextProps.value && nextState.value === undefined ||
         this.props.value !== nextProps.value) {
       const state = getStateFromProps(nextProps);
 
-      if (state.value !== this.state.value) {
+      if (state.value !== this.state.value || optionsChanged) {
         this.setState(state);
       }
-    } else if (this.props.options !== options ||
+    } else if (optionsChanged ||
       this.props.optionFilters !== optionFilters) {
       const [highlightedIndex, shownOptions] = this.updateHighlightedIndex(
         nextState.value, options, optionFilters
@@ -141,7 +210,7 @@ export default class Dropdown extends PureComponent {
 
       const state = getStateFromProps(nextProps);
 
-      if (state.value !== this.state.value && !nextState.isActive) {
+      if ((state.value !== this.state.value || optionsChanged) && !nextState.isActive) {
         this.setState(state);
       }
     } else if (this.state.isActive && !nextState.isActive) {
@@ -149,10 +218,10 @@ export default class Dropdown extends PureComponent {
     }
   }
 
-  updateHighlightedIndex(value, options, optionFilters) {
+  updateHighlightedIndex(value: StateValue, options: Option[], optionFilters: OptionFilter[]) {
     const shownOptions = getShownOptions(value, options, optionFilters);
     const match = findMatchingTextIndex(value, shownOptions, true);
-    const [highlightedIndex] = match;
+    const highlightedIndex = match.noResult ? -1 : match.index;
 
     this.setState({ highlightedIndex, shownOptions });
 
@@ -162,7 +231,7 @@ export default class Dropdown extends PureComponent {
   render() {
     const { dropdownProps, children } = this.props;
 
-    const value = this.state.value === null ? '' : this.state.value;
+    const value = this.state.value === undefined ? '' : this.state.value;
 
     return (
       <InputPopup
@@ -184,9 +253,9 @@ export default class Dropdown extends PureComponent {
     );
   }
 
-  registerInput = input => registerInput(this, input);
+  registerInput = (input: HTMLInputElement) => registerInput(this, input);
 
-  renderPopup = (styling, isActive, popupShown) => {
+  renderPopup = (styling: Function, isActive: boolean, popupShown: boolean) => {
     const { onRenderList, onRenderListHeader, options } = this.props;
     const { shownOptions } = this.state;
 
@@ -203,10 +272,10 @@ export default class Dropdown extends PureComponent {
     );
   }
 
-  renderOption = (opt, idx) => {
+  renderOption = (opt: Option, idx: number) => {
     const { onRenderOption } = this.props;
     const highlighted = idx === this.state.highlightedIndex;
-    const disabled = opt && opt.disabled;
+    const disabled = isOptionDisabled(opt);
 
     return (
       <DropdownOption
@@ -224,23 +293,26 @@ export default class Dropdown extends PureComponent {
     );
   }
 
-  handleOptionClick(idx, e) {
+  handleOptionClick(idx: number, e: SyntheticMouseEvent) {
     const option = this.state.shownOptions[idx];
 
-    if (!option || option.disabled) {
+    if (!option || option.separator || option.disabled) {
       e.preventDefault();
       return;
     }
 
+    const index = findOptionIndex(this.props.options, option);
+
     this.setState({
       listShown: false
     }, () => {
-      this.selectOption(findOptionIndex(this.props.options, option), true);
+      this.selectOption(index, true);
     });
   }
 
-  handleChange = e => {
+  handleChange = (e: SyntheticInputEvent) => {
     const { options, optionFilters } = this.props;
+
     const value = e.target.value;
 
     this.setState({ value });
@@ -251,7 +323,7 @@ export default class Dropdown extends PureComponent {
     }
   }
 
-  handleKeyDown = e => {
+  handleKeyDown = (e: SyntheticKeyboardEvent) => {
     const keyMap = {
       ArrowUp: this.handleArrowUpKeyDown,
       ArrowDown: this.handleArrowDownKeyDown,
@@ -267,7 +339,7 @@ export default class Dropdown extends PureComponent {
     }
   }
 
-  handleArrowUpKeyDown = e => {
+  handleArrowUpKeyDown = (e: KeyboardEvent) => {
     const { highlightedIndex, shownOptions } = this.state;
 
     e.preventDefault();
@@ -277,7 +349,7 @@ export default class Dropdown extends PureComponent {
     });
   }
 
-  handleArrowDownKeyDown = e => {
+  handleArrowDownKeyDown = (e: KeyboardEvent) => {
     const { highlightedIndex, shownOptions } = this.state;
 
     e.preventDefault();
@@ -297,7 +369,7 @@ export default class Dropdown extends PureComponent {
     });
   }
 
-  selectOption(index, fireOnSelect) {
+  selectOption(index: number, fireOnSelect: boolean) {
     const { options, optionFilters } = this.props;
     const option = options[index];
     const shownOptions = getShownOptions(getOptionText(option), options, optionFilters);
@@ -319,11 +391,11 @@ export default class Dropdown extends PureComponent {
     }
   }
 
-  handleIsActiveChange = isActive => {
+  handleIsActiveChange = (isActive: boolean) => {
     this.setState({ isActive });
   };
 
-  handlePopupShownChange = popupShown => {
+  handlePopupShownChange = (popupShown: boolean) => {
     this.setState({ listShown: popupShown });
   };
 }

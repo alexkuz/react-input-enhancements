@@ -75,7 +75,10 @@ module.exports = {
     }, {
       test: /\.css$/,
       loaders: ['style', 'css?-minimize', 'postcss']
-    }]
+    }, !isProduction && {
+      test: require.resolve('react-addons-perf'),
+      loader: 'expose-loader?Perf'
+    }].filter(Boolean)
   },
   devServer: isProduction ? null : {
     contentBase: 'demo/dist',

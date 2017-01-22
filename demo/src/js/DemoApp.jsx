@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
 import PageHeader from 'react-bootstrap/lib/PageHeader';
 import FormGroup from 'react-bootstrap/lib/FormGroup';
@@ -11,13 +11,14 @@ import Collapse from 'react-bootstrap/lib/Collapse';
 import Button from 'react-bootstrap/lib/Button';
 import moment from 'moment';
 import countries from './countries';
-import pure from './pure';
 
 import Autosize from 'Autosize';
 import Autocomplete from 'Autocomplete';
 import Combobox from 'Combobox';
 import Mask from 'Mask';
 import DatePicker from 'DatePicker';
+
+import 'react-addons-perf';
 
 import './bootstrap-input-inline.css';
 import './ie.css';
@@ -26,7 +27,7 @@ import Prefixer from 'inline-style-prefixer';
 const prefixerInstance = new Prefixer(window.navigator);
 const prefixer = prefixerInstance.prefix.bind(prefixerInstance);
 
-const ValueInput1 = pure(({ value, onChange }) =>
+const ValueInput1 = (({ value, onChange }) =>
   <div className='inline-input'>
     <InputGroup>
       <Autosize
@@ -48,7 +49,7 @@ const ValueInput1 = pure(({ value, onChange }) =>
   </div>
 );
 
-const ValueInput2 = pure(({ value, onChange }) =>
+const ValueInput2 = (({ value, onChange }) =>
   <div className='inline-input'>
     <InputGroup>
       <Autosize
@@ -113,7 +114,7 @@ const code1and2 = `
   </div>
 `;
 
-const ValueInput3 = pure(({ value, onChange }) =>
+const ValueInput3 = (({ value, onChange }) =>
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       Autocomplete:
@@ -159,7 +160,7 @@ const code3 = `
   </FormGroup>
 `;
 
-const ValueInput4 = pure(({ value, onChange }) =>
+const ValueInput4 = (({ value, onChange }) =>
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       Combobox (Dropdown + Autocomplete):
@@ -211,7 +212,7 @@ const code4 = `
   </FormGroup>
 `;
 
-const ValueInput5 = pure(({ value, onChange }) =>
+const ValueInput5 = (({ value, onChange }) =>
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       Combobox (Dropdown + Autosize):
@@ -260,7 +261,7 @@ const code5 = `
   </FormGroup>
 `;
 
-const ValueInput6 = pure(({ value, onChange, addonAfter, options }) =>
+const ValueInput6 = (({ value, onChange, addonAfter, options }) =>
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       Combobox (Dropdown + Autosize + Autocomplete, defaultWidth=100):
@@ -324,7 +325,7 @@ const code6 = `
   </FormGroup>
 `;
 
-const ValueInput7 = pure(({ value, onChange, onUnmaskedValueChange }) =>
+const ValueInput7 = (({ value, onChange, onUnmaskedValueChange }) =>
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       Mask + Autosize (credit card):
@@ -409,7 +410,7 @@ const code7 = `
   </FormGroup>
 `;
 
-const ValueInput8 = pure(({ value, onChange, onUnmaskedValueChange }) =>
+const ValueInput8 = (({ value, onChange, onUnmaskedValueChange }) =>
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       Mask + Autosize (phone number):
@@ -494,7 +495,7 @@ const code8 = `
   </FormGroup>
 `;
 
-const ValueInput9 = pure(({ value, onChange }) =>
+const ValueInput9 = (({ value, onChange }) =>
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       DatePicker:
@@ -549,7 +550,7 @@ const code9 = `
 
 let frDatePicker = undefined;
 
-const ValueInput10 = pure(({ value, onChange }) => {
+const ValueInput10 = (({ value, onChange }) => {
   const frCurrent = moment(value || undefined);
   frCurrent.locale('fr');
   const frNow = moment();
@@ -611,7 +612,7 @@ const code10 = `
   </FormGroup>
 `;
 
-export default class DemoApp extends React.Component {
+export default class DemoApp extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {

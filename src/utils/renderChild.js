@@ -1,6 +1,11 @@
+// @flow
 import React, { Children } from 'react';
 
-export default function renderChild(children, inputProps, otherProps, registerInput) {
+import type RegisterInput from './registerInput';
+
+export default function renderChild(
+  children: any, inputProps: Object, otherProps: Object, registerInput: RegisterInput
+): any {
   if (typeof children === 'function') {
     return children(inputProps, otherProps, registerInput);
   } else {

@@ -1,7 +1,10 @@
+// @flow
 import getOptionText from '../utils/getOptionText';
 import isStatic from '../utils/isStatic';
 
-export default function filterByMatchingTextWithThreshold(threshold) {
+import type { OptionFilter } from '../types';
+
+export default function filterByMatchingTextWithThreshold(threshold: number): OptionFilter {
   return (options, value) => {
     if (!value || threshold && options.length < threshold) return options;
     value = value.toLowerCase();

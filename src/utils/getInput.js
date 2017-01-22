@@ -1,7 +1,10 @@
+// @flow
 import ReactDOM from 'react-dom';
 import deprecated from './deprecated';
 
-export default function getInput(cmp) {
+import type { ComponentWithInput } from '../types';
+
+export default function getInput(cmp: ComponentWithInput): HTMLInputElement {
   if (cmp.props.getInputElement) {
     return cmp.props.getInputElement();
   }

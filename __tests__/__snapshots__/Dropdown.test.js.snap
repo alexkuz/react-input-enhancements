@@ -14,8 +14,10 @@ exports[`Dropdown renders correctly with element child 1`] = `
     onFocus={undefined}
     onInput={undefined}
     onKeyDown={[Function anonymous]}
+    onMouseDown={undefined}
     onMouseEnter={[Function anonymous]}
     onMouseLeave={[Function anonymous]}
+    onMouseUp={undefined}
     placeholder={undefined}
     style={
       Object {
@@ -70,8 +72,10 @@ exports[`Dropdown renders correctly with function child 1`] = `
     onFocus={undefined}
     onInput={undefined}
     onKeyDown={[Function anonymous]}
+    onMouseDown={undefined}
     onMouseEnter={[Function anonymous]}
     onMouseLeave={[Function anonymous]}
+    onMouseUp={undefined}
     placeholder={undefined}
     style={
       Object {

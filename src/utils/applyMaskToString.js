@@ -1,4 +1,19 @@
-export default function applyMaskToString(string, pattern, emptyChar) {
+// @flow
+
+export type MaskResult = {
+  result: string,
+  unmaskedValue: string,
+  isValid: true,
+  lastIndex: number
+} | {
+  result: string,
+  unmaskedValue: string,
+  isValid: false
+};
+
+export default function applyMaskToString(
+  string: string, pattern: string, emptyChar: string
+): MaskResult {
   let result = '';
   let stringIndex = 0;
   let lastIndex = 0;
@@ -63,10 +78,16 @@ export default function applyMaskToString(string, pattern, emptyChar) {
     }
   }
 
-  return {
+  const isValid = stringIndex >= string.length;
+
+  return isValid ? {
     result,
     unmaskedValue: string,
-    isValid: stringIndex >= string.length,
+    isValid: true,
     lastIndex
+  } : {
+    result,
+    unmaskedValue: string,
+    isValid: false
   };
 }

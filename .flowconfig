@@ -1,0 +1,12 @@
+[options]
+module.file_ext=.js
+module.file_ext=.jsx
+module.file_ext=.json
+esproposal.export_star_as=enable
+
+[ignore]
+.*/node_modules/fbjs/.*
+.*/build/.*
+
+[libs]
+decls/

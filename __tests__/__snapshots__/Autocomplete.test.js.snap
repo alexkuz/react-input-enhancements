@@ -2,12 +2,12 @@ exports[`Autocomplete renders correctly with element child 1`] = `
 <input
   onChange={[Function anonymous]}
   onKeyDown={[Function anonymous]}
-  value="test" />
+  value="test1" />
 `;
 
 exports[`Autocomplete renders correctly with function child 1`] = `
 <input
   onChange={[Function anonymous]}
   onKeyDown={[Function anonymous]}
-  value="test" />
+  value="test1" />
 `;

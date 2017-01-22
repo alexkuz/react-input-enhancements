@@ -1,19 +1,21 @@
-import React, { PureComponent, PropTypes } from 'react';
+// @flow
+import React, { PureComponent } from 'react';
 import { findDOMNode } from 'react-dom';
 
-export default class DropdownOption extends PureComponent {
-  static propTypes = {
-    highlighted: PropTypes.bool,
-    onMouseDown: PropTypes.func
-  };
+type Props = {
+  highlighted: boolean,
+  onMouseDown: (e: SyntheticMouseEvent) => void,
+  children?: any
+};
 
+export default class DropdownOption extends PureComponent<void, Props, void> {
   componentDidMount() {
     if (this.props.highlighted) {
       this.scrollToOption();
     }
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: Props) {
     if (!prevProps.highlighted && this.props.highlighted) {
       this.scrollToOption();
     }

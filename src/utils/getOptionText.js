@@ -1,11 +1,23 @@
-export default function getOptionText(opt) {
-  if (!opt) return '';
+// @flow
+import toString from './toString';
+import type { Option } from '../types';
 
-  const text = Array.find(
-    [opt, opt.text, opt.label, opt.value],
-    value => typeof value === 'string' || typeof value === 'number'
-  );
+export default function getOptionText(opt: Option): string {
+  if (typeof opt !== 'object') {
+    return toString(opt);
+  }
 
-  return typeof text === 'number' ?
-    text.toString() : (text || '');
+  if(opt.hasOwnProperty('text')) {
+    return toString(opt.text);
+  }
+
+  if(opt.hasOwnProperty('label')) {
+    return toString(opt.label);
+  }
+
+  if(opt.hasOwnProperty('value')) {
+    return toString(opt.value);
+  }
+
+  return '';
 }

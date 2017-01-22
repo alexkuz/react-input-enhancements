@@ -14,8 +14,10 @@ exports[`DatePicker renders correctly with element child 1`] = `
     onFocus={undefined}
     onInput={[Function anonymous]}
     onKeyDown={[Function anonymous]}
+    onMouseDown={undefined}
     onMouseEnter={[Function anonymous]}
     onMouseLeave={[Function anonymous]}
+    onMouseUp={[Function anonymous]}
     placeholder="Thu 01/01/1970"
     style={
       Object {
@@ -70,8 +72,10 @@ exports[`DatePicker renders correctly with function child 1`] = `
     onFocus={undefined}
     onInput={[Function anonymous]}
     onKeyDown={[Function anonymous]}
+    onMouseDown={undefined}
     onMouseEnter={[Function anonymous]}
     onMouseLeave={[Function anonymous]}
+    onMouseUp={[Function anonymous]}
     placeholder="Thu 01/01/1970"
     style={
       Object {

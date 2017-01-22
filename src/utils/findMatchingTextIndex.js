@@ -1,34 +1,54 @@
+// @flow
 import getOptionText from './getOptionText';
+import getOptionValue from './getOptionValue';
 
-const toLower = (val='') =>
-  (val === null ? '' : val).toString().toLowerCase();
+import type { Option } from '../types';
 
-export default function findMatchingTextIndex(value, options, allMatches) {
+type MatchResult = {
+  index: number,
+  text: string,
+  value: any,
+  position: number,
+  lowercaseText: string
+}
+
+type NoResult = { noResult: true };
+
+const toLower = (val: any = ''): string =>
+  ((val === null || val === undefined) ? '' : val).toString().toLowerCase();
+
+export default function findMatchingTextIndex(
+  value: any, options: Option[], allMatches: boolean = false
+): MatchResult | NoResult {
   const lowerText = toLower(value);
 
-  const foundOptions = options.reduce((opts, opt, idx) => {
-    if (opt && opt.disabled) {
+  const foundOptions: MatchResult[] = options.reduce((opts: MatchResult[], opt, index) => {
+    if (opt === null || opt === undefined || opt.disabled || opt.separator) {
       return opts;
     }
 
-    const optValue = opt && opt.hasOwnProperty('value') ?
-      opt.value :
-      typeof opt === 'string' ? opt : null;
+    const optValue = getOptionValue(opt);
     const optText = getOptionText(opt);
     const matchPosition = toLower(optText).indexOf(lowerText);
 
-    if (optValue === value && opt !== null ||
+    if (optValue === value ||
       optText && lowerText && (allMatches ? matchPosition !== -1 : matchPosition === 0)) {
 
-      return [...opts, [idx, optText, optValue, matchPosition, optText.toLowerCase()]];
+      return [...opts, {
+        index,
+        text: optText,
+        value: optValue,
+        position: matchPosition,
+        lowercaseText: optText.toLowerCase()
+      }];
     }
 
     return opts;
   }, []);
 
   foundOptions.sort((a, b) => {
-    return (a[3] - b[3]) || (a[4] > b[4] ? 1 : -1);
+    return (a.position - b.position) || (a.lowercaseText > b.lowercaseText ? 1 : -1);
   });
 
-  return foundOptions.length ? foundOptions[0] : [null, null, null];
+  return foundOptions.length ? foundOptions[0] : { noResult: true };
 }

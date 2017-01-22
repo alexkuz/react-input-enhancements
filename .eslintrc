@@ -14,7 +14,7 @@
     "max-len": ["warn", 100],
     "strict": ["off"],
     "eol-last": ["warn"],
-    "no-console": ["warn"],
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
     "indent": ["warn", 2],
     "quotes": ["warn", "single", "avoid-escape"],
     "jsx-quotes": ["warn", "prefer-single"],
@@ -42,9 +42,13 @@
     "babel/object-curly-spacing": ["warn", "always"],
     "babel/object-shorthand": "warn"
   },
+  "extends": [
+    "plugin:flowtype/recommended"
+  ],
   "plugins": [
     "react",
-    "babel"
+    "babel",
+    "flowtype"
   ],
   "settings": {
     "ecmascript": 6,

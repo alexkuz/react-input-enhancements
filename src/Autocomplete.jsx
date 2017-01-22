@@ -1,72 +1,82 @@
-import { PureComponent, PropTypes } from 'react';
-import * as shapes from './shapes';
+// @flow
+import { PureComponent } from 'react';
 import findMatchingTextIndex from './utils/findMatchingTextIndex';
 import getInput from './utils/getInput';
 import registerInput from './utils/registerInput';
 import renderChild from './utils/renderChild';
+import toString from './utils/toString';
+import getOptionText from './utils/getOptionText';
 
-function updateInputSelection(input, start, end) {
+import type { Option } from './types';
+
+type Props = {
+  value: any,
+  options: Option[],
+  children?: any,
+  onChange?: (e: SyntheticInputEvent) => void,
+  onKeyDown?: (e: SyntheticKeyboardEvent) => void,
+  registerInput?: (input: HTMLInputElement) => void,
+  getInputComponent: () => HTMLInputElement
+};
+
+type State = {
+  matchingText: string,
+  value: string
+};
+
+function updateInputSelection(input: HTMLInputElement, start: number, end: number) {
   input.setSelectionRange(start, end);
 }
 
-function updateInputNode(input, value) {
+function updateInputNode(input: HTMLInputElement, value: string) {
   input.value = value;
 }
 
-function setSelection(input, text, matchingText) {
+function setSelection(input: HTMLInputElement, text: string | null, matchingText: string) {
   if (text === null) {
-    updateInputNode(input, null);
+    updateInputNode(input, '');
   } else {
     updateInputNode(input, matchingText);
+
     if (text.length !== matchingText.length) {
       updateInputSelection(input, text.length, matchingText.length);
     }
   }
 }
 
-export default class Autocomplete extends PureComponent {
-  constructor(props) {
+function getStateFromProps({ value, options }: Props): State {
+  const match = findMatchingTextIndex(value, options);
+
+  if (!match.noResult) {
+    const { text: matchingText } = match;
+    const strValue = typeof value === 'string' ?
+      value : getOptionText(options[match.index]);
+    return { value: strValue, matchingText };
+  } else {
+    return { value: toString(value), matchingText: '' };
+  }
+}
+
+export default class Autocomplete extends PureComponent<void, Props, State> {
+  state: State;
+
+  constructor(props: Props) {
     super(props);
-    this.state = {
-      matchingText: null,
-      value: props.value
-    };
+    this.state = getStateFromProps(props);
   }
 
-  static propTypes = {
-    getInputElement: PropTypes.func,
-    value: PropTypes.string,
-    options: PropTypes.arrayOf(shapes.ITEM_OR_STRING).isRequired
-  };
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.value !== nextProps.value &&
-      nextProps.value !== this.state.value) {
-      this.setValue(nextProps.value, nextProps.options);
+  componentWillReceiveProps(nextProps: Props) {
+    const optionsChanged = this.props.options !== nextProps.options;
+    if (this.props.value !== nextProps.value || optionsChanged) {
+      const nextState = getStateFromProps(nextProps);
+      if (nextState.value !== this.state.value || optionsChanged) {
+        this.setState(nextState);
+      }
     }
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-    if (this.props.options !== nextProps.options &&
-      this.props.value === nextProps.value) {
-      const match = findMatchingTextIndex(nextState.value, nextProps.options);
-      const [, matchingText] = match;
-      this.setState({ matchingText });
-    }
-  }
-
-  setValue(value, options) {
-    if (value === this.state.value) {
-      return;
-    }
-    const match = findMatchingTextIndex(value, options);
-    const [, matchingText] = match;
-    this.setState({ value, matchingText });
   }
 
   componentDidUpdate() {
-    const matchingText = this.state.matchingText || '';
-    const value = this.state.value || '';
+    const { value, matchingText } = this.state;
 
     if (matchingText && value.length !== matchingText.length) {
       const input = getInput(this);
@@ -74,7 +84,7 @@ export default class Autocomplete extends PureComponent {
     }
   }
 
-  registerInput = input => registerInput(this, input);
+  registerInput = (input: HTMLInputElement) => registerInput(this, input);
 
   render() {
     const { children } = this.props;
@@ -88,17 +98,21 @@ export default class Autocomplete extends PureComponent {
     return renderChild(children, inputProps, { matchingText, value }, this.registerInput);
   }
 
-  handleChange = e => {
+  handleChange = (e: SyntheticInputEvent) => {
     let value = e.target.value;
 
-    this.setValue(value, this.props.options);
+    const nextState = getStateFromProps({ ...this.props, value });
+
+    if (nextState.value !== this.state.value) {
+      this.setState(nextState);
+    }
 
     if (this.props.onChange) {
       this.props.onChange(e);
     }
   }
 
-  handleKeyDown = e => {
+  handleKeyDown = (e: SyntheticKeyboardEvent) => {
     const keyMap = {
       Backspace: this.handleBackspaceKeyDown,
       Enter: this.handleEnterKeyDown
@@ -115,19 +129,25 @@ export default class Autocomplete extends PureComponent {
 
   handleBackspaceKeyDown = () => {
     const input = getInput(this);
+
     if (input.selectionStart !== input.selectionEnd &&
         input.selectionEnd === input.value.length &&
         input.selectionStart !== 0) {
       const value = input.value.substr(0, input.selectionStart);
-      this.setValue(value.substr(0, value.length - 1), this.props.options);
+      const updatedValue = value.substr(0, value.length - 1);
+
+      const nextState = getStateFromProps({ ...this.props, value: updatedValue });
+      this.setState(nextState);
+
       updateInputNode(input, value);
     }
   }
 
   handleEnterKeyDown = () => {
+    const { matchingText } = this.state;
     const input = getInput(this);
 
-    setSelection(input, this.state.matchingText, this.state.matchingText);
+    setSelection(input, matchingText, matchingText);
     input.blur();
   }
 }

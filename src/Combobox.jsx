@@ -1,4 +1,5 @@
-import React, { PureComponent, PropTypes } from 'react';
+// @flow
+import React, { PureComponent } from 'react';
 import Autocomplete from './Autocomplete';
 import Dropdown from './Dropdown';
 import Autosize from './Autosize';
@@ -6,12 +7,13 @@ import renderChild from './utils/renderChild';
 
 const CARET_PADDING = 15;
 
-export default class Combobox extends PureComponent {
-  static propTypes = {
-    autosize: PropTypes.bool,
-    autocomplete: PropTypes.bool
-  };
+type Props = {
+  autosize: boolean,
+  autocomplete: boolean,
+  children: any
+};
 
+export default class Combobox extends PureComponent<void, Props, void> {
   render() {
     const { autosize, autocomplete, children, ...props } = this.props;
 
@@ -26,7 +28,7 @@ export default class Combobox extends PureComponent {
     }
   }
 
-  renderAutosizeAutocompleteDropdown(children, props) {
+  renderAutosizeAutocompleteDropdown(children: any, props: Object) {
     return (
       <Dropdown {...props}>
         {(dropdownInputProps, { textValue }, registerInput) =>
@@ -68,7 +70,7 @@ export default class Combobox extends PureComponent {
     );
   }
 
-  renderAutosizeDropdown(children, props) {
+  renderAutosizeDropdown(children: any, props: Object) {
     return (
       <Dropdown {...props}>
         {(inputProps, { textValue }, registerInput) =>
@@ -95,7 +97,7 @@ export default class Combobox extends PureComponent {
     );
   }
 
-  renderAutocompleteDropdown(children, props) {
+  renderAutocompleteDropdown(children: any, props: Object) {
     return (
       <Dropdown {...props}>
         {(dropdownInputProps, { textValue }, registerInput) =>
@@ -123,7 +125,7 @@ export default class Combobox extends PureComponent {
     );
   }
 
-  renderDropdown(children, props) {
+  renderDropdown(children: any, props: Object) {
     return (
       <Dropdown {...props}>
         {(inputProps, otherProps, registerInput) =>

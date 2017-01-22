@@ -1,8 +1,28 @@
-import { PureComponent, PropTypes } from 'react';
+// @flow
+import { PureComponent } from 'react';
 import './utils/getComputedStyle';
 import getInput from './utils/getInput';
 import registerInput from './utils/registerInput';
 import renderChild from './utils/renderChild';
+
+type DefaultProps = {
+  getSizerContainer: () => HTMLElement,
+  padding: number
+};
+
+type Props = DefaultProps & {
+  defaultWidth?: number,
+  value: string,
+  placeholder?: string,
+  children?: any,
+  style?: Object,
+  onChange?: (e: SyntheticInputEvent) => void
+};
+
+type State = {
+  value: string,
+  width: number
+};
 
 const ALLOWED_CSS_PROPS = [
   'direction',
@@ -21,11 +41,14 @@ const ALLOWED_CSS_PROPS = [
   'wordSpacing'
 ];
 
-let sizersListEl = null;
+const toDashCase = (str: string) => str.replace(/([A-Z])/g, (m, l) => '-' + l.toLowerCase());
+
+let sizersListEl: ?HTMLElement = null;
+
 const sizerContainerStyle = {
   position: 'absolute',
   visibility: 'hidden',
-  whiteSpace: 'nowrap',
+  whiteSpace: 'pre',
   width: 'auto',
   minWidth: 'initial',
   maxWidth: 'initial',
@@ -34,23 +57,47 @@ const sizerContainerStyle = {
   top: 100
 };
 
-export default class Autosize extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      width: props.defaultWidth,
-      defaultWidth: props.defaultWidth,
-      value: props.value
-    };
+function getStateFromProps(
+  props: Props, stateValue: string, initialWidth?: number,
+  input?: HTMLInputElement, sizerEl?: ?HTMLElement
+): State {
+  const widthValue = (props.value === undefined ? stateValue : props.value) || props.placeholder;
+  const inputStyle = input && window.getComputedStyle(input, null);
+
+  let width;
+
+  if (!widthValue || !sizerEl || !input) {
+    width = props.defaultWidth || initialWidth || 0;
+  } else {
+    for(const key in inputStyle) {
+      if (ALLOWED_CSS_PROPS.indexOf(key) !== -1) {
+        sizerEl.style.setProperty(toDashCase(key), inputStyle[key]);
+      }
+    }
+
+    sizerEl.innerText = widthValue;
+
+    width = Math.max(
+      sizerEl.offsetWidth + props.padding + 1,
+      props.defaultWidth || initialWidth || 0
+    );
   }
 
-  static propTypes = {
-    value: PropTypes.string,
-    defaultWidth: PropTypes.number,
-    getInputElement: PropTypes.func,
-    getSizerContainer: PropTypes.func,
-    padding: PropTypes.number
+  return {
+    width,
+    value: stateValue
   };
+}
+
+export default class Autosize extends PureComponent<DefaultProps, Props, State> {
+  state: State;
+  sizerEl: ?HTMLElement;
+  initialWidth: number;
+
+  constructor(props: Props) {
+    super(props);
+    this.state = getStateFromProps(props, props.value);
+  }
 
   static defaultProps = {
     getSizerContainer: () => document.body,
@@ -64,98 +111,68 @@ export default class Autosize extends PureComponent {
 
     if (!sizersListEl) {
       sizersListEl = document.createElement('div');
-      for(const [key, val] of Object.entries(sizerContainerStyle)) {
-        sizersListEl.style[key] = val;
+      for(const key in sizerContainerStyle) {
+        sizersListEl.style.setProperty(toDashCase(key), sizerContainerStyle[key]);
       }
-      sizersListEl.style.whiteSpace = 'pre';
       this.props.getSizerContainer().appendChild(sizersListEl);
     }
 
     this.sizerEl = document.createElement('span');
     sizersListEl.appendChild(this.sizerEl);
 
-    window.addEventListener('resize', this.handleWindownResize);
+    window.addEventListener('resize', this.handleWindowResize);
   }
 
   componentWillUnmount() {
-    sizersListEl.removeChild(this.sizerEl);
-    if (sizersListEl.childNodes.length === 0) {
-      this.props.getSizerContainer().removeChild(sizersListEl);
-      sizersListEl = null;
+    if (sizersListEl) {
+      if (this.sizerEl) {
+        sizersListEl.removeChild(this.sizerEl);
+      }
+      if (sizersListEl.childNodes.length === 0) {
+        this.props.getSizerContainer().removeChild(sizersListEl);
+        sizersListEl = null;
+      }
     }
+
     this.sizerEl = null;
 
-    window.removeEventListener('resize', this.handleWindownResize);
+    window.removeEventListener('resize', this.handleWindowResize);
   }
 
   componentDidMount() {
     if (typeof window === 'undefined') {
       return;
     }
-    let defaultWidth = this.props.defaultWidth;
 
-    if (defaultWidth === undefined) {
-      const input = getInput(this);
-      defaultWidth = input.offsetWidth;
-      this.setDefaultWidth(defaultWidth);
-    }
-
-    this.updateWidth(
-      this.props.value || this.props.placeholder,
-      defaultWidth,
-      this.props.padding
-    );
-  }
-
-  setDefaultWidth(defaultWidth) {
-    this.setState({ defaultWidth });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.value !== this.props.value) {
-      this.setState({ value: nextProps.value });
-    }
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-    if (nextState.value !== this.state.value ||
-      nextProps.padding !== this.props.padding) {
-      this.updateWidth(
-        nextState.value || nextProps.placeholder,
-        nextState.defaultWidth,
-        nextProps.padding
-      );
-    }
-  }
-
-  registerInput = input => registerInput(this, input);
-
-  updateWidth(value, defaultWidth, padding) {
     const input = getInput(this);
-    const inputStyle = window.getComputedStyle(input, null);
+    this.initialWidth = input.offsetWidth;
+    const nextState = getStateFromProps(
+      this.props, this.state.value, this.initialWidth, input, this.sizerEl
+    );
 
-    if (!value) {
-      this.setState({
-        width: defaultWidth
-      });
-      return;
+    if (nextState.width !== this.state.width) {
+      this.setState(nextState); // eslint-disable-line react/no-did-mount-set-state
     }
+  }
 
-    for(const key in inputStyle) {
-      if (ALLOWED_CSS_PROPS.indexOf(key) !== -1) {
-        this.sizerEl.style[key] = inputStyle[key];
+  componentWillReceiveProps(nextProps: Props) {
+    if (
+      nextProps.value !== this.props.value ||
+      nextProps.padding !== this.props.padding
+    ) {
+      const input = getInput(this);
+      const nextState = getStateFromProps(
+        nextProps, this.state.value,
+        this.initialWidth, input, this.sizerEl
+      );
+
+      if (nextState.width !== this.state.width) {
+        this.setState(nextState);
       }
     }
-
-    this.sizerEl.innerText = value;
-
-    this.setState({
-      width: Math.max(
-        this.sizerEl.offsetWidth + padding + 1,
-        defaultWidth
-      )
-    });
   }
+
+  registerInput = (input: HTMLInputElement) => registerInput(this, input);
 
   render() {
     const { children, style, placeholder, value } = this.props;
@@ -173,19 +190,27 @@ export default class Autosize extends PureComponent {
     return renderChild(children, inputProps, { width }, this.registerInput);
   }
 
-  handleWindownResize = () => {
-    this.updateWidth(
-      this.state.value || this.props.placeholder,
-      this.state.defaultWidth,
-      this.props.padding
+  handleWindowResize = () => {
+    const input = getInput(this);
+    const nextState = getStateFromProps(
+      this.props, this.state.value, this.initialWidth, input, this.sizerEl
     );
+
+    if (nextState.width !== this.state.width) {
+      this.setState(nextState);
+    }
   }
 
-  handleChange = e => {
+  handleChange = (e: SyntheticInputEvent) => {
     const value = e.target.value;
 
-    if (this.props.value === undefined) {
-      this.setState({ value });
+    const input = getInput(this);
+    const nextState = getStateFromProps(
+      this.props, value, this.initialWidth, input, this.sizerEl
+    );
+
+    if (nextState.width !== this.state.width) {
+      this.setState(nextState);
     }
 
     if (this.props.onChange) {
