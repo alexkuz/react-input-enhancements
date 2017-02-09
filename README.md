@@ -262,3 +262,4 @@ See [demo](http://alexkuz.github.io/react-input-enhancements/) for code examples
 
 * [react-autocomplete](https://github.com/rackt/react-autocomplete) - Dropdown with autocompletion by Ryan Florence (that led me to create this library)
 * [react-maskedinput](https://github.com/insin/react-maskedinput) - More advanced masked input by Jonny Buchanan
+* [react-autosuggest](https://github.com/moroshko/react-autosuggest) - Beautifully crafted input with dropdown suggestions
