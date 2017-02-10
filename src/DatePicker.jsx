@@ -14,14 +14,32 @@ const VALIDATORS = {
 };
 
 function getStateFromProps(value, props) {
-  const date = moment(value === null ? undefined : value, value ? props.pattern : '', props.locale);
+  const date = value ? moment(value, props.pattern, props.locale) : null;
 
   return {
-    date: date.isValid() ? date : moment(undefined, '', props.locale),
-    value,
+    date,
+    value: value || '',
     pattern: props.pattern.replace(/ddd/g, '\\d\\d\\d').replace(/[DMY]/g, '0')
   };
 }
+
+function handleRenderDatepicker(styling, date, isActive, popupShown, onSelect, locale) {
+  if (!popupShown) {
+    return null;
+  }
+
+  return (
+    <div {...styling(['inputEnhancementsPopup', 'inputEnhancementsDatePickerPopup'])}>
+      <DayPicker
+        theme={styling(null)}
+        selectedDays={day => date && DateUtils.isSameDay(date.toDate(), day)}
+        onDayClick={(e, day, { selected }) => onSelect(selected ? null : moment(day, null, locale))}
+        locale={locale}
+        localeUtils={MomentLocaleUtils}
+      />
+    </div>
+  )
+};
 
 export default class DatePicker extends PureComponent {
   constructor(props) {
@@ -41,18 +59,7 @@ export default class DatePicker extends PureComponent {
   static defaultProps = {
     pattern: 'ddd DD/MM/YYYY',
     placeholder: moment().format('ddd DD/MM/YYYY'),
-    onRenderCalendar: (styling, date, isActive, popupShown, onSelect, locale) =>
-      popupShown && (
-        <div {...styling(['inputEnhancementsPopup', 'inputEnhancementsDatePickerPopup'])}>
-          <DayPicker
-            theme={styling(null)}
-            selectedDays={day => DateUtils.isSameDay(date.toDate(), day)}
-            onDayClick={(e, day) => onSelect(moment(day, null, locale))}
-            locale={locale}
-            localeUtils={MomentLocaleUtils}
-          />
-        </div>
-      ),
+    onRenderCalendar: handleRenderDatepicker,
     locale: 'en'
   };
 
@@ -160,14 +167,14 @@ export default class DatePicker extends PureComponent {
   }
 
   handleSelect = date => {
-    const localeMoment = moment(date);
-    localeMoment.locale(this.props.locale);
-    const value = localeMoment.format(this.props.pattern);
+    const value = date ? moment(date).locale(this.props.locale).format(this.props.pattern) : null;
+
     this.setState({
       popupShown: false,
       isActive: false,
       ...getStateFromProps(value, this.props)
     });
+
     this.props.onChange && this.props.onChange(date);
   }
 

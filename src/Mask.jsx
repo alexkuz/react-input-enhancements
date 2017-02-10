@@ -28,7 +28,6 @@ export default class Mask extends PureComponent {
   constructor(props) {
     super(props);
 
-
     const value = props.value || '';
     const [state] = getStateFromProps(value, props);
     this.state = {
