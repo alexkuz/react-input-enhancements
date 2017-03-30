@@ -160,7 +160,7 @@ export default class Dropdown extends PureComponent {
   }
 
   render() {
-    const { dropdownProps, children } = this.props;
+    const { dropdownProps, onRenderCaret, children } = this.props;
 
     const value = this.state.value === null ? '' : this.state.value;
 
@@ -178,6 +178,7 @@ export default class Dropdown extends PureComponent {
         popupShown={this.state.listShown}
         isActive={this.state.isActive}
         registerInput={this.registerInput}
+        onRenderCaret={onRenderCaret}
       >
         {children}
       </InputPopup>
