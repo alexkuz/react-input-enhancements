@@ -1,6 +1,6 @@
 {
   "name": "react-input-enhancements",
-  "version": "0.5.4-beta3",
+  "version": "0.5.4",
   "description": "Set of enhancements for input control (bootstrap-ready)",
   "scripts": {
     "test:jsdom": "jest --config __tests__/jest.jsdom.config.json",
