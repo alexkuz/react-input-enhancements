@@ -1,4 +1,5 @@
-import React, { PureComponent, PropTypes } from 'react';
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import renderChild from './utils/renderChild';
 
 export default class InputPopup extends PureComponent {

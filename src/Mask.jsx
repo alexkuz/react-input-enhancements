@@ -1,4 +1,5 @@
-import { PureComponent, PropTypes } from 'react';
+import { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import applyMaskToString from './applyMaskToString';
 import getInput from './utils/getInput';
 import registerInput from './utils/registerInput';

@@ -1,4 +1,4 @@
-import { PropTypes } from 'react';
+import PropTypes from 'prop-types';
 const { shape, oneOfType, string, any } = PropTypes;
 
 export const ITEM = shape({
