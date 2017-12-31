@@ -30,7 +30,7 @@ export default class Combobox extends PureComponent {
   renderAutosizeAutocompleteDropdown(children, props) {
     return (
       <Dropdown {...props}>
-        {(dropdownInputProps, { textValue }, registerInput) =>
+        {(dropdownInputProps, { textValue }, registerInput) => (
           <Autocomplete
             value={textValue}
             onChange={dropdownInputProps.onChange}
@@ -39,7 +39,7 @@ export default class Combobox extends PureComponent {
             registerInput={registerInput}
             getInputComponent={props.getInputComponent}
           >
-            {(inputProps, { matchingText }, registerInput) =>
+            {(inputProps, { matchingText }, registerInput) => (
               <Autosize
                 value={inputProps.value}
                 onChange={inputProps.onChange}
@@ -49,22 +49,22 @@ export default class Combobox extends PureComponent {
                 getInputComponent={props.getInputComponent}
                 padding={CARET_PADDING}
               >
-                  {(autosizeInputProps, { width }, registerInput) =>
-                    renderChild(
-                      children,
-                      {
-                        ...dropdownInputProps,
-                        ...inputProps,
-                        ...autosizeInputProps
-                      },
-                      { matchingText, width },
-                      registerInput
-                    )
-                  }
+                {(autosizeInputProps, { width }, registerInput) =>
+                  renderChild(
+                    children,
+                    {
+                      ...dropdownInputProps,
+                      ...inputProps,
+                      ...autosizeInputProps
+                    },
+                    { matchingText, width },
+                    registerInput
+                  )
+                }
               </Autosize>
-            }
+            )}
           </Autocomplete>
-        }
+        )}
       </Dropdown>
     );
   }
@@ -72,7 +72,7 @@ export default class Combobox extends PureComponent {
   renderAutosizeDropdown(children, props) {
     return (
       <Dropdown {...props}>
-        {(inputProps, { textValue }, registerInput) =>
+        {(inputProps, { textValue }, registerInput) => (
           <Autosize
             value={textValue}
             onChange={inputProps.onChange}
@@ -82,16 +82,16 @@ export default class Combobox extends PureComponent {
             getInputComponent={props.getInputComponent}
             padding={CARET_PADDING}
           >
-              {(autosizeInputProps, { width }, registerInput) =>
-                renderChild(
-                  children,
-                  { ...inputProps, ...autosizeInputProps },
-                  { width },
-                  registerInput
-                )
-              }
+            {(autosizeInputProps, { width }, registerInput) =>
+              renderChild(
+                children,
+                { ...inputProps, ...autosizeInputProps },
+                { width },
+                registerInput
+              )
+            }
           </Autosize>
-        }
+        )}
       </Dropdown>
     );
   }
@@ -99,7 +99,7 @@ export default class Combobox extends PureComponent {
   renderAutocompleteDropdown(children, props) {
     return (
       <Dropdown {...props}>
-        {(dropdownInputProps, { textValue }, registerInput) =>
+        {(dropdownInputProps, { textValue }, registerInput) => (
           <Autocomplete
             value={textValue}
             onChange={dropdownInputProps.onChange}
@@ -110,7 +110,8 @@ export default class Combobox extends PureComponent {
           >
             {(inputProps, { matchingText }, registerInput) =>
               renderChild(
-                children, {
+                children,
+                {
                   ...dropdownInputProps,
                   ...inputProps
                 },
@@ -119,7 +120,7 @@ export default class Combobox extends PureComponent {
               )
             }
           </Autocomplete>
-        }
+        )}
       </Dropdown>
     );
   }
@@ -128,12 +129,7 @@ export default class Combobox extends PureComponent {
     return (
       <Dropdown {...props}>
         {(inputProps, otherProps, registerInput) =>
-          renderChild(
-            children,
-            inputProps,
-            otherProps,
-            registerInput
-          )
+          renderChild(children, inputProps, otherProps, registerInput)
         }
       </Dropdown>
     );

@@ -11,10 +11,10 @@ export default function getInput(cmp) {
   }
 
   // eslint-disable-next-line
-  deprecated('Automatic input resolving is deprecated: please provide input instance via `registerInput`');
+  deprecated(
+    'Automatic input resolving is deprecated: please provide input instance via `registerInput`'
+  );
 
   const el = ReactDOM.findDOMNode(cmp);
-  return el.tagName === 'INPUT' ?
-    el:
-    el.getElementsByTagName('INPUT')[0];
+  return el.tagName === 'INPUT' ? el : el.getElementsByTagName('INPUT')[0];
 }

@@ -228,7 +228,8 @@ If `<input>` element wasn't provided, component tries to find node automatically
   * `ddd` - day of week *(not editable)*
 * **`placeholder`** *string* - If set, it is shown when `unmaskedValue` is empty
 * **`locale`** *string* - Date locale
-* **`onRenderCalendar`** *function(className, style, date, isActive, popupShown, onSelect, locale)* - Returns calendar component shown in popup ([react-date-picker](https://github.com/zippyui/react-date-picker) by default)
+* **`todayButtonText`** *string* - Text for 'Go to Today' button label
+* **`onRenderCalendar`** *function({ styling, style, date, isActive, popupShown, onSelect, locale, todayButtonText })* - Returns calendar component shown in popup ([react-day-picker-themeable](https://github.com/alexkuz/react-day-picker-themeable) by default)
 * **`onChange`** *function(date)* - Fires when date is selected, providing [moment.js](http://momentjs.com/) object
 * **`getInputElement`** *function* - Optional callback that provides `<input>` DOM element
 * **`registerInput`** *function* - Registers `<input>` DOM element

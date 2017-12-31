@@ -65,7 +65,7 @@ export default class Autosize extends PureComponent {
 
     if (!sizersListEl) {
       sizersListEl = document.createElement('div');
-      for(const [key, val] of Object.entries(sizerContainerStyle)) {
+      for (const [key, val] of Object.entries(sizerContainerStyle)) {
         sizersListEl.style[key] = val;
       }
       sizersListEl.style.whiteSpace = 'pre';
@@ -119,8 +119,10 @@ export default class Autosize extends PureComponent {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if (nextState.value !== this.state.value ||
-      nextProps.padding !== this.props.padding) {
+    if (
+      nextState.value !== this.state.value ||
+      nextProps.padding !== this.props.padding
+    ) {
       this.updateWidth(
         nextState.value || nextProps.placeholder,
         nextState.defaultWidth,
@@ -142,7 +144,7 @@ export default class Autosize extends PureComponent {
       return;
     }
 
-    for(const key in inputStyle) {
+    for (const key in inputStyle) {
       if (ALLOWED_CSS_PROPS.indexOf(key) !== -1) {
         this.sizerEl.style[key] = inputStyle[key];
       }
@@ -151,10 +153,7 @@ export default class Autosize extends PureComponent {
     this.sizerEl.innerText = value;
 
     this.setState({
-      width: Math.max(
-        this.sizerEl.offsetWidth + padding + 1,
-        defaultWidth
-      )
+      width: Math.max(this.sizerEl.offsetWidth + padding + 1, defaultWidth)
     });
   }
 
@@ -169,7 +168,7 @@ export default class Autosize extends PureComponent {
       placeholder,
       value,
       onChange: this.handleChange
-    }
+    };
 
     return renderChild(children, inputProps, { width }, this.registerInput);
   }
@@ -180,7 +179,7 @@ export default class Autosize extends PureComponent {
       this.state.defaultWidth,
       this.props.padding
     );
-  }
+  };
 
   handleChange = e => {
     const value = e.target.value;
@@ -192,5 +191,5 @@ export default class Autosize extends PureComponent {
     if (this.props.onChange) {
       this.props.onChange(e);
     }
-  }
+  };
 }

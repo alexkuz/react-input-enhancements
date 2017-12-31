@@ -14,9 +14,9 @@ function getStateFromProps(value, props) {
   } else if (validatedValue) {
     processedValue.isValid = false;
   }
-  const state = processedValue.isValid ?
-    { value: processedValue.result, lastIndex: processedValue.lastIndex } :
-    {};
+  const state = processedValue.isValid
+    ? { value: processedValue.result, lastIndex: processedValue.lastIndex }
+    : {};
 
   if (!processedValue.unmaskedValue && props.placeholder) {
     state.value = '';
@@ -28,7 +28,6 @@ function getStateFromProps(value, props) {
 export default class Mask extends PureComponent {
   constructor(props) {
     super(props);
-
 
     const value = props.value || '';
     const [state] = getStateFromProps(value, props);
@@ -53,9 +52,11 @@ export default class Mask extends PureComponent {
   };
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.pattern !== nextProps.pattern ||
+    if (
+      this.props.pattern !== nextProps.pattern ||
       this.props.value !== nextProps.value ||
-      this.props.emptyChar !== nextProps.emptyChar) {
+      this.props.emptyChar !== nextProps.emptyChar
+    ) {
       this.setValue(nextProps.value, nextProps);
     }
   }
@@ -64,10 +65,7 @@ export default class Mask extends PureComponent {
     const [state, processedValue] = getStateFromProps(value, props);
 
     if (processedValue.isValid) {
-      this.setState(
-        state,
-        () => this.setSelectionRange(this.state.lastIndex)
-      );
+      this.setState(state, () => this.setSelectionRange(this.state.lastIndex));
     } else {
       this.setSelectionRange(this.state.lastIndex);
     }
@@ -90,7 +88,8 @@ export default class Mask extends PureComponent {
     const inputProps = {
       value,
       placeholder,
-      onInput: this.handleInput
+      onInput: this.handleInput,
+      onChange: () => {}
     };
 
     return renderChild(children, inputProps, { value }, this.registerInput);
@@ -117,5 +116,5 @@ export default class Mask extends PureComponent {
     if (this.props.onChange) {
       this.props.onChange(e);
     }
-  }
+  };
 }

@@ -1,6 +1,11 @@
 import React, { Children } from 'react';
 
-export default function renderChild(children, inputProps, otherProps, registerInput) {
+export default function renderChild(
+  children,
+  inputProps,
+  otherProps,
+  registerInput
+) {
   if (typeof children === 'function') {
     return children(inputProps, otherProps, registerInput);
   } else {
@@ -18,7 +23,7 @@ export default function renderChild(children, inputProps, otherProps, registerIn
           ...(inputProps.style || {}),
           ...(input.props.style || {})
         }
-      }
+      };
     }
 
     return React.cloneElement(input, props);

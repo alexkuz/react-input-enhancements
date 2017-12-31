@@ -26,50 +26,47 @@ import Prefixer from 'inline-style-prefixer';
 const prefixerInstance = new Prefixer(window.navigator);
 const prefixer = prefixerInstance.prefix.bind(prefixerInstance);
 
-const ValueInput1 = pure(({ value, onChange }) =>
-  <div className='inline-input'>
+const ValueInput1 = pure(({ value, onChange }) => (
+  <div className="inline-input">
     <InputGroup>
-      <Autosize
-        value={value}
-        onChange={e => onChange(e.target.value)}
-      >
-        {(inputProps, otherProps, registerInput) =>
+      <Autosize value={value} onChange={e => onChange(e.target.value)}>
+        {(inputProps, otherProps, registerInput) => (
           <FormControl
-            type='text'
+            type="text"
             ref={c => registerInput(ReactDOM.findDOMNode(c))}
             {...inputProps}
           />
-        }
+        )}
       </Autosize>
       <InputGroup.Addon>
-        <Glyphicon glyph='star' />
+        <Glyphicon glyph="star" />
       </InputGroup.Addon>
     </InputGroup>
   </div>
-);
+));
 
-const ValueInput2 = pure(({ value, onChange }) =>
-  <div className='inline-input'>
+const ValueInput2 = pure(({ value, onChange }) => (
+  <div className="inline-input">
     <InputGroup>
       <Autosize
         value={value}
         defaultWidth={100}
         onChange={e => onChange(e.target.value)}
       >
-        {(inputProps, otherProps, registerInput) =>
+        {(inputProps, otherProps, registerInput) => (
           <FormControl
-            type='text'
+            type="text"
             ref={c => registerInput(ReactDOM.findDOMNode(c))}
             {...inputProps}
           />
-        }
+        )}
       </Autosize>
       <InputGroup.Addon>
-        <Glyphicon glyph='asterisk' />
+        <Glyphicon glyph="asterisk" />
       </InputGroup.Addon>
     </InputGroup>
   </div>
-);
+));
 
 const code1and2 = `
   This text has no default width:{' '}
@@ -113,7 +110,7 @@ const code1and2 = `
   </div>
 `;
 
-const ValueInput3 = pure(({ value, onChange }) =>
+const ValueInput3 = pure(({ value, onChange }) => (
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       Autocomplete:
@@ -124,17 +121,17 @@ const ValueInput3 = pure(({ value, onChange }) =>
         options={countries}
         onChange={e => onChange(e.target.value)}
       >
-        {(inputProps, otherProps, registerInput) =>
+        {(inputProps, otherProps, registerInput) => (
           <FormControl
             ref={c => registerInput(ReactDOM.findDOMNode(c))}
-            type='text'
+            type="text"
             {...inputProps}
           />
-        }
+        )}
       </Autocomplete>
     </Col>
   </FormGroup>
-);
+));
 
 const code3 = `
   <FormGroup>
@@ -159,7 +156,7 @@ const code3 = `
   </FormGroup>
 `;
 
-const ValueInput4 = pure(({ value, onChange }) =>
+const ValueInput4 = pure(({ value, onChange }) => (
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       Combobox (Dropdown + Autocomplete):
@@ -172,18 +169,18 @@ const ValueInput4 = pure(({ value, onChange }) =>
         onSelect={onChange}
         autocomplete
       >
-        {(inputProps, otherProps, registerInput) =>
+        {(inputProps, otherProps, registerInput) => (
           <FormControl
             {...inputProps}
             ref={c => registerInput(ReactDOM.findDOMNode(c))}
-            type='text'
-            placeholder='No Country'
+            type="text"
+            placeholder="No Country"
           />
-        }
+        )}
       </Combobox>
     </Col>
   </FormGroup>
-);
+));
 
 const code4 = `
   <FormGroup>
@@ -211,7 +208,7 @@ const code4 = `
   </FormGroup>
 `;
 
-const ValueInput5 = pure(({ value, onChange }) =>
+const ValueInput5 = pure(({ value, onChange }) => (
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       Combobox (Dropdown + Autosize):
@@ -223,18 +220,18 @@ const ValueInput5 = pure(({ value, onChange }) =>
         onSelect={onChange}
         autosize
       >
-        {(inputProps, otherProps, registerInput) =>
+        {(inputProps, otherProps, registerInput) => (
           <FormControl
             {...inputProps}
             ref={c => registerInput(ReactDOM.findDOMNode(c))}
-            type='text'
-            placeholder='No Country'
+            type="text"
+            placeholder="No Country"
           />
-        }
+        )}
       </Combobox>
     </Col>
   </FormGroup>
-);
+));
 
 const code5 = `
   <FormGroup>
@@ -260,7 +257,7 @@ const code5 = `
   </FormGroup>
 `;
 
-const ValueInput6 = pure(({ value, onChange, addonAfter, options }) =>
+const ValueInput6 = pure(({ value, onChange, addonAfter, options }) => (
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       Combobox (Dropdown + Autosize + Autocomplete, defaultWidth=100):
@@ -275,22 +272,20 @@ const ValueInput6 = pure(({ value, onChange, addonAfter, options }) =>
           autosize
           autocomplete
         >
-          {(inputProps, otherProps, registerInput) =>
+          {(inputProps, otherProps, registerInput) => (
             <FormControl
               {...inputProps}
               ref={c => registerInput(ReactDOM.findDOMNode(c))}
-              type='text'
-              placeholder='No Country'
+              type="text"
+              placeholder="No Country"
             />
-          }
+          )}
         </Combobox>
-        <InputGroup.Addon>
-          {addonAfter}
-        </InputGroup.Addon>
+        <InputGroup.Addon>{addonAfter}</InputGroup.Addon>
       </InputGroup>
     </Col>
   </FormGroup>
-);
+));
 
 const code6 = `
   <FormGroup>
@@ -324,7 +319,7 @@ const code6 = `
   </FormGroup>
 `;
 
-const ValueInput7 = pure(({ value, onChange, onUnmaskedValueChange }) =>
+const ValueInput7 = pure(({ value, onChange, onUnmaskedValueChange }) => (
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       Mask + Autosize (credit card):
@@ -338,36 +333,36 @@ const ValueInput7 = pure(({ value, onChange, onUnmaskedValueChange }) =>
         })}
       >
         <Mask
-          pattern='0000-0000-0000-0000'
-          placeholder='1234-5678-1234-5678'
+          pattern="0000-0000-0000-0000"
+          placeholder="1234-5678-1234-5678"
           value={value}
           onChange={e => onChange(e.target.value)}
           onUnmaskedValueChange={onUnmaskedValueChange}
         >
-          {(inputProps, otherProps, registerInput) =>
+          {(inputProps, otherProps, registerInput) => (
             <Autosize
               defaultWidth={100}
               {...inputProps}
               registerInput={registerInput}
             >
-              {(autosizeInputProps, otherProps, registerInput) =>
+              {(autosizeInputProps, otherProps, registerInput) => (
                 <FormControl
                   {...inputProps}
                   {...autosizeInputProps}
-                  type='text'
+                  type="text"
                   ref={c => registerInput(ReactDOM.findDOMNode(c))}
                 />
-              }
+              )}
             </Autosize>
-          }
+          )}
         </Mask>
         <InputGroup.Addon style={{ display: 'block' }}>
-          <Glyphicon glyph='credit-card' />
+          <Glyphicon glyph="credit-card" />
         </InputGroup.Addon>
       </InputGroup>
     </Col>
   </FormGroup>
-);
+));
 
 const code7 = `
   <FormGroup>
@@ -409,7 +404,7 @@ const code7 = `
   </FormGroup>
 `;
 
-const ValueInput8 = pure(({ value, onChange, onUnmaskedValueChange }) =>
+const ValueInput8 = pure(({ value, onChange, onUnmaskedValueChange }) => (
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       Mask + Autosize (phone number):
@@ -423,36 +418,36 @@ const ValueInput8 = pure(({ value, onChange, onUnmaskedValueChange }) =>
         })}
       >
         <Mask
-          pattern='+\ 7\ (000) 000-00-00'
-          placeholder='+ 7 (XXX) XXX-XX-XX'
+          pattern="+\ 7\ (000) 000-00-00"
+          placeholder="+ 7 (XXX) XXX-XX-XX"
           value={value}
           onChange={e => onChange(e.target.value)}
           onUnmaskedValueChange={onUnmaskedValueChange}
         >
-          {(inputProps, otherProps, registerInput) =>
+          {(inputProps, otherProps, registerInput) => (
             <Autosize
               defaultWidth={100}
               {...inputProps}
               registerInput={registerInput}
             >
-              {(autosizeInputProps, otherProps, registerInput) =>
+              {(autosizeInputProps, otherProps, registerInput) => (
                 <FormControl
                   {...inputProps}
                   {...autosizeInputProps}
-                  type='text'
+                  type="text"
                   ref={c => registerInput(ReactDOM.findDOMNode(c))}
                 />
-              }
+              )}
             </Autosize>
-          }
+          )}
         </Mask>
         <InputGroup.Addon style={{ display: 'block' }}>
-          <Glyphicon glyph='phone' />
+          <Glyphicon glyph="phone" />
         </InputGroup.Addon>
       </InputGroup>
     </Col>
   </FormGroup>
-);
+));
 
 const code8 = `
   <FormGroup>
@@ -464,7 +459,7 @@ const code8 = `
         style={{ display: 'inline-flex', alignItems: 'baseline', fontFamily: 'monospace' }}
       >
         <Mask
-          pattern='+\ 7\ (000) 000-00-00'
+          pattern='+\\ 7\\ (000) 000-00-00'
           placeholder='+ 7 (XXX) XXX-XX-XX'
           value={value}
           onChange={e => onChange(e.target.value)}
@@ -494,7 +489,7 @@ const code8 = `
   </FormGroup>
 `;
 
-const ValueInput9 = pure(({ value, onChange }) =>
+const ValueInput9 = pure(({ value, onChange }) => (
   <FormGroup>
     <Col componentClass={ControlLabel} xs={3}>
       DatePicker:
@@ -503,22 +498,24 @@ const ValueInput9 = pure(({ value, onChange }) =>
       <DatePicker
         value={moment(value || undefined).format('ddd DD/MM/YYYY')}
         onChange={onChange}
-        onValuePreUpdate={v => parseInt(v, 10) > 1e6 ?
-          moment(parseInt(v, 10)).format('ddd DD/MM/YYYY') : v
+        onValuePreUpdate={v =>
+          parseInt(v, 10) > 1e6
+            ? moment(parseInt(v, 10)).format('ddd DD/MM/YYYY')
+            : v
         }
       >
-        {(inputProps, otherProps, registerInput) =>
+        {(inputProps, otherProps, registerInput) => (
           <FormControl
             {...inputProps}
             style={{ ...inputProps.style, fontFamily: 'monospace' }}
             ref={c => registerInput(ReactDOM.findDOMNode(c))}
-            type='text'
+            type="text"
           />
-        }
+        )}
       </DatePicker>
     </Col>
   </FormGroup>
-);
+));
 
 const code9 = `
   <FormGroup>
@@ -547,7 +544,7 @@ const code9 = `
   </FormGroup>
 `;
 
-let frDatePicker = undefined;
+let frDatePicker;
 
 const ValueInput10 = pure(({ value, onChange }) => {
   const frCurrent = moment(value || undefined);
@@ -564,15 +561,16 @@ const ValueInput10 = pure(({ value, onChange }) => {
         <DatePicker
           value={frCurrent.format('YYYY.MM.DD ddd')}
           placeholder={frNow.format('YYYY.MM.DD ddd')}
-          pattern='YYYY.MM.DD ddd'
+          pattern="YYYY.MM.DD ddd"
           onChange={onChange}
-          locale='fr'
+          locale="fr"
           getInputElement={() => frDatePicker}
+          todayButtonText="aller à aujourd’hui"
         >
           <FormControl
             style={{ fontFamily: 'monospace' }}
-            ref={c => frDatePicker = ReactDOM.findDOMNode(c)}
-            type='text'
+            ref={c => (frDatePicker = ReactDOM.findDOMNode(c))}
+            type="text"
           />
         </DatePicker>
       </Col>
@@ -600,6 +598,7 @@ const code10 = `
         onChange={onChange}
         locale='fr'
         getInputElement={() => frDatePicker}
+        todayButtonText='aller à aujourd’hui'
       >
         <FormControl
           style={{ fontFamily: 'monospace' }}
@@ -654,18 +653,21 @@ export default class DemoApp extends React.Component {
   alterCountries = () => {
     this.lastTime = new Date();
     this.setState({
-      countries: countries.map(country => country && ({
-        ...country,
-        text: country.text && country.text + ' ' + Math.random().toFixed(2)
-      }))
+      countries: countries.map(
+        country =>
+          country && {
+            ...country,
+            text: country.text && country.text + ' ' + Math.random().toFixed(2)
+          }
+      )
     });
   };
 
   countDown = () => {
     this.setState({
-      countDown: (this.state.countDown - 1) || 5
+      countDown: this.state.countDown - 1 || 5
     });
-  }
+  };
 
   toggleAsyncAlterCountries = () => {
     const asyncAlterCountries = !this.state.asyncAlterCountries;
@@ -677,7 +679,7 @@ export default class DemoApp extends React.Component {
       this.alterCountriesTimeout = setInterval(this.alterCountries, 5000);
       this.countDownTimeout = setInterval(this.countDown, 1000);
     }
-  }
+  };
 
   render() {
     return (
@@ -688,78 +690,103 @@ export default class DemoApp extends React.Component {
         </PageHeader>
         <h5>{process.env.npm_package_description}</h5>
         <div style={styles.content}>
-          <form className='form-horizontal'>
-            <div className='form-group'>
-              <div className='control-label col-xs-3'>Autosize (inline):</div>
-              <div className='col-xs-6'>
+          <form className="form-horizontal">
+            <div className="form-group">
+              <div className="control-label col-xs-3">Autosize (inline):</div>
+              <div className="col-xs-6">
                 This text has no default width:{' '}
-                <ValueInput1 value={this.state.value1}
-                             onChange={this.handleValue1Change} />,
-                and this has 100px default width:{' '}
-                <ValueInput2 value={this.state.value2}
-                             onChange={this.handleValue2Change} />
+                <ValueInput1
+                  value={this.state.value1}
+                  onChange={this.handleValue1Change}
+                />, and this has 100px default width:{' '}
+                <ValueInput2
+                  value={this.state.value2}
+                  onChange={this.handleValue2Change}
+                />
               </div>
             </div>
             {this.renderCode(code1and2, 'code1and2open')}
-            <ValueInput3 value={this.state.value3}
-                         onChange={this.handleValue3Change} />
+            <ValueInput3
+              value={this.state.value3}
+              onChange={this.handleValue3Change}
+            />
             {this.renderCode(code3, 'code3open')}
-            <ValueInput4 value={this.state.value4}
-                         onChange={this.handleValue4Change} />
+            <ValueInput4
+              value={this.state.value4}
+              onChange={this.handleValue4Change}
+            />
             {this.renderCode(code4, 'code4open')}
-            <ValueInput5 value={this.state.value5}
-                         onChange={this.handleValue5Change} />
+            <ValueInput5
+              value={this.state.value5}
+              onChange={this.handleValue5Change}
+            />
             {this.renderCode(code5, 'code5open')}
-            <ValueInput6 value={this.state.value6}
-                         onChange={this.handleValue6Change}
-                         options={this.state.countries}
-                         addonAfter={
-                          <div style={{ display: 'flex' }}>
-                            <Button onClick={() => this.setState({ value6: '' })}>
-                              Reset
-                            </Button>
-                            <Button onClick={() => this.setState({ value6: 'value--Andorra' })}
-                                    style={{ marginLeft: '2rem' }}>
-                              Set Andorra
-                            </Button>
-                            <Button onClick={this.alterCountries}
-                                    style={{ marginLeft: '2rem' }}>
-                              Alter Options
-                            </Button>
-                            <Button onClick={this.toggleAsyncAlterCountries}
-                                    style={{ marginLeft: '2rem' }}>
-                              {this.state.asyncAlterCountries ?
-                                `Async Alter On (${this.state.countDown})` :
-                                'Async Alter Off'}
-                            </Button>
-                          </div>
-                         } />
+            <ValueInput6
+              value={this.state.value6}
+              onChange={this.handleValue6Change}
+              options={this.state.countries}
+              addonAfter={
+                <div style={{ display: 'flex' }}>
+                  <Button onClick={() => this.setState({ value6: '' })}>
+                    Reset
+                  </Button>
+                  <Button
+                    onClick={() => this.setState({ value6: 'value--Andorra' })}
+                    style={{ marginLeft: '2rem' }}
+                  >
+                    Set Andorra
+                  </Button>
+                  <Button
+                    onClick={this.alterCountries}
+                    style={{ marginLeft: '2rem' }}
+                  >
+                    Alter Options
+                  </Button>
+                  <Button
+                    onClick={this.toggleAsyncAlterCountries}
+                    style={{ marginLeft: '2rem' }}
+                  >
+                    {this.state.asyncAlterCountries
+                      ? `Async Alter On (${this.state.countDown})`
+                      : 'Async Alter Off'}
+                  </Button>
+                </div>
+              }
+            />
             {this.renderCode(code6, 'code6open')}
-            <ValueInput7 value={this.state.value7}
-                         onChange={this.handleValue7Change}
-                         onUnmaskedValueChange={
-                          value => this.setState({ unmaskedValue7: value })
-                         } />
+            <ValueInput7
+              value={this.state.value7}
+              onChange={this.handleValue7Change}
+              onUnmaskedValueChange={value =>
+                this.setState({ unmaskedValue7: value })
+              }
+            />
             <FormControl.Static
-              label='Unmasked value:'
+              label="Unmasked value:"
               value={this.state.unmaskedValue7}
             />
             {this.renderCode(code7, 'code7open')}
-            <ValueInput8 value={this.state.value8}
-                         onChange={this.handleValue8Change}
-                         onUnmaskedValueChange={
-                          value => this.setState({ unmaskedValue8: value })
-                         } />
+            <ValueInput8
+              value={this.state.value8}
+              onChange={this.handleValue8Change}
+              onUnmaskedValueChange={value =>
+                this.setState({ unmaskedValue8: value })
+              }
+            />
             <FormControl.Static
-              label='Unmasked value:'
+              label="Unmasked value:"
               value={this.state.unmaskedValue8}
             />
             {this.renderCode(code8, 'code8open')}
-            <ValueInput9 value={this.state.value9}
-                         onChange={this.handleValue9Change} />
+            <ValueInput9
+              value={this.state.value9}
+              onChange={this.handleValue9Change}
+            />
             {this.renderCode(code9, 'code9open')}
-            <ValueInput10 value={this.state.value10}
-                          onChange={this.handleValue10Change} />
+            <ValueInput10
+              value={this.state.value10}
+              onChange={this.handleValue10Change}
+            />
             {this.renderCode(code10, 'code10open')}
           </form>
         </div>
@@ -769,10 +796,14 @@ export default class DemoApp extends React.Component {
 
   renderCode(code, key) {
     return (
-      <div className='form-group'>
-        <div className='col-xs-6 col-xs-offset-3'>
-          <a role='button'
-             onClick={() => this.setState({ [key]: !this.state[key] })}>Show code</a>
+      <div className="form-group">
+        <div className="col-xs-6 col-xs-offset-3">
+          <a
+            role="button"
+            onClick={() => this.setState({ [key]: !this.state[key] })}
+          >
+            Show code
+          </a>
           <Collapse in={this.state[key]}>
             <pre>{code.replace(/^\n+/, '')}</pre>
           </Collapse>
@@ -781,27 +812,26 @@ export default class DemoApp extends React.Component {
     );
   }
 
-  handleValue1Change = value => this.setState({ value1: value })
+  handleValue1Change = value => this.setState({ value1: value });
 
-  handleValue2Change = value => this.setState({ value2: value })
+  handleValue2Change = value => this.setState({ value2: value });
 
-  handleValue3Change = value => this.setState({ value3: value })
+  handleValue3Change = value => this.setState({ value3: value });
 
-  handleValue4Change = value => this.setState({ value4: value })
+  handleValue4Change = value => this.setState({ value4: value });
 
-  handleValue5Change = value => this.setState({ value5: value })
+  handleValue5Change = value => this.setState({ value5: value });
 
-  handleValue6Change = value => this.setState({ value6: value })
+  handleValue6Change = value => this.setState({ value6: value });
 
-  handleValue7Change = value => this.setState({ value7: value })
+  handleValue7Change = value => this.setState({ value7: value });
 
-  handleValue8Change = value => this.setState({ value8: value })
+  handleValue8Change = value => this.setState({ value8: value });
 
-  handleValue9Change = value => this.setState({ value9: value })
+  handleValue9Change = value => this.setState({ value9: value });
 
-  handleValue10Change = value => this.setState({ value10: value })
+  handleValue10Change = value => this.setState({ value10: value });
 }
-
 
 const styles = {
   wrapper: {
@@ -809,8 +839,7 @@ const styles = {
     width: '80%',
     margin: '0 auto'
   },
-  header: {
-  },
+  header: {},
   content: {
     paddingTop: '20px',
     paddingBottom: '300px'

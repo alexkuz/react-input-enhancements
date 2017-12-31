@@ -7,7 +7,4 @@ export const ITEM = shape({
   value: any
 });
 
-export const ITEM_OR_STRING = oneOfType([
-  ITEM,
-  string
-]);
+export const ITEM_OR_STRING = oneOfType([ITEM, string]);

@@ -6,6 +6,5 @@ export default function getOptionText(opt) {
     value => typeof value === 'string' || typeof value === 'number'
   );
 
-  return typeof text === 'number' ?
-    text.toString() : (text || '');
+  return typeof text === 'number' ? text.toString() : text || '';
 }

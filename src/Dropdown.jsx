@@ -17,9 +17,9 @@ import registerInput from './utils/registerInput';
 function getOptionKey(opt, idx) {
   const value = getOptionValue(opt);
 
-  return opt === null ?
-    `option-separator-${idx}` :
-    `option-${typeof value === 'string' ? value : (getOptionText(opt) + idx)}`;
+  return opt === null
+    ? `option-separator-${idx}`
+    : `option-${typeof value === 'string' ? value : getOptionText(opt) + idx}`;
 }
 
 function getSiblingIndex(idx, options, next) {
@@ -51,8 +51,15 @@ function getStateFromProps(props) {
   const value = props.value;
   const match = findMatchingTextIndex(value, props.options);
   const [selectedIndex, matchingText] = match;
-  const shownOptions = getShownOptions(matchingText, props.options, props.optionFilters);
-  const highlightedIndex = findOptionIndex(shownOptions, props.options[selectedIndex]);
+  const shownOptions = getShownOptions(
+    matchingText,
+    props.options,
+    props.optionFilters
+  );
+  const highlightedIndex = findOptionIndex(
+    shownOptions,
+    props.options[selectedIndex]
+  );
 
   return {
     value: matchingText || null,
@@ -69,10 +76,12 @@ export default class Dropdown extends PureComponent {
     super(props);
 
     this.state = getStateFromProps(props);
-    this.styling = createStyling(props.theme, props.invertTheme);
+    this.styling = createStyling(props.theme);
 
     if (typeof props.onValueChange !== 'undefined') {
-      deprecated('`onValueChange` is deprecated, please use `onSelect` instead');
+      deprecated(
+        '`onValueChange` is deprecated, please use `onSelect` instead'
+      );
     }
   }
 
@@ -86,28 +95,41 @@ export default class Dropdown extends PureComponent {
 
   static defaultProps = {
     onRenderOption: (styling, opt, highlighted, disabled) =>
-      opt !== null ?
+      opt !== null ? (
         <div {...styling('inputEnhancementsOption', highlighted, disabled)}>
           {getOptionLabel(opt, highlighted, disabled)}
-        </div> :
-        <div {...styling('inputEnhancementsSeparator')} />,
+        </div>
+      ) : (
+        <div {...styling('inputEnhancementsSeparator')} />
+      ),
 
     onRenderList: (styling, isActive, listShown, children, header) =>
       listShown && (
-        <div {...styling(['inputEnhancementsPopup', 'inputEnhancementsDropdownPopup'])}>
-          {header && <div {...styling('inputEnhancementsListHeader', isActive)}>{header}</div>}
-          <div {...styling('inputEnhancementsListOptions', isActive)}>{children}</div>
+        <div
+          {...styling([
+            'inputEnhancementsPopup',
+            'inputEnhancementsDropdownPopup'
+          ])}
+        >
+          {header && (
+            <div {...styling('inputEnhancementsListHeader', isActive)}>
+              {header}
+            </div>
+          )}
+          <div {...styling('inputEnhancementsListOptions', isActive)}>
+            {children}
+          </div>
         </div>
       ),
 
     onRenderListHeader: (allCount, shownCount, staticCount) => {
       if (allCount - staticCount < 20) return null;
       const allItems = `${allCount - staticCount} ${
-        (allCount - staticCount) === 1 ? 'item' : 'items'
+        allCount - staticCount === 1 ? 'item' : 'items'
       }`;
-      return allCount === shownCount ?
-        `${allItems} found` :
-        `${shownCount - staticCount} of ${allItems} shown`;
+      return allCount === shownCount
+        ? `${allItems} found`
+        : `${shownCount - staticCount} of ${allItems} shown`;
     },
 
     dropdownProps: {},
@@ -119,24 +141,33 @@ export default class Dropdown extends PureComponent {
       filters.notFoundMessage('No matches found'),
       filters.filterRedudantSeparators
     ]
-  }
+  };
 
   componentWillUpdate(nextProps, nextState) {
     const { options, optionFilters } = nextProps;
 
-    if (nextProps.value && nextState.value === null ||
-        this.props.value !== nextProps.value) {
+    if (
+      (nextProps.value && nextState.value === null) ||
+      this.props.value !== nextProps.value
+    ) {
       const state = getStateFromProps(nextProps);
 
       if (state.value !== this.state.value) {
         this.setState(state);
       }
-    } else if (this.props.options !== options ||
-      this.props.optionFilters !== optionFilters) {
+    } else if (
+      this.props.options !== options ||
+      this.props.optionFilters !== optionFilters
+    ) {
       const [highlightedIndex, shownOptions] = this.updateHighlightedIndex(
-        nextState.value, options, optionFilters
+        nextState.value,
+        options,
+        optionFilters
       );
-      const selectedIndex = findOptionIndex(options, shownOptions[highlightedIndex]);
+      const selectedIndex = findOptionIndex(
+        options,
+        shownOptions[highlightedIndex]
+      );
 
       this.setState({ selectedIndex });
 
@@ -146,7 +177,9 @@ export default class Dropdown extends PureComponent {
         this.setState(state);
       }
     } else if (this.state.isActive && !nextState.isActive) {
-      this.setState({ value: getOptionText(nextProps.options[nextState.selectedIndex]) });
+      this.setState({
+        value: getOptionText(nextProps.options[nextState.selectedIndex])
+      });
     }
   }
 
@@ -203,7 +236,7 @@ export default class Dropdown extends PureComponent {
         shownOptions.filter(isStatic).length
       )
     );
-  }
+  };
 
   renderOption = (opt, idx) => {
     const { onRenderOption } = this.props;
@@ -216,15 +249,10 @@ export default class Dropdown extends PureComponent {
         onMouseDown={this.handleOptionClick.bind(this, idx)}
         highlighted={highlighted}
       >
-        {onRenderOption(
-          this.styling,
-          opt,
-          highlighted,
-          disabled
-        )}
+        {onRenderOption(this.styling, opt, highlighted, disabled)}
       </DropdownOption>
     );
-  }
+  };
 
   handleOptionClick(idx, e) {
     const option = this.state.shownOptions[idx];
@@ -234,11 +262,14 @@ export default class Dropdown extends PureComponent {
       return;
     }
 
-    this.setState({
-      listShown: false
-    }, () => {
-      this.selectOption(findOptionIndex(this.props.options, option), true);
-    });
+    this.setState(
+      {
+        listShown: false
+      },
+      () => {
+        this.selectOption(findOptionIndex(this.props.options, option), true);
+      }
+    );
   }
 
   handleChange = e => {
@@ -251,14 +282,14 @@ export default class Dropdown extends PureComponent {
     if (this.props.onChange) {
       this.props.onChange(e);
     }
-  }
+  };
 
   handleKeyDown = e => {
     const keyMap = {
       ArrowUp: this.handleArrowUpKeyDown,
       ArrowDown: this.handleArrowDownKeyDown,
       Enter: this.handleEnterKeyDown
-    }
+    };
 
     if (keyMap[e.key]) {
       keyMap[e.key](e);
@@ -267,7 +298,7 @@ export default class Dropdown extends PureComponent {
     if (this.props.onKeyDown) {
       this.props.onKeyDown(e);
     }
-  }
+  };
 
   handleArrowUpKeyDown = e => {
     const { highlightedIndex, shownOptions } = this.state;
@@ -277,7 +308,7 @@ export default class Dropdown extends PureComponent {
     this.setState({
       highlightedIndex: getSiblingIndex(highlightedIndex, shownOptions, false)
     });
-  }
+  };
 
   handleArrowDownKeyDown = e => {
     const { highlightedIndex, shownOptions } = this.state;
@@ -287,7 +318,7 @@ export default class Dropdown extends PureComponent {
     this.setState({
       highlightedIndex: getSiblingIndex(highlightedIndex, shownOptions, true)
     });
-  }
+  };
 
   handleEnterKeyDown = () => {
     const { highlightedIndex, shownOptions } = this.state;
@@ -297,12 +328,16 @@ export default class Dropdown extends PureComponent {
       this.selectOption(findOptionIndex(this.props.options, option), true);
       getInput(this).blur();
     });
-  }
+  };
 
   selectOption(index, fireOnSelect) {
     const { options, optionFilters } = this.props;
     const option = options[index];
-    const shownOptions = getShownOptions(getOptionText(option), options, optionFilters);
+    const shownOptions = getShownOptions(
+      getOptionText(option),
+      options,
+      optionFilters
+    );
 
     const onSelect = this.props.onSelect || this.props.onValueChange;
 
@@ -314,10 +349,7 @@ export default class Dropdown extends PureComponent {
       shownOptions
     });
     if (fireOnSelect && onSelect) {
-      onSelect(
-        getOptionValue(option),
-        getOptionText(option)
-      );
+      onSelect(getOptionValue(option), getOptionText(option));
     }
   }
 

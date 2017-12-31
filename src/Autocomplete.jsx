@@ -41,15 +41,19 @@ export default class Autocomplete extends PureComponent {
   };
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.value !== nextProps.value &&
-      nextProps.value !== this.state.value) {
+    if (
+      this.props.value !== nextProps.value &&
+      nextProps.value !== this.state.value
+    ) {
       this.setValue(nextProps.value, nextProps.options);
     }
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if (this.props.options !== nextProps.options &&
-      this.props.value === nextProps.value) {
+    if (
+      this.props.options !== nextProps.options &&
+      this.props.value === nextProps.value
+    ) {
       const match = findMatchingTextIndex(nextState.value, nextProps.options);
       const [, matchingText] = match;
       this.setState({ matchingText });
@@ -86,7 +90,12 @@ export default class Autocomplete extends PureComponent {
       onChange: this.handleChange
     };
 
-    return renderChild(children, inputProps, { matchingText, value }, this.registerInput);
+    return renderChild(
+      children,
+      inputProps,
+      { matchingText, value },
+      this.registerInput
+    );
   }
 
   handleChange = e => {
@@ -97,13 +106,13 @@ export default class Autocomplete extends PureComponent {
     if (this.props.onChange) {
       this.props.onChange(e);
     }
-  }
+  };
 
   handleKeyDown = e => {
     const keyMap = {
       Backspace: this.handleBackspaceKeyDown,
       Enter: this.handleEnterKeyDown
-    }
+    };
 
     if (keyMap[e.key]) {
       keyMap[e.key](e);
@@ -112,23 +121,25 @@ export default class Autocomplete extends PureComponent {
     if (this.props.onKeyDown) {
       this.props.onKeyDown(e);
     }
-  }
+  };
 
   handleBackspaceKeyDown = () => {
     const input = getInput(this);
-    if (input.selectionStart !== input.selectionEnd &&
-        input.selectionEnd === input.value.length &&
-        input.selectionStart !== 0) {
+    if (
+      input.selectionStart !== input.selectionEnd &&
+      input.selectionEnd === input.value.length &&
+      input.selectionStart !== 0
+    ) {
       const value = input.value.substr(0, input.selectionStart);
       this.setValue(value.substr(0, value.length - 1), this.props.options);
       updateInputNode(input, value);
     }
-  }
+  };
 
   handleEnterKeyDown = () => {
     const input = getInput(this);
 
     setSelection(input, this.state.matchingText, this.state.matchingText);
     input.blur();
-  }
+  };
 }

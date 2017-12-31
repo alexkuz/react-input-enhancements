@@ -29,14 +29,12 @@ export default class DropdownOption extends PureComponent {
         const listHeight = listEl.clientHeight;
         listEl.scrollTop = optionEl.offsetTop - (listHeight - optionHeight) / 2;
       }
-    } catch(e) {}
+    } catch (e) {}
   }
 
   render() {
     return (
-      <div onMouseDown={this.props.onMouseDown}>
-        {this.props.children}
-      </div>
+      <div onMouseDown={this.props.onMouseDown}>{this.props.children}</div>
     );
   }
 }

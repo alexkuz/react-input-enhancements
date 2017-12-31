@@ -10,7 +10,7 @@ exports[`DatePicker renders correctly with element child 1`] = `
   }>
   <input
     onBlur={undefined}
-    onChange={undefined}
+    onChange={[Function onChange]}
     onFocus={undefined}
     onInput={[Function anonymous]}
     onKeyDown={[Function anonymous]}
@@ -66,7 +66,7 @@ exports[`DatePicker renders correctly with function child 1`] = `
   }>
   <input
     onBlur={undefined}
-    onChange={undefined}
+    onChange={[Function onChange]}
     onFocus={undefined}
     onInput={[Function anonymous]}
     onKeyDown={[Function anonymous]}

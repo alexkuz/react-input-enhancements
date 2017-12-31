@@ -150,7 +150,10 @@ export default [
   { text: 'Rwanda', value: 'value--Rwanda' },
   { text: 'St Kitts & Nevis', value: 'value--St Kitts & Nevis' },
   { text: 'St Lucia', value: 'value--St Lucia' },
-  { text: 'Saint Vincent & the Grenadines', value: 'value--Saint Vincent & the Grenadines' },
+  {
+    text: 'Saint Vincent & the Grenadines',
+    value: 'value--Saint Vincent & the Grenadines'
+  },
   { text: 'Samoa', value: 'value--Samoa' },
   { text: 'San Marino', value: 'value--San Marino' },
   { text: 'Sao Tome & Principe', value: 'value--Sao Tome & Principe' },
