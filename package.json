@@ -60,8 +60,8 @@
     "webpack-simple-progress-plugin": "^0.0.3"
   },
   "peerDependencies": {
-    "react": "^15.3.1 | ^16.0.0",
-    "react-dom": "^15.3.1 | ^16.0.0"
+    "react": "^15.3.1 || ^16.0.0",
+    "react-dom": "^15.3.1 || ^16.0.0"
   },
   "dependencies": {
     "babel-runtime": "^6.11.6",
