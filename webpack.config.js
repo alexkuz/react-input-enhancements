@@ -1,7 +1,6 @@
 var path = require('path');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-var CleanWebpackPlugin = require('clean-webpack-plugin');
 var SimpleProgressPlugin = require('webpack-simple-progress-plugin');
 
 var config = {
@@ -43,11 +42,7 @@ module.exports = {
     }),
     new webpack.NoErrorsPlugin(),
     new SimpleProgressPlugin()
-  ].concat(
-    isProduction
-      ? [new CleanWebpackPlugin(['demo/dist', 'lib'])]
-      : [new webpack.HotModuleReplacementPlugin()]
-  ),
+  ].concat(isProduction ? [] : [new webpack.HotModuleReplacementPlugin()]),
   resolve: {
     extensions: ['.js', '.jsx'],
     modules: ['node_modules', path.join(__dirname, 'src')]
