@@ -145,6 +145,7 @@ export default class Dropdown extends PureComponent {
 
   componentWillUpdate(nextProps, nextState) {
     const { options, optionFilters } = nextProps;
+    const optionsChanged = this.props.options !== options;
 
     if (
       (nextProps.value && nextState.value === null) ||
@@ -152,13 +153,10 @@ export default class Dropdown extends PureComponent {
     ) {
       const state = getStateFromProps(nextProps);
 
-      if (state.value !== this.state.value) {
+      if (state.value !== this.state.value || optionsChanged) {
         this.setState(state);
       }
-    } else if (
-      this.props.options !== options ||
-      this.props.optionFilters !== optionFilters
-    ) {
+    } else if (optionsChanged || this.props.optionFilters !== optionFilters) {
       const [highlightedIndex, shownOptions] = this.updateHighlightedIndex(
         nextState.value,
         options,
