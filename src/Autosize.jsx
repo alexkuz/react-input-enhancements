@@ -151,6 +151,7 @@ export default class Autosize extends PureComponent {
     }
 
     this.sizerEl.innerText = value;
+    this.sizerEl.style.position = 'absolute';
 
     this.setState({
       width: Math.max(this.sizerEl.offsetWidth + padding + 1, defaultWidth)
