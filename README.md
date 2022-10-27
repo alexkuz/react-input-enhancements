@@ -1,10 +1,12 @@
----------------
+<table><tr></tr><tr><td><h3>🏚</h3></td><td>
 
 **This project was originally thought to be an experiment and currently is unmaintained (and buggy)**
 
 **Use it at your own risk**
 
----------------
+Also, consider using more modern, WAI-ARIA compliant approach like [downshift](https://github.com/downshift-js/downshift)
+
+</td></tr></table>
 
 # react-input-enhancements [![Gitter chat](https://img.shields.io/gitter/room/gitterHQ/gitter.svg)](https://gitter.im/react-input-enhancements)
 
