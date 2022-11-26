@@ -131,7 +131,9 @@ export default class Autocomplete extends PureComponent {
       input.selectionStart !== 0
     ) {
       const value = input.value.substr(0, input.selectionStart);
-      this.setValue(value.substr(0, value.length - 1), this.props.options);
+      if (value.length > 1) {
+        this.setValue(value.substr(0, value.length - 1), this.props.options);
+      }
       updateInputNode(input, value);
     }
   };
